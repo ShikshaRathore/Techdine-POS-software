@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Techdine Login - Minimalist Card UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gray-50 flex items-center justify-center min-h-screen p-4"
+    style="
+      background-image: url(https://plus.unsplash.com/premium_photo-1661883237884-263e8de8869b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600);
+      background-size: contain;
+    "
+  >
+    <div
+      class="w-full max-w-md bg-white p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-200"
+    >
+      <div class="flex flex-col items-center mb-10">
+        <div class="text-4xl text-orange-600 mb-2">🍽️</div>
+        <span class="text-3xl font-bold text-gray-800">Techdine</span>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">
+        Welcome Back!
+      </h2>
+      <p class="text-gray-500 text-center mb-8">
+        Sign in to manage your restaurant operations.
+      </p>
+
+      <form class="space-y-6">
+        <div>
+          <label for="email" class="sr-only">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition duration-150"
+            placeholder="Email Address"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="sr-only">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition duration-150"
+            placeholder="Password"
+          />
+        </div>
+
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              class="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+            />
+            <label for="remember-me" class="ml-2 block text-gray-900">
+              Remember me
+            </label>
+          </div>
+
+          <a
+            href="#"
+            class="font-medium text-orange-600 hover:text-orange-500 transition duration-150"
+          >
+            Forgot Password?
+          </a>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-orange-300"
+          >
+            Sign In to Dashboard
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center text-sm mt-8">
+        <span class="text-gray-600">Don't have an account?</span>
+        <a
+          href="#"
+          class="font-semibold text-orange-600 hover:text-orange-700 transition duration-150"
+        >
+          Sign up here
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

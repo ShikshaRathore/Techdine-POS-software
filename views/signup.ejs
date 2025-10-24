@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Techdine Sign Up - Image Background UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen antialiased">
+    <div class="flex min-h-screen">
+      <!-- Left Side - Hero Section with Background Image -->
+      <div
+        class="hidden lg:flex lg:w-3/5 xl:w-7/12 bg-cover bg-center"
+        style="
+          background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+        "
+      >
+        <div
+          class="w-full h-full p-16 flex flex-col justify-center bg-black/50 text-white"
+        >
+          <div class="flex items-center space-x-3 mb-16">
+            <div class="text-4xl">🍽️</div>
+            <span class="text-3xl font-bold">Techdine</span>
+          </div>
+
+          <h1 class="text-5xl font-extrabold leading-tight mb-8">
+            The Platform Built to Run <br />Your Restaurant, Effortlessly.
+          </h1>
+
+          <ul class="space-y-4 text-xl font-light">
+            <li class="flex items-start">
+              <svg
+                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span
+                >Streamline <strong>Order Management</strong> and reduce
+                errors.</span
+              >
+            </li>
+            <li class="flex items-start">
+              <svg
+                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span
+                ><strong>Optimize Table Reservations</strong> for maximum
+                seating capacity.</span
+              >
+            </li>
+            <li class="flex items-start">
+              <svg
+                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span
+                >Enable <strong>Effortless Menu Management</strong> updates in
+                real-time.</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Side - Signup Form -->
+      <div
+        class="w-full lg:w-2/5 xl:w-5/12 p-8 md:p-12 flex items-center justify-center bg-gray-100"
+      >
+        <div
+          class="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-200"
+        >
+          <!-- Logo for Mobile -->
+          <div class="flex lg:hidden items-center space-x-2 mb-8">
+            <div class="text-3xl text-orange-600">🍽️</div>
+            <span class="text-2xl font-bold text-gray-800">Techdine</span>
+          </div>
+
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            Start Your Free Trial
+          </h2>
+          <p class="text-gray-500 mb-8">
+            Create your account to begin optimizing your operations.
+          </p>
+
+          <form
+            id="signupForm"
+            method="POST"
+            action="/Techdine/signup"
+            class="space-y-5"
+          >
+            <div>
+              <input
+                type="text"
+                id="restaurantName"
+                name="restaurantName"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
+                placeholder="Restaurant Name"
+              />
+              <p
+                class="error-message text-red-500 text-sm mt-1 hidden"
+                id="restaurantNameError"
+              ></p>
+            </div>
+            <div>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
+                placeholder="Your Full Name"
+              />
+              <p
+                class="error-message text-red-500 text-sm mt-1 hidden"
+                id="fullNameError"
+              ></p>
+            </div>
+            <div>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
+                placeholder="Enter your email"
+              />
+              <p
+                class="error-message text-red-500 text-sm mt-1 hidden"
+                id="emailError"
+              ></p>
+            </div>
+            <div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
+                placeholder="Password"
+              />
+              <p
+                class="error-message text-red-500 text-sm mt-1 hidden"
+                id="passwordError"
+              ></p>
+            </div>
+
+            <button
+              type="submit"
+              id="submitBtn"
+              class="w-full py-3 px-4 mt-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-orange-300"
+            >
+              <span id="btnText">Next: Branch Details</span>
+              <span id="btnLoader" class="hidden">
+                <svg
+                  class="animate-spin h-5 w-5 mx-auto"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <div class="text-center text-sm mt-6">
+            <span class="text-gray-600">Already have an account?</span>
+            <a
+              href="login.html"
+              class="font-semibold text-orange-600 hover:text-orange-700 transition duration-150 ml-1"
+            >
+              Login here
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <script>
+      // API Configuration
+      const API_URL = "http://localhost:5000/api";
+
+      // Show error function
+      function showError(field, message) {
+        const errorEl = document.getElementById(field + "Error");
+        if (errorEl) {
+          errorEl.textContent = message;
+          errorEl.classList.remove("hidden");
+        }
+      }
+
+      // Clear errors
+      function clearErrors() {
+        document.querySelectorAll(".error-message").forEach((el) => {
+          el.classList.add("hidden");
+          el.textContent = "";
+        });
+      }
+
+      // Validate form
+      function validateForm() {
+        clearErrors();
+        let isValid = true;
+
+        const restaurantName = document
+          .getElementById("restaurantName")
+          .value.trim();
+        const OwnerName = document.getElementById("OwnerName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (!restaurantName) {
+          showError("restaurantName", "Restaurant name is required");
+          isValid = false;
+        }
+
+        if (!OwnerName) {
+          showError("fullName", "Full name is required");
+          isValid = false;
+        }
+
+        const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (!email) {
+          showError("email", "Email is required");
+          isValid = false;
+        } else if (!emailRegex.test(email)) {
+          showError("email", "Please enter a valid email");
+          isValid = false;
+        }
+
+        if (!password) {
+          showError("password", "Password is required");
+          isValid = false;
+        } else if (password.length < 8) {
+          showError("password", "Password must be at least 8 characters");
+          isValid = false;
+        }
+
+        return isValid;
+      }
+
+      // Handle form submission
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          if (!validateForm()) {
+            return;
+          }
+
+          const data = {
+            username: document
+              .getElementById("email")
+              .value.trim()
+              .split("@")[0],
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value,
+            confirmPassword: document.getElementById("password").value,
+            phone: "0000000000",
+            restaurantName: document
+              .getElementById("restaurantName")
+              .value.trim(),
+            role: "super_admin",
+          };
+
+          const submitBtn = document.getElementById("submitBtn");
+          const btnText = document.getElementById("btnText");
+          const btnLoader = document.getElementById("btnLoader");
+
+          submitBtn.disabled = true;
+          btnText.classList.add("hidden");
+          btnLoader.classList.remove("hidden");
+
+          try {
+            const response = await fetch(`${API_URL}/auth/signup`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              localStorage.setItem("authToken", result.data.token);
+              localStorage.setItem("user", JSON.stringify(result.data.user));
+
+              submitBtn.innerHTML = `
+              <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            `;
+
+              setTimeout(() => {
+                window.location.href = "dashboard.html";
+              }, 500);
+            } else {
+              if (result.message) {
+                if (result.message.includes("Email")) {
+                  showError("email", result.message);
+                } else {
+                  showError("password", result.message);
+                }
+              }
+
+              submitBtn.disabled = false;
+              btnText.classList.remove("hidden");
+              btnLoader.classList.add("hidden");
+            }
+          } catch (error) {
+            console.error("Signup error:", error);
+            showError("password", "Network error. Please try again.");
+
+            submitBtn.disabled = false;
+            btnText.classList.remove("hidden");
+            btnLoader.classList.add("hidden");
+          }
+        });
+
+      // Clear errors on input
+      document.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("input", () => {
+          const errorEl = document.getElementById(input.id + "Error");
+          if (errorEl) {
+            errorEl.classList.add("hidden");
+          }
+        });
+      });
+    </script> -->
+  </body>
+</html>

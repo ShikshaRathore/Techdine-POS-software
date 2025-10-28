@@ -1,0 +1,125 @@
+<% if (success && success.length) { %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flash Message</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      .slide-down {
+        animation: slideDown 0.5s ease-out;
+      }
+
+      .fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-start justify-center pt-6">
+    <!-- Flash Message -->
+    <div
+      id="flashMessage"
+      class="slide-down fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4"
+    >
+      <div
+        class="bg-white rounded-lg shadow-2xl border-l-4 border-green-500 p-4 flex items-start space-x-3"
+      >
+        <!-- Success Icon -->
+        <div class="flex-shrink-0">
+          <svg
+            class="w-6 h-6 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+        </div>
+
+        <!-- Message Content -->
+        <div class="flex-1">
+          <h3 class="font-semibold text-gray-900"><%= success %></h3>
+          <!-- <p class="text-sm text-gray-600 mt-1">
+            Welcome back! Your session is now active.
+          </p> -->
+        </div>
+
+        <!-- Close Button -->
+        <button
+          onclick="closeMessage()"
+          class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          id="progressBar"
+          class="h-full bg-green-500 transition-all duration-[5000ms] ease-linear w-full"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        closeMessage();
+      }, 5000);
+
+      // Animate progress bar
+      setTimeout(() => {
+        document.getElementById("progressBar").style.width = "0%";
+      }, 100);
+
+      function closeMessage() {
+        const msg = document.getElementById("flashMessage");
+        msg.classList.add("fade-out");
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 500);
+      }
+    </script>
+  </body>
+</html>
+
+<% } %>

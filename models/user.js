@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const Schema = mongoose.Schema;
+const passportLocalMongoose = require("passport-local-mongoose");
 
-const ownerSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     restaurantName: { type: String, required: true, trim: true },
-    ownerName: { type: String, required: true, trim: true },
+    username: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -12,17 +16,11 @@ const ownerSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    password: { type: String, required: true, minlength: 8 },
-    role: { type: String, default: "SuperAdmin" },
+    role: { type: String, default: "Hotel-Admin" },
   },
   { timestamps: true }
 );
 
-ownerSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+userSchema.plugin(passportLocalMongoose, { usernameField: "email" });
 
-module.exports = mongoose.model("Owner", ownerSchema);
+module.exports = mongoose.model("User", userSchema);

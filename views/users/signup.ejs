@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100 min-h-screen antialiased">
+    <%- include("../includes/flash.ejs") %>
     <div class="flex min-h-screen">
       <!-- Left Side - Hero Section with Background Image -->
       <div
@@ -115,7 +116,7 @@
           <form
             id="signupForm"
             method="POST"
-            action="/Techdine/signup"
+            action="/signup"
             class="space-y-5"
           >
             <div>
@@ -135,8 +136,8 @@
             <div>
               <input
                 type="text"
-                id="fullName"
-                name="fullName"
+                id="username"
+                name="username"
                 required
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
                 placeholder="Your Full Name"
@@ -217,159 +218,5 @@
         </div>
       </div>
     </div>
-
-    <!-- <script>
-      // API Configuration
-      const API_URL = "http://localhost:5000/api";
-
-      // Show error function
-      function showError(field, message) {
-        const errorEl = document.getElementById(field + "Error");
-        if (errorEl) {
-          errorEl.textContent = message;
-          errorEl.classList.remove("hidden");
-        }
-      }
-
-      // Clear errors
-      function clearErrors() {
-        document.querySelectorAll(".error-message").forEach((el) => {
-          el.classList.add("hidden");
-          el.textContent = "";
-        });
-      }
-
-      // Validate form
-      function validateForm() {
-        clearErrors();
-        let isValid = true;
-
-        const restaurantName = document
-          .getElementById("restaurantName")
-          .value.trim();
-        const OwnerName = document.getElementById("OwnerName").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-
-        if (!restaurantName) {
-          showError("restaurantName", "Restaurant name is required");
-          isValid = false;
-        }
-
-        if (!OwnerName) {
-          showError("fullName", "Full name is required");
-          isValid = false;
-        }
-
-        const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if (!email) {
-          showError("email", "Email is required");
-          isValid = false;
-        } else if (!emailRegex.test(email)) {
-          showError("email", "Please enter a valid email");
-          isValid = false;
-        }
-
-        if (!password) {
-          showError("password", "Password is required");
-          isValid = false;
-        } else if (password.length < 8) {
-          showError("password", "Password must be at least 8 characters");
-          isValid = false;
-        }
-
-        return isValid;
-      }
-
-      // Handle form submission
-      document
-        .getElementById("signupForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          if (!validateForm()) {
-            return;
-          }
-
-          const data = {
-            username: document
-              .getElementById("email")
-              .value.trim()
-              .split("@")[0],
-            email: document.getElementById("email").value.trim(),
-            password: document.getElementById("password").value,
-            confirmPassword: document.getElementById("password").value,
-            phone: "0000000000",
-            restaurantName: document
-              .getElementById("restaurantName")
-              .value.trim(),
-            role: "super_admin",
-          };
-
-          const submitBtn = document.getElementById("submitBtn");
-          const btnText = document.getElementById("btnText");
-          const btnLoader = document.getElementById("btnLoader");
-
-          submitBtn.disabled = true;
-          btnText.classList.add("hidden");
-          btnLoader.classList.remove("hidden");
-
-          try {
-            const response = await fetch(`${API_URL}/auth/signup`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-              localStorage.setItem("authToken", result.data.token);
-              localStorage.setItem("user", JSON.stringify(result.data.user));
-
-              submitBtn.innerHTML = `
-              <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            `;
-
-              setTimeout(() => {
-                window.location.href = "dashboard.html";
-              }, 500);
-            } else {
-              if (result.message) {
-                if (result.message.includes("Email")) {
-                  showError("email", result.message);
-                } else {
-                  showError("password", result.message);
-                }
-              }
-
-              submitBtn.disabled = false;
-              btnText.classList.remove("hidden");
-              btnLoader.classList.add("hidden");
-            }
-          } catch (error) {
-            console.error("Signup error:", error);
-            showError("password", "Network error. Please try again.");
-
-            submitBtn.disabled = false;
-            btnText.classList.remove("hidden");
-            btnLoader.classList.add("hidden");
-          }
-        });
-
-      // Clear errors on input
-      document.querySelectorAll("input").forEach((input) => {
-        input.addEventListener("input", () => {
-          const errorEl = document.getElementById(input.id + "Error");
-          if (errorEl) {
-            errorEl.classList.add("hidden");
-          }
-        });
-      });
-    </script> -->
   </body>
 </html>

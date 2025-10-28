@@ -1,0 +1,61 @@
+<!-- Orders with submenu -->
+<div class="menu-item">
+  <a
+    href="#"
+    class="menu-toggle flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+    data-menu="orders"
+  >
+    <div class="flex items-center space-x-3">
+      <svg
+        class="w-5 h-5 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+        />
+      </svg>
+      <span class="font-medium text-sm sm:text-base">Orders</span>
+    </div>
+    <svg
+      class="w-4 h-4 transition-transform transform"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 9l-7 7-7-7"
+      />
+    </svg>
+  </a>
+  <div class="submenu pl-8" id="submenu-orders">
+    <a
+      href="#"
+      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      data-content="pending-orders"
+    >
+      <span class="font-medium text-sm">Pending Orders</span>
+    </a>
+    <a
+      href="#"
+      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      data-content="completed-orders"
+    >
+      <span class="font-medium text-sm">Completed Orders</span>
+    </a>
+    <a
+      href="#"
+      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      data-content="order-history"
+    >
+      <span class="font-medium text-sm">Order History</span>
+    </a>
+  </div>
+</div>

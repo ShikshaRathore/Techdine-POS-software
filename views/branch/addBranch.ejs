@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Restaurant Branch - Techdine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Euclid+Circular+A:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Euclid Circular A", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-12 lg:py-20">
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-7xl mx-auto"
+      >
+        <!-- Left Side - Information Section -->
+        <div class="space-y-8">
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-lg"
+            >
+              <span class="text-white font-bold text-2xl">T</span>
+            </div>
+            <span class="text-3xl font-bold text-gray-900">Techdine</span>
+          </div>
+
+          <!-- Heading -->
+          <div>
+            <h1
+              class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+            >
+              Take Control of Your Restaurant
+            </h1>
+            <p class="text-lg text-gray-600">
+              Join thousands of restaurants managing their operations
+              efficiently with Techdine
+            </p>
+          </div>
+
+          <!-- Features List -->
+          <div class="space-y-5">
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <svg
+                  class="w-6 h-6 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                  Streamline Order Management
+                </h3>
+                <p class="text-gray-600">
+                  Handle orders efficiently with our intuitive POS system
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <svg
+                  class="w-6 h-6 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                  Optimize Table Reservations
+                </h3>
+                <p class="text-gray-600">
+                  Manage bookings and maximize your seating capacity
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <svg
+                  class="w-6 h-6 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                  Effortless Menu Management
+                </h3>
+                <p class="text-gray-600">
+                  Update your menu in real-time across all platforms
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-6 pt-6">
+            <div>
+              <p class="text-3xl font-bold text-orange-500">5000+</p>
+              <p class="text-sm text-gray-600 mt-1">Restaurants</p>
+            </div>
+            <div>
+              <p class="text-3xl font-bold text-orange-500">50K+</p>
+              <p class="text-sm text-gray-600 mt-1">Daily Orders</p>
+            </div>
+            <div>
+              <p class="text-3xl font-bold text-orange-500">98%</p>
+              <p class="text-sm text-gray-600 mt-1">Satisfaction</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side - Form Section -->
+        <div class="w-full">
+          <div class="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
+            <!-- Form Header -->
+            <div class="mb-8">
+              <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+                Add Restaurant Branch Details
+              </h2>
+              <p class="text-gray-600">
+                Fill in the information below to get started
+              </p>
+            </div>
+
+            <!-- Form -->
+            <form action="/add-branch" method="POST" class="space-y-6">
+              <!-- Branch Name -->
+              <div>
+                <label
+                  for="branchName"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Branch Name
+                </label>
+                <input
+                  type="text"
+                  id="branchName"
+                  name="branchName"
+                  placeholder="Enter branch name"
+                  class="w-full px-4 py-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                  required
+                />
+              </div>
+
+              <!-- Country -->
+              <div>
+                <label
+                  for="country"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Country
+                </label>
+                <div class="relative">
+                  <select
+                    id="country"
+                    name="country"
+                    class="w-full px-4 py-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none bg-white cursor-pointer"
+                    required
+                  >
+                    <option value="India">India</option>
+                    <option value="USA">USA</option>
+                    <option value="UK">UK</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                  </select>
+                  <svg
+                    class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Branch Address -->
+              <div>
+                <label
+                  for="address"
+                  class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Branch Address
+                </label>
+                <textarea
+                  id="address"
+                  name="address"
+                  rows="4"
+                  placeholder="Enter complete branch address"
+                  class="w-full px-4 py-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition resize-none"
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-4 text-base rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                Signup
+              </button>
+
+              <!-- Footer Text -->
+              <p class="text-center text-sm text-gray-600 pt-4">
+                Already have an account?
+                <a
+                  href="/login"
+                  class="text-orange-500 hover:text-orange-600 font-semibold transition"
+                  >Login here</a
+                >
+              </p>
+            </form>
+          </div>
+
+          <!-- Trust Badge -->
+          <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">
+              🔒 Your data is secure and encrypted
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

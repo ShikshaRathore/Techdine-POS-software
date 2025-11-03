@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delete Menu Item Warning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .modal-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      .modal-content {
+        animation: slideUp 0.3s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Modal Overlay -->
+    <div id="deleteMenuModal" class="fixed inset-0 z-50 hidden modal-overlay">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <!-- Modal Content -->
+        <div
+          class="modal-content bg-white w-full max-w-md rounded-2xl shadow-2xl"
+        >
+          <!-- Modal Body -->
+          <div class="p-6">
+            <!-- Warning Icon -->
+            <div class="flex justify-center mb-4">
+              <div class="bg-red-100 rounded-full p-3">
+                <svg
+                  class="w-12 h-12 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Warning Text -->
+            <h2
+              class="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-2"
+            >
+              Delete Menu Item?
+            </h2>
+            <p class="text-sm text-gray-600 text-center mb-6">
+              Are you sure you want to delete "<span
+                id="itemNameDisplay"
+                class="font-semibold text-gray-900"
+              ></span
+              >"? This action cannot be undone.
+            </p>
+
+            <!-- Form -->
+            <form
+              id="deleteMenuItemForm"
+              method="POST"
+              action="/dashboard/menu-items/delete/<%= menuItem._id %>?_method=DELETE"
+            >
+              <input type="hidden" name="itemId" value="<%= menuItem._id %>" />
+
+              <!-- Action Buttons -->
+              <div class="flex flex-col-reverse sm:flex-row gap-3">
+                <button
+                  type="button"
+                  id="cancelBtn"
+                  class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors shadow-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  Delete Item
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.getElementById("deleteMenuModal");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const itemNameDisplay = document.getElementById("itemNameDisplay");
+
+      // Set item name (replace with actual EJS variable)
+      itemNameDisplay.textContent = "<%= menuItem.itemName %>";
+
+      // Auto-open modal when page loads
+      window.addEventListener("DOMContentLoaded", () => {
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      });
+
+      // Close Modal
+      function closeModal() {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "";
+        window.history.back();
+      }
+
+      cancelBtn.addEventListener("click", closeModal);
+
+      // Close on backdrop click
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Close on ESC key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+          closeModal();
+        }
+      });
+    </script>
+  </body>
+</html>

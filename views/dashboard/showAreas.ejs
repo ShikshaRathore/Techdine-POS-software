@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Areas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">All Areas</h1>
+        <form action="/addArea/<%= branchId %>" method="GET">
+          <button
+            type="submit"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-colors"
+          >
+            Add Area
+          </button>
+        </form>
+      </div>
+
+      <!-- Table Container -->
+      <div
+        class="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200"
+      >
+        <!-- Table Header -->
+        <div
+          class="grid grid-cols-12 bg-gray-50 border-b border-gray-200 px-4 py-3"
+        >
+          <div class="col-span-6 text-sm font-semibold text-gray-600 uppercase">
+            Area Name
+          </div>
+          <div class="col-span-3 text-sm font-semibold text-gray-600 uppercase">
+            No of Tables
+          </div>
+          <div
+            class="col-span-3 text-right text-sm font-semibold text-gray-600 uppercase"
+          >
+            Action
+          </div>
+        </div>
+
+        <!-- Table Body -->
+        <div>
+          <% if (areas && areas.length > 0) { %> <% areas.forEach(area => { %>
+          <div
+            class="grid grid-cols-12 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <!-- Area Name -->
+            <div class="col-span-6 text-gray-800 font-medium">
+              <%= area.name %>
+            </div>
+
+            <!-- No of Tables -->
+            <div class="col-span-3 text-gray-700">
+              <%= area.tableCount || 0 %>
+            </div>
+
+            <!-- Actions -->
+            <div class="col-span-3 flex justify-end gap-3">
+              <form action="/updateArea/<%= area._id %>" method="GET">
+                <button
+                  type="submit"
+                  class="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  Update
+                </button>
+              </form>
+
+              <form action="/deleteArea/<%= area._id %>" method="POST">
+                <button
+                  type="submit"
+                  class="flex items-center gap-1 px-3 py-1.5 border border-red-300 rounded-md text-red-600 hover:bg-red-50 transition"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  Delete
+                </button>
+              </form>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <div class="text-center text-gray-500 py-6 text-sm">
+            No areas found.
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

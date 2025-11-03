@@ -1,5 +1,5 @@
 <!-- Orders with submenu -->
-<div class="menu-item">
+<div class="menu-item content-form">
   <a
     href="#"
     class="menu-toggle flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
@@ -35,27 +35,31 @@
       />
     </svg>
   </a>
+
+  <!-- Submenu for Orders -->
   <div class="submenu pl-8" id="submenu-orders">
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="pending-orders"
+    <!-- KOT -->
+    <form action="/showKOT/<%= branchId %>" method="GET" class="content-form">
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">KOT</span>
+      </button>
+    </form>
+
+    <!-- Orders -->
+    <form
+      action="/showOrders/<%= branchId %>"
+      method="GET"
+      class="content-form"
     >
-      <span class="font-medium text-sm">Pending Orders</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="completed-orders"
-    >
-      <span class="font-medium text-sm">Completed Orders</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="order-history"
-    >
-      <span class="font-medium text-sm">Order History</span>
-    </a>
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Orders</span>
+      </button>
+    </form>
   </div>
 </div>

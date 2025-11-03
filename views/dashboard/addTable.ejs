@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .modal-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.2s ease-out;
+      }
+      .modal-content {
+        animation: slideUp 0.3s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Modal Overlay -->
+    <div
+      id="addTableModal"
+      class="fixed inset-0 z-50 modal-overlay flex items-center justify-center"
+    >
+      <!-- Modal Content -->
+      <div
+        class="modal-content bg-white w-full max-w-md rounded-2xl shadow-2xl p-6"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3">
+          <h2 class="text-xl font-bold text-gray-800">Add Table</h2>
+          <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+            ✕
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form
+          method="POST"
+          action="/addTable/<%= branchId %>"
+          class="mt-6 space-y-6"
+          id="tableForm"
+        >
+          <!-- Area Selection -->
+          <div>
+            <label
+              for="area"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Select Area <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="area"
+              name="area"
+              required
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none bg-white text-sm sm:text-base"
+            >
+              <option value="">Select Area</option>
+              <% if (areas && areas.length > 0) { %> <% areas.forEach(a => { %>
+              <option value="<%= a._id %>"><%= a.name %></option>
+              <% }) %> <% } else { %>
+              <option value="" disabled>No areas available</option>
+              <% } %>
+            </select>
+          </div>
+
+          <!-- Table Code -->
+          <div>
+            <label
+              for="tableCode"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Table Code <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="tableCode"
+              name="tableCode"
+              required
+              placeholder="e.g., T01, VIP1, Outdoor-3"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+            />
+          </div>
+
+          <!-- Seating Capacity -->
+          <div>
+            <label
+              for="seatingCapacity"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Seating Capacity <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="seatingCapacity"
+              name="seatingCapacity"
+              required
+              min="1"
+              placeholder="Enter number of seats"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+            />
+          </div>
+
+          <!-- Availability Status -->
+          <div>
+            <label
+              for="availabilityStatus"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Availability Status
+            </label>
+            <select
+              id="availabilityStatus"
+              name="availabilityStatus"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none bg-white text-sm sm:text-base"
+            >
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Reserved">Reserved</option>
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label
+              for="status"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none bg-white text-sm sm:text-base"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Footer Buttons -->
+          <div class="flex gap-3 pt-4 border-t">
+            <button
+              type="button"
+              id="clearFormBtn"
+              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg"
+            >
+              Clear
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg shadow-lg"
+            >
+              Add Table
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.getElementById("addTableModal");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const tableForm = document.getElementById("tableForm");
+      const clearFormBtn = document.getElementById("clearFormBtn");
+
+      // Close Modal
+      function closeModal() {
+        modal.remove();
+        window.history.back();
+      }
+
+      closeModalBtn.addEventListener("click", closeModal);
+
+      // Close on backdrop click
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // Close on ESC
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      // Clear Form
+      clearFormBtn.addEventListener("click", () => tableForm.reset());
+    </script>
+  </body>
+</html>

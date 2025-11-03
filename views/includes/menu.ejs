@@ -36,26 +36,37 @@
     </svg>
   </a>
   <div class="submenu pl-8" id="submenu-menu">
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="categories"
+    <form action="/showMenu/<%= branchId %>" method="GET" class="content-form">
+      <button
+        type="submit"
+        class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all w-full text-left"
+      >
+        <span class="font-medium text-sm">Menus</span>
+      </button>
+    </form>
+    <form
+      action="/showMenuItems/<%= branchId %>"
+      method="GET"
+      class="content-form"
     >
-      <span class="font-medium text-sm">Menus</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="items"
+      <button
+        type="submit"
+        class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all w-full text-left"
+      >
+        <span class="font-medium text-sm">Menu Items</span>
+      </button>
+    </form>
+    <form
+      action="/showItemCategories/<%= branchId %>"
+      method="GET"
+      class="content-form"
     >
-      <span class="font-medium text-sm">Menu Items</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="addons"
-    >
-      <span class="font-medium text-sm">Item Categories</span>
-    </a>
+      <button
+        type="submit"
+        class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all w-full text-left"
+      >
+        <span class="font-medium text-sm">Item Categories</span>
+      </button>
+    </form>
   </div>
 </div>

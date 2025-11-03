@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOT Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-gray-50 p-6">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">KOT</h1>
+
+      <!-- Filters -->
+      <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+          <div class="flex-shrink-0">
+            <select
+              id="dateFilter"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="this-week">This Week</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+
+          <div class="flex-shrink-0">
+            <input
+              type="date"
+              id="fromDate"
+              value="<%= new Date().toISOString().split('T')[0] %>"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div class="flex-shrink-0">
+            <span class="text-gray-600 font-medium">To</span>
+          </div>
+
+          <div class="flex-shrink-0">
+            <input
+              type="date"
+              id="toDate"
+              value="<%= new Date().toISOString().split('T')[0] %>"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div class="flex gap-2 ml-auto">
+            <button
+              class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg border border-yellow-300"
+            >
+              In Kitchen (<%= kotCounts?.kitchen || 0 %>)
+            </button>
+            <button
+              class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg border border-blue-300"
+            >
+              Food is Ready (<%= kotCounts?.ready || 0 %>)
+            </button>
+            <button
+              class="px-4 py-2 bg-green-100 text-green-800 rounded-lg border border-green-300"
+            >
+              Food is Served (<%= kotCounts?.served || 0 %>)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Grid -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        id="ordersContainer"
+      >
+        <% if (kots && kots.length > 0) { %> <% kots.forEach(kot => { %>
+        <div
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 order-card"
+          data-status="<%= kot.status.toLowerCase().replace(/\s+/g, '-') %>"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-orange-600">
+                KOT #<%= kot.kotNumber %>
+              </h3>
+              <p class="text-sm text-gray-600">
+                <%= kot.items.length %> Item(s)
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-gray-700">
+                Order #<%= kot.order?.orderNumber || 'N/A' %>
+              </p>
+              <p class="text-xs text-gray-500">
+                <%= new Date(kot.createdAt).toLocaleString() %>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mb-4">
+            <svg
+              class="w-5 h-5 text-gray-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+            </svg>
+            <span class="text-sm text-gray-700 font-medium">
+              <%= kot.customerName || "Walk-in Customer" %>
+            </span>
+          </div>
+
+          <% if (kot.status === "In Kitchen") { %>
+          <span
+            class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded mb-4"
+            >IN KITCHEN</span
+          >
+          <% } else if (kot.status === "Food is Ready") { %>
+          <span
+            class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded mb-4"
+            >FOOD IS READY</span
+          >
+          <% } else if (kot.status === "Food is Served") { %>
+          <span
+            class="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded mb-4"
+            >FOOD SERVED</span
+          >
+          <% } %>
+
+          <div class="bg-gray-50 rounded-lg p-3 mb-4">
+            <div
+              class="flex justify-between text-sm font-semibold text-gray-700 mb-2"
+            >
+              <span>ITEM NAME</span>
+              <span>QTY</span>
+            </div>
+            <% kot.items.forEach(item => { %>
+            <div class="flex justify-between text-sm text-gray-800">
+              <span
+                ><%= item.menuItem ? item.menuItem.itemName : 'Item Deleted'
+                %></span
+              >
+              <span><%= item.quantity %></span>
+            </div>
+            <% if (item.notes) { %>
+            <div class="text-xs text-gray-500 mt-1">
+              Note: <%= item.notes %>
+            </div>
+            <% } %> <% }) %>
+          </div>
+
+          <!-- Status Control Buttons -->
+          <div class="flex gap-2">
+            <% if (kot.status === "In Kitchen") { %>
+            <form
+              method="POST"
+              action="/dashboard/kot/<%= kot._id %>/ready"
+              class="flex-1"
+            >
+              <button
+                type="submit"
+                class="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors border border-blue-200 flex items-center justify-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Mark as Ready
+              </button>
+            </form>
+            <% } else if (kot.status === "Food is Ready") { %>
+            <form
+              method="POST"
+              action="/dashboard/kot/<%= kot._id %>/served"
+              class="flex-1"
+            >
+              <button
+                type="submit"
+                class="w-full px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-colors border border-green-200 flex items-center justify-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Mark as Served
+              </button>
+            </form>
+            <% } %>
+
+            <form method="POST" action="/dashboard/kot/<%= kot._id %>/delete">
+              <button
+                type="submit"
+                class="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors border border-red-200 flex items-center justify-center"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+        <% }) %> <% } else { %>
+        <div id="emptyState" class="text-center py-12 col-span-full">
+          <svg
+            class="w-16 h-16 mx-auto text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <p class="text-gray-500 text-lg">No orders found</p>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

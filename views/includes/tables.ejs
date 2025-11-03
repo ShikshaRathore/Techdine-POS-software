@@ -1,5 +1,5 @@
 <!-- Tables with submenu -->
-<div class="menu-item">
+<div class="menu-item content-form">
   <a
     href="#"
     class="menu-toggle flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
@@ -35,27 +35,43 @@
       />
     </svg>
   </a>
-  <div class="submenu pl-8" id="submenu-tables">
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="table-management"
+  <div class="submenu pl-8" id="submenu-tables" class="content-form">
+    <!-- Areas -->
+    <form action="/showAreas/<%= branchId %>" method="GET" class="content-form">
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Areas</span>
+      </button>
+    </form>
+
+    <!-- Tables -->
+    <form
+      action="/showTables/<%= branchId %>"
+      method="GET"
+      class="content-form"
     >
-      <span class="font-medium text-sm">Areas</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="floor-plan"
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Tables</span>
+      </button>
+    </form>
+
+    <!-- QR Codes -->
+    <form
+      action="/showQRCodes/<%= branchId %>"
+      method="GET"
+      class="content-form"
     >
-      <span class="font-medium text-sm">Tables</span>
-    </a>
-    <a
-      href="#"
-      class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-      data-content="floor-plan"
-    >
-      <span class="font-medium text-sm">QR Codes</span>
-    </a>
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">QR Codes</span>
+      </button>
+    </form>
   </div>
 </div>

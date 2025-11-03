@@ -1,290 +1,517 @@
-// Sidebar functionality
-document.addEventListener("DOMContentLoaded", function () {
-  const openSidebarBtn = document.getElementById("open-sidebar");
-  const closeSidebarBtn = document.getElementById("close-sidebar");
+// // ============================================
+// // DASHBOARD SCRIPT (Production Ready)
+// // ============================================
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   const content = document.getElementById("dashboard-content");
+
+//   // ============================================
+//   // 🆕 GET BRANCH ID FROM URL
+//   // ============================================
+//   function getBranchIdFromURL() {
+//     const pathParts = window.location.pathname.split("/");
+//     const branchId = pathParts[pathParts.length - 1]; // last part after /dashboard/
+//     console.log("🔵 Branch ID from URL path:", branchId);
+//     return branchId || "";
+//   }
+
+//   // ============================================
+//   // 1️⃣ MAIN CONTENT LOADER (Dynamic + Modular)
+//   // ============================================
+//   async function loadContent(url, method = "GET") {
+//     try {
+//       showLoading();
+
+//       const res = await fetch(url, {
+//         method,
+//         headers: { Accept: "text/html" },
+//       });
+
+//       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+//       const html = await res.text();
+//       content.innerHTML = html;
+
+//       // ✅ Detect EJS page name for JS import (based on URL)
+//       let pageName = null;
+
+//       if (url.includes("/showTables")) pageName = "showTables";
+//       else if (url.includes("/menu")) pageName = "menu";
+//       else if (url.includes("/orders")) pageName = "orders";
+//       else if (url.includes("/pos"))
+//         pageName = "showPos"; // ✅ Matches your file name
+//       else if (url.includes("/showOrders"))
+//         pageName = "showOrders"; // ✅ Matches your file name
+//       else if (url.includes("/showKOT"))
+//         pageName = "showKOT"; // ✅ Matches your file name
+//       else {
+//         const match = url.match(/\/([a-zA-Z0-9_-]+)$/);
+//         pageName = match ? match[1] : null;
+//       }
+
+//       // ✅ Try dynamic import for corresponding JS file
+//       if (pageName) {
+//         try {
+//           const module = await import(`/js/pages/${pageName}.js`);
+
+//           // ✅ Get branchId from URL query parameter
+//           const branchId = getBranchIdFromURL();
+//           console.log(`🔵 Loading ${pageName} with branchId:`, branchId);
+
+//           if (typeof module.initPage === "function") {
+//             module.initPage(branchId); // ✅ Pass branchId
+//             console.log(
+//               `✅ Initialized ${pageName}.js with branchId:`,
+//               branchId
+//             );
+//           } else if (typeof module.initTablesPage === "function") {
+//             module.initTablesPage(branchId); // ✅ Pass branchId
+//             console.log(
+//               `✅ Initialized ${pageName} page with branchId:`,
+//               branchId
+//             );
+//           } else {
+//             console.warn(`⚠️ No init function found in ${pageName}.js`);
+//           }
+//         } catch (err) {
+//           console.warn(`⚠️ Could not load /js/pages/${pageName}.js`, err);
+//           console.error(err);
+//         }
+//       }
+//     } catch (err) {
+//       console.error("❌ Error loading content:", err);
+//       showError();
+//     } finally {
+//       hideLoading();
+//       closeSidebarOnMobile();
+//     }
+//   }
+
+//   // ============================================
+//   // 2️⃣ INTERCEPT SIDEBAR LINKS + FORMS
+//   // ============================================
+//   document.querySelectorAll(".content-link").forEach((link) => {
+//     link.addEventListener("click", (e) => {
+//       e.preventDefault();
+//       let url = link.getAttribute("href");
+
+//       // ✅ Append branchId to the URL if it exists
+//       const branchId = getBranchIdFromURL();
+//       if (branchId && url && !url.includes("branchId=")) {
+//         const separator = url.includes("?") ? "&" : "?";
+//         url = `${url}${separator}branchId=${branchId}`;
+//       }
+
+//       if (url) loadContent(url);
+//     });
+//   });
+
+//   document.querySelectorAll(".content-form").forEach((form) => {
+//     form.addEventListener("submit", (e) => {
+//       e.preventDefault();
+//       let url = form.getAttribute("action");
+//       if (!url || url === "null" || url === "/null" || url === "#") return;
+
+//       // ✅ Append branchId to the URL if it exists
+//       const branchId = getBranchIdFromURL();
+//       if (branchId && !url.includes("branchId=")) {
+//         const separator = url.includes("?") ? "&" : "?";
+//         url = `${url}${separator}branchId=${branchId}`;
+//       }
+
+//       const method = form.getAttribute("method") || "GET";
+//       loadContent(url, method);
+//     });
+//   });
+
+//   // ============================================
+//   // 3️⃣ SIDEBAR + DROPDOWN + TOGGLE LOGIC
+//   // ============================================
+//   const sidebar = document.getElementById("sidebar");
+//   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+//   const openSidebarBtn = document.getElementById("open-sidebar");
+//   const closeSidebarBtn = document.getElementById("close-sidebar");
+//   const profileBtn = document.getElementById("profileBtn");
+//   const dropdownMenu = document.getElementById("dropdownMenu");
+//   const loadingIndicator = document.getElementById("loading-indicator");
+
+//   function openSidebar() {
+//     sidebar.classList.remove("-translate-x-full");
+//     sidebarBackdrop.classList.remove("hidden");
+//   }
+//   function closeSidebar() {
+//     sidebar.classList.add("-translate-x-full");
+//     sidebarBackdrop.classList.add("hidden");
+//   }
+//   function closeSidebarOnMobile() {
+//     if (window.innerWidth < 1024) closeSidebar();
+//   }
+
+//   openSidebarBtn?.addEventListener("click", openSidebar);
+//   closeSidebarBtn?.addEventListener("click", closeSidebar);
+//   sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+//   // Profile dropdown
+//   function toggleDropdown() {
+//     dropdownMenu.classList.toggle("hidden");
+//   }
+//   function closeDropdown() {
+//     dropdownMenu.classList.add("hidden");
+//   }
+
+//   profileBtn?.addEventListener("click", toggleDropdown);
+//   document.addEventListener("click", (e) => {
+//     if (!profileBtn?.contains(e.target) && !dropdownMenu?.contains(e.target))
+//       closeDropdown();
+//   });
+
+//   // ============================================
+//   // 4️⃣ SUBMENU LOGIC
+//   // ============================================
+//   function closeAllSubmenus(except = null) {
+//     document.querySelectorAll(".submenu").forEach((s) => {
+//       if (s.id !== `submenu-${except}`) s.classList.remove("open");
+//     });
+//     document.querySelectorAll(".menu-toggle svg:last-child").forEach((icon) => {
+//       const menuId = icon.closest(".menu-toggle")?.dataset.menu;
+//       if (menuId !== except) icon.classList.remove("rotate-180");
+//     });
+//   }
+
+//   function toggleSubmenu(toggle) {
+//     const menuId = toggle.dataset.menu;
+//     const submenu = document.getElementById(`submenu-${menuId}`);
+//     const icon = toggle.querySelector("svg:last-child");
+
+//     closeAllSubmenus(menuId);
+//     submenu.classList.toggle("open");
+//     icon.classList.toggle("rotate-180", submenu.classList.contains("open"));
+//   }
+
+//   document.querySelectorAll(".menu-toggle").forEach((toggle) => {
+//     toggle.addEventListener("click", (e) => {
+//       e.preventDefault();
+//       toggleSubmenu(toggle);
+//     });
+//   });
+
+//   // ============================================
+//   // 5️⃣ LOADING & ERROR HANDLERS
+//   // ============================================
+//   function showLoading() {
+//     loadingIndicator?.classList.add("active");
+//   }
+//   function hideLoading() {
+//     loadingIndicator?.classList.remove("active");
+//   }
+//   function showError(msg = "Failed to load content. Please try again.") {
+//     content.innerHTML = `<div class="p-6 text-center text-red-500">${msg}</div>`;
+//   }
+
+//   // Expose global loader for manual use
+//   window.loadDashboardContent = loadContent;
+//   window.getBranchId = getBranchIdFromURL; // ✅ Expose for global use
+// });
+
+// ============================================
+// DASHBOARD SCRIPT (Fixed - No Nested Dashboards)
+// ============================================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const content = document.getElementById("dashboard-content");
+
+  // ============================================
+  // 🆕 GET BRANCH ID FROM URL PATH
+  // ============================================
+  function getBranchIdFromURL() {
+    const path = window.location.pathname;
+    // Extract branchId from /dashboard/:branchId format
+    const match = path.match(/\/dashboard\/([a-f0-9]{24})/i);
+
+    if (match && match[1]) {
+      console.log("🔵 Branch ID from URL path:", match[1]);
+      return match[1];
+    }
+
+    console.warn("⚠️ No branch ID found in URL");
+    return "";
+  }
+
+  // ============================================
+  // 1️⃣ MAIN CONTENT LOADER (Dynamic + Modular)
+  // ============================================
+  async function loadContent(url, method = "GET") {
+    try {
+      showLoading();
+
+      const res = await fetch(url, {
+        method,
+        headers: { Accept: "text/html" },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+      content.innerHTML = html;
+
+      // ✅ Detect page name for JS import (based on URL)
+      let pageName = null;
+
+      if (url.includes("/showTables")) pageName = "showTables";
+      else if (url.includes("/showMenuItems")) pageName = "showMenuItems";
+      else if (url.includes("/showOrders")) pageName = "showOrders";
+      else if (url.includes("/pos")) pageName = "showPos";
+      else if (url.includes("/showKOT")) pageName = "showKOT";
+      else {
+        const match = url.match(/\/([a-zA-Z0-9_-]+)(?:\?|$)/);
+        pageName = match ? match[1] : null;
+      }
+
+      // ✅ Try dynamic import for corresponding JS file
+      if (pageName) {
+        try {
+          const module = await import(`/js/pages/${pageName}.js`);
+
+          // ✅ Get branchId from URL
+          const branchId = getBranchIdFromURL();
+          console.log(`🔵 Loading ${pageName} with branchId:`, branchId);
+
+          // ✅ Call appropriate init function
+          if (typeof module.initPage === "function") {
+            module.initPage(branchId);
+            console.log(
+              `✅ Initialized ${pageName}.js with branchId:`,
+              branchId
+            );
+          } else if (typeof module.initTablesPage === "function") {
+            module.initTablesPage(branchId);
+            console.log(
+              `✅ Initialized ${pageName} page with branchId:`,
+              branchId
+            );
+          } else if (typeof module.initOrders === "function") {
+            module.initOrders(branchId);
+            console.log(
+              `✅ Initialized ${pageName} orders with branchId:`,
+              branchId
+            );
+          } else {
+            console.warn(`⚠️ No init function found in ${pageName}.js`);
+          }
+        } catch (err) {
+          console.warn(`⚠️ Could not load /js/pages/${pageName}.js`, err);
+        }
+      }
+    } catch (err) {
+      console.error("❌ Error loading content:", err);
+      showError();
+    } finally {
+      hideLoading();
+      closeSidebarOnMobile();
+    }
+  }
+
+  // ============================================
+  // 2️⃣ INTERCEPT SIDEBAR LINKS + FORMS
+  // ============================================
+  document.querySelectorAll(".content-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      let url = link.getAttribute("href");
+
+      // ❌ DON'T intercept dashboard routes - let them navigate normally
+      if (url && url.includes("/dashboard/")) {
+        console.log("🔄 Navigating to dashboard (full page load):", url);
+        window.location.href = url;
+        return;
+      }
+
+      // ✅ For other routes, load content dynamically
+      const branchId = getBranchIdFromURL();
+      if (branchId && url && !url.includes(branchId)) {
+        // Replace :id placeholder with actual branchId
+        url = url.replace(/:id/g, branchId);
+      }
+
+      if (url) {
+        console.log("🔵 Loading content via AJAX:", url);
+        loadContent(url);
+      }
+    });
+  });
+
+  document.querySelectorAll(".content-form").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      let url = form.getAttribute("action");
+
+      if (!url || url === "null" || url === "/null" || url === "#") return;
+
+      // ❌ DON'T intercept dashboard routes - let them navigate normally
+      if (url.includes("/dashboard/")) {
+        console.log("🔄 Navigating to dashboard (full page load):", url);
+        window.location.href = url;
+        return;
+      }
+
+      // ✅ For other routes, load content dynamically
+      const branchId = getBranchIdFromURL();
+      if (branchId && !url.includes(branchId)) {
+        url = url.replace(/:id/g, branchId);
+      }
+
+      const method = form.getAttribute("method") || "GET";
+      console.log("🔵 Loading content via AJAX:", url);
+      loadContent(url, method);
+    });
+  });
+
+  // ============================================
+  // 3️⃣ SIDEBAR + DROPDOWN + TOGGLE LOGIC
+  // ============================================
   const sidebar = document.getElementById("sidebar");
   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+  const openSidebarBtn = document.getElementById("open-sidebar");
+  const closeSidebarBtn = document.getElementById("close-sidebar");
   const profileBtn = document.getElementById("profileBtn");
   const dropdownMenu = document.getElementById("dropdownMenu");
+  const loadingIndicator = document.getElementById("loading-indicator");
 
-  // Toggle sidebar on mobile
-  openSidebarBtn.addEventListener("click", function () {
-    sidebar.classList.remove("-translate-x-full");
-    sidebarBackdrop.classList.remove("hidden");
-  });
+  function openSidebar() {
+    sidebar?.classList.remove("-translate-x-full");
+    sidebarBackdrop?.classList.remove("hidden");
+  }
 
-  closeSidebarBtn.addEventListener("click", function () {
-    sidebar.classList.add("-translate-x-full");
-    sidebarBackdrop.classList.add("hidden");
-  });
+  function closeSidebar() {
+    sidebar?.classList.add("-translate-x-full");
+    sidebarBackdrop?.classList.add("hidden");
+  }
 
-  sidebarBackdrop.addEventListener("click", function () {
-    sidebar.classList.add("-translate-x-full");
-    sidebarBackdrop.classList.add("hidden");
-  });
+  function closeSidebarOnMobile() {
+    if (window.innerWidth < 1024) closeSidebar();
+  }
 
-  // Toggle profile dropdown
-  profileBtn.addEventListener("click", function () {
-    dropdownMenu.classList.toggle("hidden");
-  });
+  openSidebarBtn?.addEventListener("click", openSidebar);
+  closeSidebarBtn?.addEventListener("click", closeSidebar);
+  sidebarBackdrop?.addEventListener("click", closeSidebar);
 
-  // Close dropdown when clicking outside
-  document.addEventListener("click", function (event) {
-    if (
-      !profileBtn.contains(event.target) &&
-      !dropdownMenu.contains(event.target)
-    ) {
-      dropdownMenu.classList.add("hidden");
+  // Profile dropdown
+  function toggleDropdown() {
+    dropdownMenu?.classList.toggle("hidden");
+  }
+
+  function closeDropdown() {
+    dropdownMenu?.classList.add("hidden");
+  }
+
+  profileBtn?.addEventListener("click", toggleDropdown);
+  document.addEventListener("click", (e) => {
+    if (!profileBtn?.contains(e.target) && !dropdownMenu?.contains(e.target)) {
+      closeDropdown();
     }
   });
 
-  // Submenu toggle functionality
-  const menuToggles = document.querySelectorAll(".menu-toggle");
-
-  menuToggles.forEach((toggle) => {
-    toggle.addEventListener("click", function (e) {
-      e.preventDefault();
-      const menuId = this.getAttribute("data-menu");
-      const submenu = document.getElementById(`submenu-${menuId}`);
-      const icon = this.querySelector("svg:last-child");
-
-      // Close other open submenus
-      document.querySelectorAll(".submenu").forEach((sm) => {
-        if (sm.id !== `submenu-${menuId}`) {
-          sm.classList.remove("open");
-          // Reset other icons
-          const otherIcons = document.querySelectorAll(
-            ".menu-toggle svg:last-child"
-          );
-          otherIcons.forEach((otherIcon) => {
-            if (otherIcon !== icon) {
-              otherIcon.classList.remove("rotate-180");
-            }
-          });
-        }
-      });
-
-      // Toggle current submenu
-      submenu.classList.toggle("open");
-
-      // Rotate icon
-      if (submenu.classList.contains("open")) {
-        icon.classList.add("rotate-180");
-      } else {
+  // ============================================
+  // 4️⃣ SUBMENU LOGIC
+  // ============================================
+  function closeAllSubmenus(except = null) {
+    document.querySelectorAll(".submenu").forEach((s) => {
+      if (s.id !== `submenu-${except}`) {
+        s.classList.remove("open");
+      }
+    });
+    document.querySelectorAll(".menu-toggle svg:last-child").forEach((icon) => {
+      const menuId = icon.closest(".menu-toggle")?.dataset.menu;
+      if (menuId !== except) {
         icon.classList.remove("rotate-180");
       }
     });
-  });
+  }
 
-  // Submenu item click handler - SIMPLIFIED VERSION
-  const submenuItems = document.querySelectorAll(".submenu-item");
-  const contentTitle = document.getElementById("content-title");
-  const contentBody = document.getElementById("content-body");
+  function toggleSubmenu(toggle) {
+    const menuId = toggle.dataset.menu;
+    const submenu = document.getElementById(`submenu-${menuId}`);
+    const icon = toggle.querySelector("svg:last-child");
 
-  submenuItems.forEach((item) => {
-    item.addEventListener("click", function (e) {
+    if (!submenu || !icon) return;
+
+    closeAllSubmenus(menuId);
+    submenu.classList.toggle("open");
+    icon.classList.toggle("rotate-180", submenu.classList.contains("open"));
+  }
+
+  document.querySelectorAll(".menu-toggle").forEach((toggle) => {
+    toggle.addEventListener("click", (e) => {
       e.preventDefault();
-      const contentType = this.getAttribute("data-content");
-
-      // Directly update content without loading indicator
-      updateContent(contentType);
-
-      // Close sidebar on mobile after selection
-      if (window.innerWidth < 1024) {
-        sidebar.classList.add("-translate-x-full");
-        sidebarBackdrop.classList.add("hidden");
-      }
+      toggleSubmenu(toggle);
     });
   });
 
-  // Function to update content based on submenu selection
-  function updateContent(contentType) {
-    let title = "";
-    let body = "";
-
-    switch (contentType) {
-      case "categories":
-        title = "Menu Categories";
-        body = `
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-              <div class="flex justify-between items-center mb-6">
-                <h4 class="text-lg font-semibold text-gray-800">All Categories</h4>
-                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  Add Category
-                </button>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="flex-shrink-0 h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <span class="text-orange-600 font-medium">A</span>
-                          </div>
-                          <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">Appetizers</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">12 items</div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-orange-600 hover:text-orange-900 mr-3">Edit</a>
-                        <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <span class="text-blue-600 font-medium">M</span>
-                          </div>
-                          <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">Main Course</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">24 items</div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-orange-600 hover:text-orange-900 mr-3">Edit</a>
-                        <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <span class="text-purple-600 font-medium">D</span>
-                          </div>
-                          <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">Desserts</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">8 items</div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-orange-600 hover:text-orange-900 mr-3">Edit</a>
-                        <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
-        break;
-
-      case "items":
-        title = "Menu Items";
-
-        break;
-
-      case "pending-orders":
-        title = "Pending Orders";
-        body = `
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-              <div class="flex justify-between items-center mb-6">
-                <h4 class="text-lg font-semibold text-gray-800">Pending Orders (3)</h4>
-                <div class="flex space-x-2">
-                  <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Filter
-                  </button>
-                  <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Refresh
-                  </button>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <div class="flex justify-between items-start mb-2">
-                    <div>
-                      <h5 class="font-semibold text-gray-800">Order #1234</h5>
-                      <p class="text-sm text-gray-600">Table 5 • 2 people</p>
-                    </div>
-                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Pending</span>
-                  </div>
-                  <div class="text-sm text-gray-700 mb-3">
-                    <p>• Paneer Tikka</p>
-                    <p>• Butter Naan</p>
-                    <p>• Mango Lassi</p>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="font-bold text-gray-900">$32.97</span>
-                    <div class="flex space-x-2">
-                      <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Accept
-                      </button>
-                      <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <div class="flex justify-between items-start mb-2">
-                    <div>
-                      <h5 class="font-semibold text-gray-800">Order #1235</h5>
-                      <p class="text-sm text-gray-600">Takeaway • John Doe</p>
-                    </div>
-                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Pending</span>
-                  </div>
-                  <div class="text-sm text-gray-700 mb-3">
-                    <p>• Chicken Biryani</p>
-                    <p>• Raita</p>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="font-bold text-gray-900">$18.99</span>
-                    <div class="flex space-x-2">
-                      <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Accept
-                      </button>
-                      <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        break;
-
-      default:
-        title = "Dashboard Overview";
-        body = document.getElementById("content-body").innerHTML;
-    }
-
-    // Update the content
-    contentTitle.textContent = title;
-    contentBody.innerHTML = body;
+  // ============================================
+  // 5️⃣ LOADING & ERROR HANDLERS
+  // ============================================
+  function showLoading() {
+    loadingIndicator?.classList.add("active");
   }
+
+  function hideLoading() {
+    loadingIndicator?.classList.remove("active");
+  }
+
+  function showError(msg = "Failed to load content. Please try again.") {
+    if (content) {
+      content.innerHTML = `
+        <div class="flex items-center justify-center min-h-[400px]">
+          <div class="text-center">
+            <div class="text-red-500 text-6xl mb-4">⚠️</div>
+            <p class="text-red-500 text-lg font-medium">${msg}</p>
+            <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              Reload Page
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // ============================================
+  // 6️⃣ GLOBAL FUNCTIONS
+  // ============================================
+
+  // Expose functions for global use
+  window.loadDashboardContent = loadContent;
+  window.getBranchId = getBranchIdFromURL;
+
+  // Function to load POS with existing order (for editing)
+  window.loadPOSWithOrder = function (orderId, branchId) {
+    console.log("🔵 Loading POS with order:", orderId);
+    const url = `/pos/${branchId}?orderId=${orderId}`;
+    loadContent(url);
+  };
+
+  // Function to view order details
+  window.viewOrderDetails = function (orderId) {
+    console.log("🔵 Viewing order details:", orderId);
+    alert(`View order details for: ${orderId}\n(Implement detail modal here)`);
+  };
+
+  // ============================================
+  // 7️⃣ BRANCH SWITCHER (Fixed)
+  // ============================================
+
+  // Handle branch selection dropdown
+  const branchSelect = document.querySelector('select[name="branchId"]');
+  if (branchSelect) {
+    branchSelect.addEventListener("change", function () {
+      const selectedBranchId = this.value;
+      console.log("🔄 Switching to branch:", selectedBranchId);
+      // ✅ Full page navigation to new branch dashboard
+      window.location.href = `/dashboard/${selectedBranchId}`;
+    });
+  }
+
+  // ============================================
+  // 8️⃣ INITIAL LOAD CHECK
+  // ============================================
+
+  console.log("✅ Dashboard script loaded");
+  console.log("🔵 Current branch ID:", getBranchIdFromURL());
 });

@@ -162,7 +162,7 @@ app.post("/signup", async (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("./users/login.ejs");
+  res.render("users/login");
 });
 
 app.post("/login", (req, res, next) => {
@@ -263,7 +263,7 @@ app.get(
         return res.redirect("/add-branch");
       }
 
-      res.render("./layouts/dashboard.ejs", {
+      res.render("layouts/dashboard.ejs", {
         user: req.user,
         branches,
         branch,
@@ -277,7 +277,7 @@ app.get(
 );
 
 app.get("/add-branch", isLoggedIn, (req, res) => {
-  res.render("./branch/addBranch.ejs");
+  res.render("branch/addBranch.ejs");
 });
 
 // ========== ADD BRANCH ROUTE ==========

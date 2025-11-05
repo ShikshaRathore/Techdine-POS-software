@@ -5,25 +5,254 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= branch.branchName %> - Order Now</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .line-clamp-1 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+      }
+      .category-scroll {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .category-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      .group:hover .group-hover\:block {
+        display: block;
+      }
+    </style>
   </head>
 
-  <body class="bg-gray-50">
-    <!-- Navbar -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div class="max-w-7xl mx-auto px-6 py-3">
+  <body class="bg-white">
+    <!-- MOBILE NAVBAR -->
+    <nav
+      class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm md:hidden"
+    >
+      <div class="px-4 py-3">
         <div class="flex justify-between items-center">
           <div class="flex items-center space-x-3">
             <div
-              class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center"
+              class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
             >
-              <span class="text-white font-bold text-xl">
-                <%= branch.branchName.charAt(0).toUpperCase() %>
-              </span>
+              <svg
+                class="w-6 h-6 text-orange-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z"
+                />
+              </svg>
             </div>
-            <div>
-              <h1 class="text-xl font-bold text-gray-900">
-                <%= branch.branchName %>
-              </h1>
+
+            <!-- DYNAMIC BRANCH DROPDOWN - MOBILE -->
+            <div class="relative group max-w-[140px]">
+              <button
+                class="flex items-center space-x-1 text-gray-800 font-semibold"
+              >
+                <span class="truncate"><%= branch.branchName %></span>
+                <svg
+                  class="w-4 h-4 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <div
+                class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-56 max-h-64 overflow-y-auto"
+              >
+                <% allBranches.forEach(b => { %>
+                <a
+                  href="/restaurant/<%= b._id %>"
+                  class="block px-4 py-2.5 text-sm hover:bg-gray-100 <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 text-orange-600 font-semibold' : 'text-gray-700' %>"
+                >
+                  <%= b.branchName %> <% if (b._id.toString() ===
+                  branch._id.toString()) { %>
+                  <span class="text-xs text-orange-500 ml-1">(Current)</span>
+                  <% } %> <% if (b.address) { %>
+                  <div class="text-xs text-gray-500 mt-0.5">
+                    <%= b.address %>
+                  </div>
+                  <% } %>
+                </a>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <button
+              onclick="openCart()"
+              class="relative text-gray-600 hover:text-orange-500"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span
+                id="cartCount"
+                class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2"
+                >0</span
+              >
+            </button>
+
+            <button id="mobileMenuButton" class="text-gray-600">
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden mt-4 pt-4 border-t border-gray-200">
+          <div class="flex flex-col space-y-4">
+            <a
+              href="#"
+              class="text-orange-500 font-semibold border-l-4 border-orange-500 pl-3 py-1"
+              >Home</a
+            >
+            <form
+              action="/restaurant/<%= branch._id %>/reservations"
+              method="GET"
+            >
+              <button
+                type="submit"
+                class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1 text-left w-full"
+              >
+                Book a Table
+              </button>
+            </form>
+
+            <a
+              href="#"
+              class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1"
+              >About</a
+            >
+            <a
+              href="#"
+              class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1"
+              >Contact</a
+            >
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <a
+              href="#"
+              class="bg-orange-500 text-white w-full text-center py-2 rounded-lg font-semibold block"
+              >Login</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- DESKTOP NAVBAR -->
+    <nav
+      class="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm"
+    >
+      <div class="max-w-7xl mx-auto px-6 py-3">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-8">
+            <div class="flex items-center space-x-2">
+              <div
+                class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
+              >
+                <svg
+                  class="w-6 h-6 text-orange-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z"
+                  />
+                </svg>
+              </div>
+              <h1 class="text-xl font-bold text-gray-900">Rajbhog</h1>
+            </div>
+
+            <!-- DYNAMIC BRANCH DROPDOWN - DESKTOP -->
+            <div class="relative group">
+              <button
+                class="flex items-center space-x-2 text-gray-600 hover:text-orange-500 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span class="font-medium"><%= branch.branchName %></span>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <div
+                class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-64 max-h-80 overflow-y-auto"
+              >
+                <% allBranches.forEach(b => { %>
+                <a
+                  href="/restaurant/<%= b._id %>"
+                  class="block px-4 py-3 text-sm hover:bg-gray-100 transition-colors <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 border-l-4 border-orange-500' : 'text-gray-700' %>"
+                >
+                  <div class="flex items-center justify-between">
+                    <span
+                      class="font-medium <%= b._id.toString() === branch._id.toString() ? 'text-orange-600' : 'text-gray-900' %>"
+                    >
+                      <%= b.branchName %>
+                    </span>
+                    <% if (b._id.toString() === branch._id.toString()) { %>
+                    <svg
+                      class="w-5 h-5 text-orange-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <% } %>
+                  </div>
+                  <% if (b.address) { %>
+                  <div class="text-xs text-gray-500 mt-1"><%= b.address %></div>
+                  <% } %>
+                </a>
+                <% }) %>
+              </div>
             </div>
           </div>
 
@@ -45,23 +274,12 @@
           </div>
 
           <div class="flex items-center space-x-4">
-            <button class="flex items-center space-x-2 text-orange-500">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fill-rule="evenodd"
-                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <span class="font-medium"><%= branch.branchName %></span>
-            </button>
-
             <button
               onclick="openCart()"
-              class="relative flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+              class="relative text-gray-600 hover:text-orange-500"
             >
               <svg
-                class="w-5 h-5"
+                class="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -74,31 +292,133 @@
                 />
               </svg>
               <span
-                id="cartCount"
-                class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold"
+                id="cartCountDesktop"
+                class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2"
                 >0</span
               >
-              <span class="font-semibold">My Account</span>
             </button>
+
+            <div class="relative">
+              <!-- Dropdown Trigger Button -->
+              <button
+                id="accountDropdown"
+                class="bg-orange-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
+              >
+                My Account
+                <svg
+                  id="dropdownArrow"
+                  class="w-4 h-4 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                id="dropdownMenu"
+                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50"
+              >
+                <ul class="py-2">
+                  <li>
+                    <a
+                      href="/profile"
+                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                    >
+                      Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/my-orders"
+                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                    >
+                      My Orders
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/my-bookings"
+                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                    >
+                      My Bookings
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/logout"
+                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors border-t border-gray-100"
+                    >
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-orange-50 to-red-50 py-8 text-center">
-      <h2 class="text-3xl font-bold text-gray-900">
-        Ready to Satisfy Your Cravings? Place Your Order Now!
-      </h2>
+    <!-- REST OF THE PAGE REMAINS THE SAME -->
+    <div class="max-w-7xl mx-auto px-4 mt-4">
+      <div class="bg-orange-50 py-6 px-4 rounded-lg shadow-sm text-center">
+        <h2 class="text-xl md:text-3xl font-bold text-gray-900 px-4">
+          Ready to Satisfy Your Cravings? Place Your Order Now!
+        </h2>
+      </div>
     </div>
 
-    <!-- Category Filters -->
-    <div class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex space-x-2 overflow-x-auto">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <div class="relative flex-1">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search your menu item here"
+            class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            onkeyup="searchItems()"
+          />
+          <svg
+            class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+
+        <div class="flex items-center space-x-2 ml-4">
+          <span class="text-gray-700 font-medium">Veg</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" value="" class="sr-only peer" />
+            <div
+              class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 peer-checked:bg-green-600"
+            ></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex space-x-6 overflow-x-auto category-scroll">
           <button
             onclick="filterByCategory('all')"
-            class="category-filter-btn bg-orange-500 text-white px-6 py-2 rounded-lg font-semibold whitespace-nowrap hover:bg-orange-600 transition-colors"
+            class="category-filter-btn text-orange-500 font-bold border-b-2 border-orange-500 pb-2 whitespace-nowrap flex-shrink-0"
           >
             Show All
           </button>
@@ -110,7 +430,7 @@
           <button
             onclick="filterByCategory(this.dataset.category)"
             data-category="<%= cat %>"
-            class="category-filter-btn bg-white text-gray-700 px-6 py-2 rounded-lg font-semibold border border-gray-300 whitespace-nowrap hover:bg-gray-50 transition-colors"
+            class="category-filter-btn text-gray-500 pb-2 whitespace-nowrap hover:text-orange-500 transition-colors flex-shrink-0"
           >
             <%= cat %> (<%= categories[cat] %>)
           </button>
@@ -119,133 +439,109 @@
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="relative max-w-md">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search your menu item here"
-          class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-          onkeyup="searchItems()"
-        />
-        <svg
-          class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Menu Items -->
-    <div class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="max-w-7xl mx-auto px-4 pb-20 md:pb-12 mt-4">
       <% if (menuItems && menuItems.length > 0) { %>
-      <div id="menuGrid" class="space-y-2">
+      <div id="menuGrid" class="space-y-4">
         <% menuItems.forEach(item => { %>
         <div
-          class="menu-item bg-white rounded-lg border border-gray-200 p-3 flex items-center space-x-4 hover:shadow-md transition-shadow"
+          class="menu-item bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow flex items-center justify-between"
           data-category="<%= item.category?.name || 'Uncategorized' %>"
           data-name="<%= item.itemName.toLowerCase() %>"
           data-id="<%= item._id %>"
           data-price="<%= item.price %>"
           data-prep-time="<%= item.preparationTime || 0 %>"
         >
-          <!-- Image -->
-          <div class="flex-shrink-0">
-            <div
-              class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden relative"
-            >
-              <% if (item.menuItemImage?.url) { %>
-              <img
-                src="<%= item.menuItemImage.url %>"
-                class="w-full h-full object-cover"
-                alt="<%= item.itemName %>"
-              />
-              <% } else { %>
-              <div class="w-full h-full flex items-center justify-center">
-                <svg
-                  class="w-10 h-10 text-gray-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <% } %>
-
-              <!-- Veg/Non-Veg Badge -->
-              <div class="absolute top-1 left-1">
-                <% if (item.type === 'Veg') { %>
-                <div
-                  class="w-5 h-5 bg-white rounded border-2 border-green-600 flex items-center justify-center"
-                >
-                  <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                </div>
-                <% } else if (item.type === 'Non Veg') { %>
-                <div
-                  class="w-5 h-5 bg-white rounded border-2 border-red-600 flex items-center justify-center"
-                >
-                  <div class="w-2 h-2 bg-red-600"></div>
-                </div>
-                <% } else if (item.type === 'Egg') { %>
-                <div
-                  class="w-5 h-5 bg-white rounded border-2 border-yellow-600 flex items-center justify-center"
-                >
-                  <div class="w-2 h-2 bg-yellow-600"></div>
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+              <div
+                class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden relative"
+              >
+                <% if (item.menuItemImage?.url) { %>
+                <img
+                  src="<%= item.menuItemImage.url %>"
+                  class="w-full h-full object-cover"
+                  alt="<%= item.itemName %>"
+                />
+                <% } else { %>
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg
+                    class="w-8 h-8 text-gray-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
                 </div>
                 <% } %>
               </div>
             </div>
-          </div>
 
-          <!-- Details -->
-          <div class="flex-1">
-            <h3 class="font-bold text-gray-900"><%= item.itemName %></h3>
-            <% if (item.description) { %>
-            <p class="text-sm text-gray-600 line-clamp-1">
-              <%= item.description %>
-            </p>
-            <% } %> <% if (item.preparationTime > 0) { %>
-            <p class="text-xs text-gray-500 mt-1">
-              Preparation Time: <%= item.preparationTime %> Minutes
-            </p>
-            <% } %>
-          </div>
+            <div class="min-w-0">
+              <div class="flex items-center space-x-2">
+                <div>
+                  <% if (item.type === 'Veg') { %>
+                  <div
+                    class="w-5 h-5 bg-white rounded border-2 border-green-600 flex items-center justify-center"
+                  >
+                    <div class="w-2 h-2 rounded-full bg-green-600"></div>
+                  </div>
+                  <% } else if (item.type === 'Non Veg') { %>
+                  <div
+                    class="w-5 h-5 bg-white rounded border-2 border-red-600 flex items-center justify-center"
+                  >
+                    <div class="w-2 h-2 bg-red-600"></div>
+                  </div>
+                  <% } else if (item.type === 'Egg') { %>
+                  <div
+                    class="w-5 h-5 bg-white rounded border-2 border-yellow-600 flex items-center justify-center"
+                  >
+                    <div class="w-2 h-2 bg-yellow-600"></div>
+                  </div>
+                  <% } %>
+                </div>
 
-          <!-- Price & Add Button -->
-          <div class="flex items-center space-x-4">
-            <span class="text-lg font-bold text-gray-900"
-              >$<%= item.price %></span
-            >
+                <h3 class="font-bold text-gray-900 text-lg truncate">
+                  <%= item.itemName %>
+                </h3>
+              </div>
 
-            <div
-              class="item-controls-<%= item._id %> flex items-center space-x-2"
-            >
-              <button
-                onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)"
-                data-id="<%= item._id %>"
-                data-name="<%= item.itemName %>"
-                data-price="<%= item.price %>"
-                data-prep-time="<%= item.preparationTime || 0 %>"
-                class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-1 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors"
+              <% if (item.description) { %>
+              <p class="text-gray-600 line-clamp-1 mt-1 text-sm">
+                <%= item.description %>
+              </p>
+              <% } %>
+
+              <span class="text-lg font-bold text-gray-900 block mt-1"
+                >$<%= item.price %></span
               >
-                Add
-              </button>
+
+              <% if (item.preparationTime > 0) { %>
+              <p class="text-xs text-gray-500 mt-1">
+                Preparation Time: <%= item.preparationTime %> Minutes
+              </p>
+              <% } %>
             </div>
+          </div>
+
+          <div
+            class="item-controls-<%= item._id %> flex items-center space-x-2"
+          >
+            <button
+              onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)"
+              data-id="<%= item._id %>"
+              data-name="<%= item.itemName %>"
+              data-price="<%= item.price %>"
+              data-prep-time="<%= item.preparationTime || 0 %>"
+              class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-2 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors"
+            >
+              Add
+            </button>
           </div>
         </div>
         <% }) %>
@@ -257,10 +553,10 @@
       <% } %>
     </div>
 
-    <!-- Cart Sidebar -->
+    <!-- Cart Sidebar, Checkout Modal, Success Modal, Bottom Navigation - SAME AS ORIGINAL -->
     <div
       id="cartSidebar"
-      class="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col"
+      class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col"
     >
       <div class="flex items-center justify-between p-4 border-b">
         <h2 class="text-xl font-bold">My Cart</h2>
@@ -280,11 +576,7 @@
           </svg>
         </button>
       </div>
-
-      <div id="cartItems" class="flex-1 overflow-y-auto p-4">
-        <!-- Cart items will be inserted here -->
-      </div>
-
+      <div id="cartItems" class="flex-1 overflow-y-auto p-4"></div>
       <div class="border-t p-4 space-y-4">
         <div class="flex justify-between text-sm">
           <span>Item(s)</span>
@@ -313,23 +605,20 @@
       </div>
     </div>
 
-    <!-- Checkout Modal -->
     <div
       id="checkoutModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
     >
       <div
-        class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto"
       >
-        <div class="p-6 border-b">
-          <h2 class="text-2xl font-bold">Checkout</h2>
+        <div class="p-4 border-b sticky top-0 bg-white">
+          <h2 class="text-xl font-bold">Checkout</h2>
         </div>
-
-        <div class="p-6 space-y-6">
-          <!-- Order Type Selection -->
+        <div class="p-4 space-y-6">
           <div>
             <h3 class="font-bold mb-3">Select Order Type</h3>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label
                 class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors"
               >
@@ -366,19 +655,13 @@
               </label>
             </div>
           </div>
-
-          <!-- Order Summary -->
           <div>
             <h3 class="font-bold mb-3">Order Summary</h3>
             <div
               id="checkoutItems"
               class="space-y-2 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto"
-            >
-              <!-- Items will be inserted here -->
-            </div>
+            ></div>
           </div>
-
-          <!-- Total Display -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <div class="flex justify-between mb-2">
               <span>Item(s):</span>
@@ -393,8 +676,6 @@
               <span id="checkoutTotal">$0</span>
             </div>
           </div>
-
-          <!-- Special Instructions -->
           <div>
             <label class="block font-semibold mb-2"
               >Special Instructions (Optional)</label
@@ -407,8 +688,7 @@
             ></textarea>
           </div>
         </div>
-
-        <div class="p-6 border-t flex space-x-4">
+        <div class="p-4 border-t flex space-x-4">
           <button
             onclick="closeCheckout()"
             class="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
@@ -425,12 +705,11 @@
       </div>
     </div>
 
-    <!-- Success Modal -->
     <div
       id="successModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
     >
-      <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6 text-center">
+      <div class="bg-white rounded-lg w-full max-w-md p-6 text-center">
         <div class="mb-4">
           <svg
             class="w-16 h-16 text-green-500 mx-auto"
@@ -446,12 +725,13 @@
             />
           </svg>
         </div>
-        <h3 class="text-2xl font-bold text-green-600 mb-2">
+        <h3 class="text-xl font-bold text-green-600 mb-2">
           Order placed successfully!
         </h3>
-        <div id="orderDetails" class="mb-6 text-left bg-gray-50 p-4 rounded-lg">
-          <!-- Order details will be inserted here -->
-        </div>
+        <div
+          id="orderDetails"
+          class="mb-6 text-left bg-gray-50 p-4 rounded-lg"
+        ></div>
         <button
           onclick="newOrder()"
           class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"
@@ -473,10 +753,88 @@
         </button>
       </div>
     </div>
+
+    <div
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 flex justify-around items-center z-40"
+    >
+      <a href="#" class="flex flex-col items-center text-orange-500">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+          />
+        </svg>
+        <span class="text-xs mt-1">Home</span>
+      </a>
+      <a href="#" class="flex flex-col items-center text-gray-600">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+          />
+        </svg>
+        <span class="text-xs mt-1">Book Table</span>
+      </a>
+      <button
+        onclick="openCart()"
+        class="relative flex flex-col items-center text-gray-600"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+        <span class="text-xs mt-1">Cart</span>
+        <span
+          id="mobileCartCount"
+          class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-1 -right-2"
+          >0</span
+        >
+      </button>
+      <a href="#" class="flex flex-col items-center text-gray-600">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        <span class="text-xs mt-1">Account</span>
+      </a>
+    </div>
+
     <script>
       const branchId = "<%= branch._id %>";
       let cart = [];
       let currentCategory = "all";
+
+      // Mobile menu toggle
+      document
+        .getElementById("mobileMenuButton")
+        .addEventListener("click", function () {
+          const menu = document.getElementById("mobileMenu");
+          menu.classList.toggle("hidden");
+        });
 
       // Add to cart
       function addToCart(itemId, itemName, price, prepTime) {
@@ -520,11 +878,13 @@
         );
 
         document.getElementById("cartCount").textContent = count;
+        document.getElementById("cartCountDesktop").textContent = count;
+        document.getElementById("mobileCartCount").textContent = count;
         document.getElementById("cartItemCount").textContent = count;
-        document.getElementById("cartSubTotal").textContent = `$${total.toFixed(
+        document.getElementById("cartSubTotal").textContent = `${total.toFixed(
           2
         )}`;
-        document.getElementById("cartTotal").textContent = `$${total.toFixed(
+        document.getElementById("cartTotal").textContent = `${total.toFixed(
           2
         )}`;
 
@@ -537,9 +897,9 @@
           cartItemsDiv.innerHTML = cart
             .map(
               (item) => `
-            <div class="bg-gray-50 p-3 rounded-lg mb-2">
+            <div class="bg-gray-50 p-3 rounded-lg mb-3">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-semibold">${item.name}</span>
+                <span class="font-semibold text-sm">${item.name}</span>
                 <button onclick="updateQuantity('${item.id}', -${
                 item.quantity
               })" class="text-red-500 hover:text-red-700">
@@ -560,7 +920,7 @@
                     item.id
                   }', 1)" class="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100">+</button>
                 </div>
-                <span class="font-bold">$${(item.price * item.quantity).toFixed(
+                <span class="font-bold">${(item.price * item.quantity).toFixed(
                   2
                 )}</span>
               </div>
@@ -590,12 +950,15 @@
             <button onclick="updateQuantity('${itemId}', 1)" class="w-8 h-8 bg-orange-500 text-white rounded flex items-center justify-center hover:bg-orange-600">+</button>
           `;
         } else {
+          const menuItemElem = document.querySelector(`[data-id="${itemId}"]`);
+          const itemName = menuItemElem ? menuItemElem.dataset.name : "";
+          const itemPrice = menuItemElem ? menuItemElem.dataset.price : "0";
+          const itemPrepTime = menuItemElem
+            ? menuItemElem.dataset.prepTime
+            : "0";
+
           controlsDiv.innerHTML = `
-            <button onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)" data-id="${itemId}" data-name="${
-            item?.name || ""
-          }" data-price="${item?.price || 0}" data-prep-time="${
-            item?.preparationTime || 0
-          }" class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-1 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors">
+            <button onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)" data-id="${itemId}" data-name="${itemName}" data-price="${itemPrice}" data-prep-time="${itemPrepTime}" class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-2 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors">
               Add
             </button>
           `;
@@ -626,7 +989,6 @@
           return;
         }
 
-        // Update checkout modal
         const total = cart.reduce(
           (sum, item) => sum + item.price * item.quantity,
           0
@@ -641,10 +1003,10 @@
         );
         document.getElementById(
           "checkoutSubTotal"
-        ).textContent = `$${total.toFixed(2)}`;
-        document.getElementById(
-          "checkoutTotal"
-        ).textContent = `$${total.toFixed(2)}`;
+        ).textContent = `${total.toFixed(2)}`;
+        document.getElementById("checkoutTotal").textContent = `${total.toFixed(
+          2
+        )}`;
 
         document.getElementById("checkoutItems").innerHTML =
           cart
@@ -655,11 +1017,11 @@
               <div class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-semibold">${
                 item.quantity
               }</div>
-              <span>${item.name}</span>
+              <span class="text-sm">${item.name}</span>
             </div>
-            <span class="font-semibold">$${(item.price * item.quantity).toFixed(
-              2
-            )}</span>
+            <span class="font-semibold text-sm">${(
+              item.price * item.quantity
+            ).toFixed(2)}</span>
           </div>
         `
             )
@@ -709,7 +1071,7 @@
         };
 
         try {
-          const response = await fetch("/api/customer/place-order", {
+          const response = await fetch(`/restaurant/${branchId}/place-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(orderData),
@@ -723,7 +1085,6 @@
             cart = [];
             updateCart();
 
-            // Reset all item controls
             document
               .querySelectorAll('[class*="item-controls-"]')
               .forEach((control) => {
@@ -751,20 +1112,22 @@
         document.getElementById("orderDetails").innerHTML = `
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <span class="font-semibold">Order #${order.orderNumber}</span>
-              <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">COOKING NOW</span>
+              <span class="font-semibold text-sm">Order #${
+                order.orderNumber
+              }</span>
+              <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">COOKING NOW</span>
             </div>
-            <p class="text-sm text-gray-600">${itemCount} Item(s) | ${new Date().toLocaleString()}</p>
+            <p class="text-xs text-gray-600">${itemCount} Item(s) | ${new Date().toLocaleString()}</p>
             ${
               maxPrepTime > 0
-                ? `<p class="text-sm text-gray-600">Preparation Time: ${maxPrepTime} Minutes (Approx)</p>`
+                ? `<p class="text-xs text-gray-600">Preparation Time: ${maxPrepTime} Minutes (Approx)</p>`
                 : ""
             }
             <div class="border-t pt-2 mt-2 space-y-1">
               ${cart
                 .map(
                   (item) => `
-                <div class="flex justify-between text-sm">
+                <div class="flex justify-between text-xs">
                   <span>x${item.quantity} ${item.name}</span>
                   <span class="font-semibold">${(
                     item.price * item.quantity
@@ -775,11 +1138,11 @@
                 .join("")}
             </div>
             <div class="border-t pt-2 mt-2">
-              <div class="flex justify-between text-sm">
+              <div class="flex justify-between text-xs">
                 <span>Sub Total</span>
                 <span>${order.totalAmount.toFixed(2)}</span>
               </div>
-              <div class="flex justify-between text-lg font-bold mt-2">
+              <div class="flex justify-between text-base font-bold mt-2">
                 <span>Total</span>
                 <span>${order.totalAmount.toFixed(2)}</span>
               </div>
@@ -803,42 +1166,35 @@
         currentCategory = category;
         applyFilters();
 
-        // Update button styles
         document.querySelectorAll(".category-filter-btn").forEach((btn) => {
-          btn.classList.remove("bg-orange-500", "text-white");
-          btn.classList.add(
-            "bg-white",
-            "text-gray-700",
-            "border",
-            "border-gray-300"
+          btn.classList.remove(
+            "text-orange-500",
+            "font-bold",
+            "border-b-2",
+            "border-orange-500"
           );
+          btn.classList.add("text-gray-500");
         });
 
+        let activeBtn;
         if (category === "all") {
-          document
-            .querySelector(".category-filter-btn")
-            .classList.remove(
-              "bg-white",
-              "text-gray-700",
-              "border",
-              "border-gray-300"
-            );
-          document
-            .querySelector(".category-filter-btn")
-            .classList.add("bg-orange-500", "text-white");
+          activeBtn = document.querySelector(
+            ".category-filter-btn[onclick=\"filterByCategory('all')\"]"
+          );
         } else {
-          const activeBtn = Array.from(
+          activeBtn = Array.from(
             document.querySelectorAll(".category-filter-btn")
           ).find((btn) => btn.dataset.category === category);
-          if (activeBtn) {
-            activeBtn.classList.remove(
-              "bg-white",
-              "text-gray-700",
-              "border",
-              "border-gray-300"
-            );
-            activeBtn.classList.add("bg-orange-500", "text-white");
-          }
+        }
+
+        if (activeBtn) {
+          activeBtn.classList.remove("text-gray-500");
+          activeBtn.classList.add(
+            "text-orange-500",
+            "font-bold",
+            "border-b-2",
+            "border-orange-500"
+          );
         }
       }
 
@@ -863,7 +1219,7 @@
           const searchMatch = !searchTerm || itemName.includes(searchTerm);
 
           if (categoryMatch && searchMatch) {
-            item.style.display = "flex";
+            item.style.display = "block";
           } else {
             item.style.display = "none";
           }
@@ -874,7 +1230,7 @@
       function showNotification(message) {
         const notification = document.createElement("div");
         notification.className =
-          "fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity";
+          "fixed bottom-16 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity text-center";
         notification.textContent = message;
         document.body.appendChild(notification);
 
@@ -887,6 +1243,22 @@
       // Initialize on page load
       document.addEventListener("DOMContentLoaded", function () {
         updateCart();
+      });
+
+      const dropdown = document.getElementById("accountDropdown");
+      const menu = document.getElementById("dropdownMenu");
+      const arrow = document.getElementById("dropdownArrow");
+
+      dropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menu.classList.toggle("hidden");
+        arrow.classList.toggle("rotate-180");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", () => {
+        menu.classList.add("hidden");
+        arrow.classList.remove("rotate-180");
       });
     </script>
   </body>

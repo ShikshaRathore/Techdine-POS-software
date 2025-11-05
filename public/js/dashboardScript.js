@@ -1,216 +1,35 @@
-// // ============================================
-// // DASHBOARD SCRIPT (Production Ready)
-// // ============================================
+// ============================================
+// 🆕 LOAD XLSX LIBRARY FIRST
+// ============================================
+function loadXLSXLibrary() {
+  return new Promise((resolve, reject) => {
+    // Check if already loaded
+    if (typeof window.XLSX !== "undefined") {
+      console.log("✅ XLSX already loaded");
+      resolve();
+      return;
+    }
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   const content = document.getElementById("dashboard-content");
+    console.log("📦 Loading XLSX library...");
+    const script = document.createElement("script");
+    script.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    script.onload = () => {
+      console.log("✅ XLSX library loaded successfully");
+      resolve();
+    };
+    script.onerror = () => {
+      console.error("❌ Failed to load XLSX library");
+      reject(new Error("Failed to load XLSX library"));
+    };
+    document.head.appendChild(script);
+  });
+}
 
-//   // ============================================
-//   // 🆕 GET BRANCH ID FROM URL
-//   // ============================================
-//   function getBranchIdFromURL() {
-//     const pathParts = window.location.pathname.split("/");
-//     const branchId = pathParts[pathParts.length - 1]; // last part after /dashboard/
-//     console.log("🔵 Branch ID from URL path:", branchId);
-//     return branchId || "";
-//   }
-
-//   // ============================================
-//   // 1️⃣ MAIN CONTENT LOADER (Dynamic + Modular)
-//   // ============================================
-//   async function loadContent(url, method = "GET") {
-//     try {
-//       showLoading();
-
-//       const res = await fetch(url, {
-//         method,
-//         headers: { Accept: "text/html" },
-//       });
-
-//       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-//       const html = await res.text();
-//       content.innerHTML = html;
-
-//       // ✅ Detect EJS page name for JS import (based on URL)
-//       let pageName = null;
-
-//       if (url.includes("/showTables")) pageName = "showTables";
-//       else if (url.includes("/menu")) pageName = "menu";
-//       else if (url.includes("/orders")) pageName = "orders";
-//       else if (url.includes("/pos"))
-//         pageName = "showPos"; // ✅ Matches your file name
-//       else if (url.includes("/showOrders"))
-//         pageName = "showOrders"; // ✅ Matches your file name
-//       else if (url.includes("/showKOT"))
-//         pageName = "showKOT"; // ✅ Matches your file name
-//       else {
-//         const match = url.match(/\/([a-zA-Z0-9_-]+)$/);
-//         pageName = match ? match[1] : null;
-//       }
-
-//       // ✅ Try dynamic import for corresponding JS file
-//       if (pageName) {
-//         try {
-//           const module = await import(`/js/pages/${pageName}.js`);
-
-//           // ✅ Get branchId from URL query parameter
-//           const branchId = getBranchIdFromURL();
-//           console.log(`🔵 Loading ${pageName} with branchId:`, branchId);
-
-//           if (typeof module.initPage === "function") {
-//             module.initPage(branchId); // ✅ Pass branchId
-//             console.log(
-//               `✅ Initialized ${pageName}.js with branchId:`,
-//               branchId
-//             );
-//           } else if (typeof module.initTablesPage === "function") {
-//             module.initTablesPage(branchId); // ✅ Pass branchId
-//             console.log(
-//               `✅ Initialized ${pageName} page with branchId:`,
-//               branchId
-//             );
-//           } else {
-//             console.warn(`⚠️ No init function found in ${pageName}.js`);
-//           }
-//         } catch (err) {
-//           console.warn(`⚠️ Could not load /js/pages/${pageName}.js`, err);
-//           console.error(err);
-//         }
-//       }
-//     } catch (err) {
-//       console.error("❌ Error loading content:", err);
-//       showError();
-//     } finally {
-//       hideLoading();
-//       closeSidebarOnMobile();
-//     }
-//   }
-
-//   // ============================================
-//   // 2️⃣ INTERCEPT SIDEBAR LINKS + FORMS
-//   // ============================================
-//   document.querySelectorAll(".content-link").forEach((link) => {
-//     link.addEventListener("click", (e) => {
-//       e.preventDefault();
-//       let url = link.getAttribute("href");
-
-//       // ✅ Append branchId to the URL if it exists
-//       const branchId = getBranchIdFromURL();
-//       if (branchId && url && !url.includes("branchId=")) {
-//         const separator = url.includes("?") ? "&" : "?";
-//         url = `${url}${separator}branchId=${branchId}`;
-//       }
-
-//       if (url) loadContent(url);
-//     });
-//   });
-
-//   document.querySelectorAll(".content-form").forEach((form) => {
-//     form.addEventListener("submit", (e) => {
-//       e.preventDefault();
-//       let url = form.getAttribute("action");
-//       if (!url || url === "null" || url === "/null" || url === "#") return;
-
-//       // ✅ Append branchId to the URL if it exists
-//       const branchId = getBranchIdFromURL();
-//       if (branchId && !url.includes("branchId=")) {
-//         const separator = url.includes("?") ? "&" : "?";
-//         url = `${url}${separator}branchId=${branchId}`;
-//       }
-
-//       const method = form.getAttribute("method") || "GET";
-//       loadContent(url, method);
-//     });
-//   });
-
-//   // ============================================
-//   // 3️⃣ SIDEBAR + DROPDOWN + TOGGLE LOGIC
-//   // ============================================
-//   const sidebar = document.getElementById("sidebar");
-//   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
-//   const openSidebarBtn = document.getElementById("open-sidebar");
-//   const closeSidebarBtn = document.getElementById("close-sidebar");
-//   const profileBtn = document.getElementById("profileBtn");
-//   const dropdownMenu = document.getElementById("dropdownMenu");
-//   const loadingIndicator = document.getElementById("loading-indicator");
-
-//   function openSidebar() {
-//     sidebar.classList.remove("-translate-x-full");
-//     sidebarBackdrop.classList.remove("hidden");
-//   }
-//   function closeSidebar() {
-//     sidebar.classList.add("-translate-x-full");
-//     sidebarBackdrop.classList.add("hidden");
-//   }
-//   function closeSidebarOnMobile() {
-//     if (window.innerWidth < 1024) closeSidebar();
-//   }
-
-//   openSidebarBtn?.addEventListener("click", openSidebar);
-//   closeSidebarBtn?.addEventListener("click", closeSidebar);
-//   sidebarBackdrop?.addEventListener("click", closeSidebar);
-
-//   // Profile dropdown
-//   function toggleDropdown() {
-//     dropdownMenu.classList.toggle("hidden");
-//   }
-//   function closeDropdown() {
-//     dropdownMenu.classList.add("hidden");
-//   }
-
-//   profileBtn?.addEventListener("click", toggleDropdown);
-//   document.addEventListener("click", (e) => {
-//     if (!profileBtn?.contains(e.target) && !dropdownMenu?.contains(e.target))
-//       closeDropdown();
-//   });
-
-//   // ============================================
-//   // 4️⃣ SUBMENU LOGIC
-//   // ============================================
-//   function closeAllSubmenus(except = null) {
-//     document.querySelectorAll(".submenu").forEach((s) => {
-//       if (s.id !== `submenu-${except}`) s.classList.remove("open");
-//     });
-//     document.querySelectorAll(".menu-toggle svg:last-child").forEach((icon) => {
-//       const menuId = icon.closest(".menu-toggle")?.dataset.menu;
-//       if (menuId !== except) icon.classList.remove("rotate-180");
-//     });
-//   }
-
-//   function toggleSubmenu(toggle) {
-//     const menuId = toggle.dataset.menu;
-//     const submenu = document.getElementById(`submenu-${menuId}`);
-//     const icon = toggle.querySelector("svg:last-child");
-
-//     closeAllSubmenus(menuId);
-//     submenu.classList.toggle("open");
-//     icon.classList.toggle("rotate-180", submenu.classList.contains("open"));
-//   }
-
-//   document.querySelectorAll(".menu-toggle").forEach((toggle) => {
-//     toggle.addEventListener("click", (e) => {
-//       e.preventDefault();
-//       toggleSubmenu(toggle);
-//     });
-//   });
-
-//   // ============================================
-//   // 5️⃣ LOADING & ERROR HANDLERS
-//   // ============================================
-//   function showLoading() {
-//     loadingIndicator?.classList.add("active");
-//   }
-//   function hideLoading() {
-//     loadingIndicator?.classList.remove("active");
-//   }
-//   function showError(msg = "Failed to load content. Please try again.") {
-//     content.innerHTML = `<div class="p-6 text-center text-red-500">${msg}</div>`;
-//   }
-
-//   // Expose global loader for manual use
-//   window.loadDashboardContent = loadContent;
-//   window.getBranchId = getBranchIdFromURL; // ✅ Expose for global use
-// });
+// Load XLSX immediately when script loads
+loadXLSXLibrary().catch((err) => {
+  console.error("❌ Critical error loading XLSX:", err);
+});
 
 // ============================================
 // DASHBOARD SCRIPT (Fixed - No Nested Dashboards)
@@ -260,6 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (url.includes("/showOrders")) pageName = "showOrders";
       else if (url.includes("/pos")) pageName = "showPos";
       else if (url.includes("/showKOT")) pageName = "showKOT";
+      else if (url.includes("/showStaff")) pageName = "showStaff";
+      else if (url.includes("/reservations")) pageName = "showReservations";
       else {
         const match = url.match(/\/([a-zA-Z0-9_-]+)(?:\?|$)/);
         pageName = match ? match[1] : null;

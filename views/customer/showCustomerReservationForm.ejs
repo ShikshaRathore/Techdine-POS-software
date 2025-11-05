@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex justify-between items-center">
+          <!-- Restaurant Name -->
+          <div>
+            <h1 class="text-2xl font-bold text-orange-500">
+              <%= branch.owner.restaurantName %>
+            </h1>
+            <p class="text-sm text-gray-600"><%= branch.branchName %></p>
+          </div>
+
+          <!-- Back Button -->
+          <a
+            href="/restaurant/<%= branch._id %>"
+            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+          >
+            <i class="fa-solid fa-arrow-left mr-2"></i>Back to Menu
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-white rounded-lg shadow-md">
+        <!-- Header -->
+        <div class="bg-orange-500 text-white px-6 py-4 rounded-t-lg">
+          <h2 class="text-2xl font-bold">
+            <i class="fa-solid fa-calendar-check mr-2"></i>Book a Table
+          </h2>
+          <p class="text-orange-100 text-sm mt-1">
+            Reserve your table in advance
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form
+          id="reservationForm"
+          onsubmit="submitReservation(event)"
+          class="p-6 space-y-6"
+        >
+          <!-- Date, Guests, Meal Period -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Date *</label
+              >
+              <input
+                type="date"
+                id="reservationDate"
+                name="reservationDate"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Guests *</label
+              >
+              <select
+                id="numberOfGuests"
+                name="numberOfGuests"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              >
+                <% for(let i=1; i<=10; i++){ %>
+                <option value="<%= i %>">
+                  <%= i %> Guest<%= i>1?'s':'' %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Meal *</label
+              >
+              <select
+                id="mealPeriod"
+                name="mealPeriod"
+                onchange="updateTimeSlots(this.value)"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              >
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch" selected>Lunch</option>
+                <option value="Dinner">Dinner</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Time Slots -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Time Slot *</label
+            >
+            <div
+              id="timeSlotsContainer"
+              class="grid grid-cols-3 sm:grid-cols-4 gap-2"
+            ></div>
+          </div>
+
+          <!-- Area Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Select Area *</label
+            >
+            <select
+              id="areaSelect"
+              name="area"
+              onchange="loadAreaTables()"
+              required
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+            >
+              <option value="">Choose area...</option>
+              <% areas.forEach(area => { %>
+              <option value="<%= area._id %>"><%= area.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <!-- Table Selection -->
+          <div id="tableSelectContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Select Table *</label
+            >
+            <select
+              id="tableSelect"
+              name="table"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+            >
+              <option value="">Choose table...</option>
+            </select>
+          </div>
+
+          <!-- Customer Information -->
+          <div class="border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+              Your Information
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                  >Name *</label
+                >
+                <input
+                  type="text"
+                  id="customerName"
+                  name="customerName"
+                  required
+                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                  >Phone *</label
+                >
+                <input
+                  type="tel"
+                  id="customerPhone"
+                  name="customerPhone"
+                  pattern="[0-9]{10}"
+                  required
+                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  placeholder="10-digit number"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="customerEmail"
+                  name="customerEmail"
+                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Special Requests -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Special Requests</label
+            >
+            <textarea
+              id="specialRequests"
+              name="specialRequests"
+              rows="3"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+              placeholder="Any special requirements or notes..."
+            ></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="w-full py-3.5 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 active:scale-[0.98] transition-all shadow-sm"
+          >
+            <i class="fa-solid fa-check mr-2"></i>Reserve Now
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-12 border-t">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+        <p class="text-gray-600 text-sm">
+          © 2024 <%= branch.owner.restaurantName %>. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Initialize JavaScript -->
+    <script type="module">
+      import { initCustomerReservation } from "/js/customerReservation.js";
+      initCustomerReservation("<%= branch._id %>");
+    </script>
+  </body>
+</html>

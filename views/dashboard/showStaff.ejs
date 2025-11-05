@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Load XLSX library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  </head>
+  <body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Staff</h1>
+      </div>
+
+      <!-- Search and Actions -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"
+      >
+        <div class="w-full md:w-96">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by name or email"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          />
+        </div>
+        <div class="flex gap-3">
+          <button
+            onclick="exportToExcel()"
+            class="px-5 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition flex items-center gap-2"
+          >
+            <i class="fas fa-download"></i>
+            Export
+          </button>
+          <button
+            onclick="openAddModal()"
+            class="px-5 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition"
+          >
+            Add Member
+          </button>
+        </div>
+      </div>
+
+      <!-- Staff Table -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+              >
+                Member Name
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+              >
+                Email Address
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+              >
+                Role
+              </th>
+              <th
+                class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody" class="divide-y divide-gray-200">
+            <!-- Show Hotel Admin (current user) always on top -->
+            <tr
+              class="bg-blue-50 hover:bg-blue-100 transition staff-row"
+              data-name="<%= currentUser.username.toLowerCase() %>"
+              data-email="<%= currentUser.email.toLowerCase() %>"
+            >
+              <td class="px-6 py-4 text-gray-900 font-semibold">
+                <%= currentUser.username %>
+              </td>
+              <td class="px-6 py-4 text-gray-600"><%= currentUser.email %></td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg font-medium border border-blue-300"
+                  >
+                    Hotel Admin
+                  </span>
+                  <span class="text-sm text-gray-500">(You)</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button
+                  disabled
+                  class="px-4 py-2 text-gray-400 border border-gray-200 rounded-lg cursor-not-allowed"
+                >
+                  <i class="fas fa-user-shield"></i>
+                  Admin
+                </button>
+              </td>
+            </tr>
+
+            <!-- Existing staff list (excluding current admin if already in staff) -->
+            <% if (staff && staff.length > 0) { %> <%
+            staff.forEach(function(member) { %> <% if (member._id.toString() !==
+            currentUserId) { %>
+            <tr
+              class="hover:bg-gray-50 transition staff-row"
+              data-name="<%= member.name.toLowerCase() %>"
+              data-email="<%= member.email.toLowerCase() %>"
+            >
+              <td class="px-6 py-4 text-gray-900"><%= member.name %></td>
+              <td class="px-6 py-4 text-gray-600"><%= member.email %></td>
+              <td class="px-6 py-4">
+                <select
+                  onchange="updateRole('<%= member._id %>', this.value)"
+                  class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white cursor-pointer"
+                >
+                  <option value="Hotel-Admin" <%= member.role === 'Hotel-Admin'
+                  ? 'selected' : '' %>>Hotel Admin <option value="Branch Head"
+                  <%= member.role === 'Branch Head' ? 'selected' : '' %>>Branch
+                  Head <option value="Chef" <%= member.role === 'Chef' ?
+                  'selected' : '' %>>Chef <option value="Waiter" <%= member.role
+                  === 'Waiter' ? 'selected' : '' %>>Waiter
+                </select>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="flex justify-end gap-2">
+                  <button
+                    onclick="openUpdateModal('<%= member._id %>', '<%= member.name %>', '<%= member.email %>', '<%= member.phone %>', '<%= member.role %>')"
+                    class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
+                  >
+                    <i class="fas fa-edit"></i>
+                    Update
+                  </button>
+                  <button
+                    onclick="deleteStaff('<%= member._id %>', '<%= member.name %>')"
+                    class="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% } %> <% }); %> <% } else { %>
+            <tr>
+              <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                No staff members found
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div
+      id="addModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Add Member</h2>
+          <button
+            onclick="closeAddModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <form action="/staff/add/<%= branchId %>" method="POST">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Name</label
+              >
+              <input
+                type="text"
+                name="name"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Email</label
+              >
+              <input
+                type="email"
+                name="email"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Phone</label
+              >
+              <input
+                type="tel"
+                name="phone"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                name="password"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Role</label
+              >
+              <select
+                name="role"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="">Select Role</option>
+                <option value="Hotel-Admin">Hotel Admin</option>
+                <option value="Branch Head">Branch Head</option>
+                <option value="Chef">Chef</option>
+                <option value="Waiter">Waiter</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex gap-3">
+            <button
+              type="button"
+              onclick="closeAddModal()"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            >
+              Add Member
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Update Member Modal -->
+    <div
+      id="updateModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Update Member</h2>
+          <button
+            onclick="closeUpdateModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <form id="updateForm" method="POST">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Name</label
+              >
+              <input
+                type="text"
+                id="updateName"
+                name="name"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Email</label
+              >
+              <input
+                type="email"
+                id="updateEmail"
+                name="email"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Phone</label
+              >
+              <input
+                type="tel"
+                id="updatePhone"
+                name="phone"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Password (leave blank to keep current)</label
+              >
+              <input
+                type="password"
+                name="password"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Role</label
+              >
+              <select
+                id="updateRole"
+                name="role"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="Hotel-Admin">Hotel Admin</option>
+                <option value="Branch Head">Branch Head</option>
+                <option value="Chef">Chef</option>
+                <option value="Waiter">Waiter</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex gap-3">
+            <button
+              type="button"
+              onclick="closeUpdateModal()"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            >
+              Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

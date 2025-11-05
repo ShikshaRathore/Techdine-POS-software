@@ -8,14 +8,18 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const bcrypt = require("bcrypt");
 
 const { isLoggedIn, attachStatistics } = require("./middleware.js");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const kotController = require("./controllers/kotController.js");
 const posController = require("./controllers/posController.js");
+const reservationRoutes = require("./routes/reservation.js");
+const customerRoutes = require("./routes/customerRoutes");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -44,11 +48,21 @@ const { storage } = require("./cloudConfig.js");
 const menuItem = require("./models/menuItem.js");
 const upload = multer({ storage });
 
-//--------------DataBase--------------
-const Mongo_Url = "mongodb://127.0.0.1:27017/Techdine";
-async function main() {
-  await mongoose.connect(Mongo_Url);
-}
+// ---------- Database ----------
+const dbUrl = process.env.ATLASDB_URL;
+mongoose
+  .connect(dbUrl)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err.message));
+
+// ---------- Session ----------
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: { secret: process.env.SECRET },
+  touchAfter: 24 * 3600,
+});
+
+store.on("error", (err) => console.error("Session Store Error:", err));
 
 const sessionOptions = {
   secret: process.env.SECRET,
@@ -60,14 +74,6 @@ const sessionOptions = {
     httpOnly: true,
   },
 };
-
-main()
-  .then(() => {
-    console.log("Connected to Database");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -118,7 +124,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/reservations", reservationRoutes);
+app.use("/restaurant", customerRoutes);
+
 //--------------API---------------------
+
+app.get("/", (req, res) => {
+  res.render("./layouts/index.ejs");
+});
 
 app.get("/Techdine", (req, res) => {
   res.render("./layouts/index.ejs");
@@ -175,7 +188,7 @@ app.post("/login", (req, res, next) => {
       passport.authenticate("user-local", async (err, user, info) => {
         if (err) return next(err);
         if (!user) {
-          req.flash("error", "Invalid credentials for User");
+          req.flash("success", "Invalid credentials for User");
           return res.redirect("/login");
         }
         req.logIn(user, async (err) => {
@@ -1551,144 +1564,429 @@ function generateReceiptTemplate(order) {
   `;
 }
 
-// ------------------------------------------------------------//
+// -------------------------- Customer Dashboard----------------------------------//
 
-app.get("/customer-dashboard/:id", async (req, res) => {
+// app.get("/customer-dashboard/:id", async (req, res) => {
+//   try {
+//     const branchId = req.params.id;
+
+//     // Find branch by ID
+//     const branch = await Branch.findById(branchId);
+//     if (!branch) {
+//       req.flash("error", "Branch not found!");
+//       return res.redirect("/dashboard");
+//     }
+
+//     // Find menu for this branch
+//     const menu = await Menu.findOne({ branch: branchId });
+
+//     // Find all menu items for this branch, populate category
+//     const menuItems = await MenuItem.find({ branch: branchId })
+//       .populate("category")
+//       .populate("menu")
+//       .sort({ category: 1, itemName: 1 }); // Sort by category, then name
+
+//     res.render("./layouts/customer-dashboard.ejs", {
+//       branch,
+//       menu,
+//       menuItems,
+//     });
+//   } catch (err) {
+//     console.error("Error loading customer dashboard:", err);
+//     req.flash("error", "Failed to load customer dashboard!");
+//     res.redirect("/dashboard");
+//   }
+// });
+
+// // Add this route BEFORE your app.listen() line in app.js
+
+// app.post("/api/customer/place-order", async (req, res) => {
+//   try {
+//     const { branchId, orderType, items, totalAmount, specialInstructions } =
+//       req.body;
+
+//     // Validate required fields
+//     if (
+//       !branchId ||
+//       !orderType ||
+//       !items ||
+//       items.length === 0 ||
+//       !totalAmount
+//     ) {
+//       return res.status(400).json({
+//         success: false,
+//         error: "Missing required fields",
+//       });
+//     }
+
+//     // Validate branch exists
+//     const branch = await Branch.findById(branchId);
+//     if (!branch) {
+//       return res.status(404).json({
+//         success: false,
+//         error: "Branch not found",
+//       });
+//     }
+
+//     // Generate unique order number
+//     const orderCount = await Order.countDocuments({ branch: branchId });
+//     const orderNumber = `${orderCount + 1}`;
+
+//     // Create the order
+//     const newOrder = new Order({
+//       orderNumber: orderNumber,
+//       branch: branchId,
+//       orderType: orderType,
+//       items: items,
+//       totalAmount: totalAmount,
+//       specialInstructions: specialInstructions || "",
+//       status: "KOT",
+//       paymentStatus: "Unpaid",
+//       kotGenerated: true,
+//       customer: req.user?._id || null, // If user is logged in
+//     });
+
+//     await newOrder.save();
+
+//     // Generate KOT number
+//     const kotCount = await KOT.countDocuments({ branch: branchId });
+//     const kotNumber = `KOT-${kotCount + 1}`;
+
+//     // Create KOT
+//     const newKOT = new KOT({
+//       kotNumber: kotNumber,
+//       order: newOrder._id,
+//       branch: branchId,
+//       items: items.map((item) => ({
+//         menuItem: item.menuItem,
+//         quantity: item.quantity,
+//         notes: specialInstructions || "",
+//       })),
+//       status: "In Kitchen",
+//       createdBy: req.user?._id || newOrder._id, // Use order ID if customer not logged in
+//       createdByModel: "Customer",
+//       startedAt: new Date(),
+//     });
+
+//     await newKOT.save();
+
+//     // Populate order details for response
+//     await newOrder.populate("items.menuItem");
+
+//     console.log("✅ Order Created:", newOrder.orderNumber);
+//     console.log("✅ KOT Created:", newKOT.kotNumber);
+
+//     res.json({
+//       success: true,
+//       message: "Order placed successfully!",
+//       order: {
+//         _id: newOrder._id,
+//         orderNumber: newOrder.orderNumber,
+//         orderType: newOrder.orderType,
+//         totalAmount: newOrder.totalAmount,
+//         status: newOrder.status,
+//         items: newOrder.items,
+//         createdAt: newOrder.createdAt,
+//       },
+//       kot: {
+//         _id: newKOT._id,
+//         kotNumber: newKOT.kotNumber,
+//         status: newKOT.status,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("❌ Error placing order:", error);
+//     res.status(500).json({
+//       success: false,
+//       error: "Failed to place order. Please try again.",
+//     });
+//   }
+// });
+
+// -------------------------- Customer Dashboard----------------------------------//
+
+// -----------------Staff----------------
+
+// GET - Display staff list page for specific branch
+app.get("/showStaff/:branchId", isLoggedIn, async (req, res) => {
   try {
-    const branchId = req.params.id;
+    const branchId = req.params.branchId;
 
-    // Find branch by ID
+    // Verify user has access to this branch (optional - add your own logic)
+    // For example, check if user is admin or belongs to this branch
+
+    // Fetch staff for the specific branch
+    const staff = await Staff.find({ branch: branchId })
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    // Fetch branch details
     const branch = await Branch.findById(branchId);
-    if (!branch) {
-      req.flash("error", "Branch not found!");
-      return res.redirect("/dashboard");
-    }
 
-    // Find menu for this branch
-    const menu = await Menu.findOne({ branch: branchId });
+    // Fetch all branches for dropdown (if needed)
+    const branches = await Branch.find({});
 
-    // Find all menu items for this branch, populate category
-    const menuItems = await MenuItem.find({ branch: branchId })
-      .populate("category")
-      .populate("menu")
-      .sort({ category: 1, itemName: 1 }); // Sort by category, then name
-
-    res.render("./layouts/customer-dashboard.ejs", {
-      branch,
-      menu,
-      menuItems,
+    res.render("dashboard/showStaff.ejs", {
+      staff: staff,
+      currentUserId: req.user._id.toString(),
+      currentUser: req.user,
+      branchId: branchId,
+      branch: branch,
+      branches: branches,
     });
-  } catch (err) {
-    console.error("Error loading customer dashboard:", err);
-    req.flash("error", "Failed to load customer dashboard!");
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    req.flash("error", "Error loading staff page");
     res.redirect("/dashboard");
   }
 });
 
-// Add this route BEFORE your app.listen() line in app.js
-
-app.post("/api/customer/place-order", async (req, res) => {
+// POST - Add new staff member to specific branch
+app.post("/staff/add/:branchId", isLoggedIn, async (req, res) => {
   try {
-    const { branchId, orderType, items, totalAmount, specialInstructions } =
-      req.body;
+    const { name, email, phone, password, role } = req.body;
+    const branchId = req.params.branchId;
 
     // Validate required fields
-    if (
-      !branchId ||
-      !orderType ||
-      !items ||
-      items.length === 0 ||
-      !totalAmount
-    ) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields",
-      });
+    if (!name || !email || !phone || !password || !role) {
+      req.flash("error", "All fields are required");
+      return res.redirect(`/dashboard/${branchId}`);
     }
 
-    // Validate branch exists
+    // Validate phone number
+    if (isNaN(phone)) {
+      req.flash("error", "Phone number must be numeric");
+      return res.redirect(`/showStaff/${branchId}`);
+    }
+
+    // Check if email already exists
+    const existingStaff = await Staff.findOne({ email: email.toLowerCase() });
+    if (existingStaff) {
+      req.flash("error", "Email already exists");
+      return res.redirect(`/dashboard/${branchId}`);
+    }
+
+    // Verify branch exists
     const branch = await Branch.findById(branchId);
     if (!branch) {
-      return res.status(404).json({
+      req.flash("error", "Branch not found");
+      return res.redirect("/dashboard");
+    }
+
+    // Create new staff member using Passport's register method
+    const newStaff = new Staff({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      username: email.toLowerCase().trim(), // Set username same as email
+      phone: parseInt(phone),
+      role,
+      branch: branchId,
+      active: true,
+    });
+
+    // Register the user with passport-local-mongoose (this handles hashing)
+    await Staff.register(newStaff, password);
+
+    req.flash("success", "Staff member added successfully");
+    res.redirect(`/dashboard/${branchId}`);
+  } catch (error) {
+    console.error("Error adding staff:", error);
+
+    // Handle specific passport-local-mongoose errors
+    if (error.name === "UserExistsError") {
+      req.flash("error", "Email already exists");
+    } else {
+      req.flash("error", "Error adding staff member");
+    }
+
+    res.redirect(`/dashboard/${branchId}`);
+  }
+});
+
+// POST - Update staff member in specific branch
+app.post("/staff/update/:branchId/:staffId", isLoggedIn, async (req, res) => {
+  try {
+    const { name, email, phone, password, role } = req.body;
+    const { branchId, staffId } = req.params;
+
+    // Validate required fields
+    if (!name || !email || !phone || !role) {
+      req.flash("error", "All fields except password are required");
+      return res.redirect(`/dashboard/${branchId}`);
+    }
+
+    // Validate phone number
+    if (isNaN(phone)) {
+      req.flash("error", "Phone number must be numeric");
+      return res.redirect(`/dashboard/${branchId}`);
+    }
+
+    // Verify staff member exists and belongs to the branch
+    const staffToUpdate = await Staff.findById(staffId);
+    if (!staffToUpdate) {
+      req.flash("error", "Staff member not found");
+      return res.redirect(`/dashboard/${branchId}`);
+    }
+
+    if (staffToUpdate.branch.toString() !== branchId) {
+      req.flash("error", "Unauthorized to update this staff member");
+      return res.redirect(`/dashboard/${branchId}`);
+    }
+
+    // Check if email is being changed and if it already exists
+    if (email.toLowerCase() !== staffToUpdate.email) {
+      const existingEmail = await Staff.findOne({
+        email: email.toLowerCase(),
+        _id: { $ne: staffId },
+      });
+      if (existingEmail) {
+        req.flash("error", "Email already exists");
+        return res.redirect(`/dashboard/${branchId}`);
+      }
+    }
+
+    // Update basic fields
+    staffToUpdate.name = name.trim();
+    staffToUpdate.email = email.toLowerCase().trim();
+    staffToUpdate.username = email.toLowerCase().trim();
+    staffToUpdate.phone = parseInt(phone);
+    staffToUpdate.role = role;
+
+    // Update password if provided using passport-local-mongoose method
+    if (password && password.trim() !== "") {
+      await staffToUpdate.setPassword(password);
+    }
+
+    await staffToUpdate.save();
+
+    req.flash("success", "Staff member updated successfully");
+    res.redirect(`/dashboard/${branchId}`);
+  } catch (error) {
+    console.error("Error updating staff:", error);
+    req.flash("error", "Error updating staff member");
+    res.redirect(`/dashboard/${branchId}`);
+  }
+});
+
+// POST - Update staff role only in specific branch (AJAX)
+app.post(
+  "/staff/update-role/:branchId/:staffId",
+  isLoggedIn,
+  async (req, res) => {
+    try {
+      const { role } = req.body;
+      const { branchId, staffId } = req.params;
+
+      // Validate role
+      const validRoles = ["Hotel-Admin", "Branch Head", "Chef", "Waiter"];
+      if (!validRoles.includes(role)) {
+        return res.json({ success: false, message: "Invalid role" });
+      }
+
+      // Check if trying to update own role
+      if (staffId === req.user._id.toString()) {
+        return res.json({
+          success: false,
+          message: "Cannot change your own role",
+        });
+      }
+
+      // Verify staff member belongs to the branch
+      const staffToUpdate = await Staff.findById(staffId);
+      if (!staffToUpdate) {
+        return res.json({ success: false, message: "Staff member not found" });
+      }
+
+      if (staffToUpdate.branch.toString() !== branchId) {
+        return res.json({
+          success: false,
+          message: "Unauthorized to update this staff member",
+        });
+      }
+
+      await Staff.findByIdAndUpdate(staffId, { role });
+      res.json({ success: true, message: "Role updated successfully" });
+    } catch (error) {
+      console.error("Error updating role:", error);
+      res.json({ success: false, message: "Error updating role" });
+    }
+  }
+);
+
+// DELETE - Delete staff member from specific branch (AJAX)
+app.delete("/staff/delete/:branchId/:staffId", isLoggedIn, async (req, res) => {
+  try {
+    const { branchId, staffId } = req.params;
+
+    // Check if trying to delete own account
+    if (staffId === req.user._id.toString()) {
+      return res.json({
         success: false,
-        error: "Branch not found",
+        message: "Cannot delete your own account",
       });
     }
 
-    // Generate unique order number
-    const orderCount = await Order.countDocuments({ branch: branchId });
-    const orderNumber = `${orderCount + 1}`;
+    // Verify staff member belongs to the branch
+    const staffToDelete = await Staff.findById(staffId);
+    if (!staffToDelete) {
+      return res.json({ success: false, message: "Staff member not found" });
+    }
 
-    // Create the order
-    const newOrder = new Order({
-      orderNumber: orderNumber,
-      branch: branchId,
-      orderType: orderType,
-      items: items,
-      totalAmount: totalAmount,
-      specialInstructions: specialInstructions || "",
-      status: "KOT",
-      paymentStatus: "Unpaid",
-      kotGenerated: true,
-      customer: req.user?._id || null, // If user is logged in
-    });
+    if (staffToDelete.branch.toString() !== branchId) {
+      return res.json({
+        success: false,
+        message: "Unauthorized to delete this staff member",
+      });
+    }
 
-    await newOrder.save();
-
-    // Generate KOT number
-    const kotCount = await KOT.countDocuments({ branch: branchId });
-    const kotNumber = `KOT-${kotCount + 1}`;
-
-    // Create KOT
-    const newKOT = new KOT({
-      kotNumber: kotNumber,
-      order: newOrder._id,
-      branch: branchId,
-      items: items.map((item) => ({
-        menuItem: item.menuItem,
-        quantity: item.quantity,
-        notes: specialInstructions || "",
-      })),
-      status: "In Kitchen",
-      createdBy: req.user?._id || newOrder._id, // Use order ID if customer not logged in
-      createdByModel: "Customer",
-      startedAt: new Date(),
-    });
-
-    await newKOT.save();
-
-    // Populate order details for response
-    await newOrder.populate("items.menuItem");
-
-    console.log("✅ Order Created:", newOrder.orderNumber);
-    console.log("✅ KOT Created:", newKOT.kotNumber);
-
-    res.json({
-      success: true,
-      message: "Order placed successfully!",
-      order: {
-        _id: newOrder._id,
-        orderNumber: newOrder.orderNumber,
-        orderType: newOrder.orderType,
-        totalAmount: newOrder.totalAmount,
-        status: newOrder.status,
-        items: newOrder.items,
-        createdAt: newOrder.createdAt,
-      },
-      kot: {
-        _id: newKOT._id,
-        kotNumber: newKOT.kotNumber,
-        status: newKOT.status,
-      },
-    });
+    // Delete the staff member
+    await Staff.findByIdAndDelete(staffId);
+    res.json({ success: true, message: "Staff member deleted successfully" });
   } catch (error) {
-    console.error("❌ Error placing order:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to place order. Please try again.",
-    });
+    console.error("Error deleting staff:", error);
+    res.json({ success: false, message: "Error deleting staff member" });
   }
 });
+
+// Optional: Route to toggle staff active status
+app.post(
+  "/staff/toggle-status/:branchId/:staffId",
+  isLoggedIn,
+  async (req, res) => {
+    try {
+      const { branchId, staffId } = req.params;
+
+      // Check if trying to deactivate own account
+      if (staffId === req.user._id.toString()) {
+        return res.json({
+          success: false,
+          message: "Cannot change your own status",
+        });
+      }
+
+      const staffMember = await Staff.findById(staffId);
+      if (!staffMember) {
+        return res.json({ success: false, message: "Staff member not found" });
+      }
+
+      if (staffMember.branch.toString() !== branchId) {
+        return res.json({ success: false, message: "Unauthorized" });
+      }
+
+      await Staff.findByIdAndUpdate(staffId, { active: !staffMember.active });
+      res.json({
+        success: true,
+        message: `Staff member ${
+          staffMember.active ? "deactivated" : "activated"
+        } successfully`,
+        newStatus: !staffMember.active,
+      });
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      res.json({ success: false, message: "Error updating status" });
+    }
+  }
+);
 
 app.get("/logout", (req, res) => {
   req.logOut((err) => {

@@ -5,7 +5,7 @@ const branchSchema = new Schema({
   branchName: { type: String, required: true }, // Branch name
   country: { type: String, required: true },
   address: { type: String, required: true }, // Use lowercase key for consistency
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Super admin
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Hotel-admin
   branchHead: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

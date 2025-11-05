@@ -7,14 +7,12 @@ export function initPage() {
     const res = await fetch(`/showOrders/${branchId}?${query}`);
     const html = await res.text();
 
-    // Replace orders container content dynamically
     const temp = document.createElement("div");
     temp.innerHTML = html;
     const newOrders = temp.querySelector("#ordersContainer");
     document.querySelector("#ordersContainer").innerHTML =
       newOrders?.innerHTML || "";
 
-    // Re-attach click handlers after content update
     attachOrderClickHandlers();
   }
 
@@ -30,217 +28,158 @@ export function initPage() {
     }
   }
 
-  async function loadOrderInPOS(orderId) {
+  async function loadOrderInPOS(orderId, branchId) {
     try {
-      console.log("🔍 Fetching order ID:", orderId);
+      console.log("🔍 Loading order:", orderId, "for branch:", branchId);
 
       // Fetch order details
       const response = await fetch(`/api/orders/${orderId}`);
-      console.log("📡 Response status:", response.status, response.statusText);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error("❌ Server error:", errorData);
         throw new Error(
           errorData.error || `Server returned ${response.status}`
         );
       }
 
       const result = await response.json();
-      console.log("📦 Order data received:", result);
       const order = result.data || result;
+      console.log("📦 Order data:", order);
 
-      // Load POS dashboard
-      const branchId = document.getElementById("filterForm").dataset.branchId;
-      const posResponse = await fetch(`/pos/${branchId}`);
-      const posHtml = await posResponse.text();
+      // Load POS page via the global dashboard function
+      if (typeof window.loadDashboardContent === "function") {
+        console.log("🔵 Loading POS via loadDashboardContent");
+        await window.loadDashboardContent(`/pos/${branchId}`);
 
-      // Update dashboard content area - check if element exists
-      const dashboardContent = document.getElementById("dashboard-content");
-
-      if (!dashboardContent) {
-        console.error(
-          "❌ #dashboard-content element not found! Redirecting..."
-        );
-        // If no dashboard-content container, redirect to POS page directly
+        // Wait for POS to initialize and populate order
+        setTimeout(() => {
+          if (window.currentPOS) {
+            console.log("✅ POS loaded, populating order");
+            populateOrderInPOS(order);
+          } else {
+            console.warn("⚠️ POS not ready, waiting...");
+            setTimeout(() => {
+              if (window.currentPOS) {
+                populateOrderInPOS(order);
+              } else {
+                console.error("❌ POS still not ready after delay");
+                showNotification(
+                  "POS failed to load. Please try again.",
+                  "error"
+                );
+              }
+            }, 1000);
+          }
+        }, 500);
+      } else {
+        console.error("❌ loadDashboardContent not available, redirecting");
         window.location.href = `/pos/${branchId}?orderId=${orderId}`;
-        return;
       }
-
-      // Replace entire dashboard content with POS
-      dashboardContent.innerHTML = posHtml;
-
-      // Update sidebar active state
-      document
-        .querySelectorAll("#sidebar a")
-        .forEach((a) => a.classList.remove("active"));
-      const posLink = document.querySelector(
-        `#sidebar a[href='/dashboard/pos']`
-      );
-      if (posLink) posLink.classList.add("active");
-
-      // Wait for POS to initialize, then populate with order data
-      // Use longer timeout and check if elements exist
-      setTimeout(() => {
-        populateOrderInPOS(order);
-      }, 500);
     } catch (err) {
-      console.error("❌ Failed to load order in POS:", err);
-      console.error("Error stack:", err.stack);
+      console.error("❌ Failed to load order:", err);
       showNotification(`Failed to load order: ${err.message}`, "error");
     }
   }
 
-  // ✅ UPDATED FUNCTION WITH OPTION 3 FIX
   function populateOrderInPOS(order) {
     console.log("🎨 Populating POS with order:", order);
 
-    // Helper function to wait for elements to exist
-    const waitForElement = (selector, timeout = 5000) => {
-      return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        const checkElement = () => {
-          const element = document.querySelector(selector);
-          if (element) {
-            console.log(`✅ Found element: ${selector}`);
-            resolve(element);
-          } else if (Date.now() - startTime > timeout) {
-            console.error(`❌ Timeout waiting for: ${selector}`);
-            reject(new Error(`Timeout waiting for ${selector}`));
-          } else {
-            setTimeout(checkElement, 100);
-          }
+    if (!window.currentPOS) {
+      console.error("❌ POS object not available");
+      showNotification("POS not ready. Please try again.", "error");
+      return;
+    }
+
+    const POS = window.currentPOS;
+
+    try {
+      // Clear existing items and set order data
+      POS.orderItems = [];
+      POS.currentOrderId = order._id;
+      POS.currentOrderStatus = order.status;
+      POS.orderNumber = order.orderNumber;
+
+      // Set customer data
+      if (order.customer) {
+        POS.customerData = {
+          name: order.customer.name || "Walk-in Customer",
+          phone: order.customer.phone || "",
+          email: order.customer.email || "",
+          address: order.customer.address || "",
         };
-        checkElement();
-      });
-    };
 
-    // Wait for all required POS elements to be available
-    Promise.all([
-      waitForElement("#orderItems"),
-      waitForElement("[data-order-number]"),
-      waitForElement("#customerSelect"),
-    ])
-      .then(() => {
-        console.log("✅ All POS elements found, populating order data...");
-
-        // Set order number
-        const orderNumberEl = document.querySelector("[data-order-number]");
-        if (orderNumberEl) {
-          orderNumberEl.textContent = `Order #${order.orderNumber}`;
-          orderNumberEl.dataset.orderId = order._id;
-          console.log("✅ Order number set");
-        }
-
-        // Set customer info
         const customerSelect = document.getElementById("customerSelect");
-        if (customerSelect && order.customer) {
-          const customerName = order.customer.name || "Walk-in Customer";
-          customerSelect.innerHTML = `<option>${customerName}</option>`;
-          console.log("✅ Customer name set:", customerName);
+        if (customerSelect && order.customer.name) {
+          customerSelect.innerHTML = `<option>${order.customer.name}${
+            order.customer.phone ? " - " + order.customer.phone : ""
+          }</option>`;
         }
+      }
 
-        // Set order type (serviceType radio buttons)
-        const orderTypeMap = {
-          "Dine In": "dine-in",
-          Delivery: "delivery",
-          Pickup: "pickup",
-        };
-        const serviceTypeValue = orderTypeMap[order.orderType] || "dine-in";
-        const serviceTypeRadio = document.querySelector(
-          `input[name="serviceType"][value="${serviceTypeValue}"]`
-        );
-        if (serviceTypeRadio) {
-          serviceTypeRadio.checked = true;
-          console.log("✅ Service type set:", serviceTypeValue);
-        }
+      // Set service type
+      const orderTypeMap = {
+        "Dine In": "dine-in",
+        Delivery: "delivery",
+        Pickup: "pickup",
+      };
+      const serviceTypeValue = orderTypeMap[order.orderType] || "dine-in";
+      const serviceTypeRadio = document.querySelector(
+        `input[name="serviceType"][value="${serviceTypeValue}"]`
+      );
+      if (serviceTypeRadio) {
+        serviceTypeRadio.checked = true;
+      }
 
-        // Set pax count
-        const paxInput = document.getElementById("paxCount");
-        if (paxInput && order.pax) {
-          paxInput.value = order.pax;
-          console.log("✅ Pax count set:", order.pax);
-        }
+      // Set pax count
+      const paxInput = document.getElementById("paxCount");
+      if (paxInput && order.pax) {
+        paxInput.value = order.pax;
+      }
 
-        // Populate items in order table
-        const orderItemsBody = document.getElementById("orderItems");
-        if (orderItemsBody && order.items && order.items.length > 0) {
-          console.log("🛒 Populating", order.items.length, "items");
+      // Update order number display
+      const orderNumberEl = document.querySelector("[data-order-number]");
+      if (orderNumberEl) {
+        orderNumberEl.textContent = `Order #${order.orderNumber}`;
+        orderNumberEl.dataset.orderId = order._id;
+      }
 
-          // Clear existing items
-          orderItemsBody.innerHTML = "";
+      // Add items to POS
+      if (order.items && order.items.length > 0) {
+        order.items.forEach((item) => {
+          const orderItem = {
+            id: item.menuItem?._id || item.menuItem,
+            name: item.menuItem?.itemName || item.name || "Unknown Item",
+            price: item.price || 0,
+            quantity: item.quantity || 1,
+            type: item.menuItem?.type || "Veg",
+          };
+          POS.orderItems.push(orderItem);
+        });
+      }
 
-          // Add each item
-          order.items.forEach((item, index) => {
-            const itemName =
-              item.menuItem?.itemName || item.name || "Unknown Item";
-            const itemPrice = item.price || item.menuItem?.price || 0;
-            const itemQuantity = item.quantity || 1;
-            const itemTotal = itemPrice * itemQuantity;
+      // Update the display
+      POS.updateOrder();
 
-            const itemRow = `
-              <tr class="border-b">
-                <td class="px-4 py-3 font-medium">${itemName}</td>
-                <td class="px-4 py-3 text-center">
-                  <button class="px-2 bg-gray-100 rounded hover:bg-gray-200" onclick="decrementItem(${index})">-</button>
-                  <span class="px-2">${itemQuantity}</span>
-                  <button class="px-2 bg-gray-100 rounded hover:bg-gray-200" onclick="incrementItem(${index})">+</button>
-                </td>
-                <td class="px-4 py-3 text-right">₹${itemPrice.toFixed(2)}</td>
-                <td class="px-4 py-3 text-right font-semibold">₹${itemTotal.toFixed(
-                  2
-                )}</td>
-                <td class="px-4 py-3 text-right">
-                  <button class="text-red-500 hover:text-red-700 text-xl" onclick="removeItem(${index})">×</button>
-                </td>
-              </tr>
-            `;
-            orderItemsBody.insertAdjacentHTML("beforeend", itemRow);
-          });
+      console.log("✅ Order loaded successfully");
+      showNotification(`Order #${order.orderNumber} loaded`, "success");
 
-          // Update totals
-          updateCartTotals(order);
-          console.log("✅ Cart populated successfully");
-        }
-
-        // Add status control and configure buttons
-        addStatusControl(order);
-        configureActionButtons(order);
-
-        console.log("✅ Order successfully loaded in POS");
-        showNotification("Order loaded successfully", "success");
-      })
-      .catch((err) => {
-        console.error("❌ Failed to find POS elements:", err);
-        showNotification(
-          "Failed to load order in POS. Please try again.",
-          "error"
-        );
-      });
-  }
-
-  function updateCartTotals(order) {
-    const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = order.items.reduce(
-      (sum, item) => sum + item.quantity * item.price,
-      0
-    );
-
-    const itemCountEl = document.getElementById("itemCount");
-    const subTotalEl = document.getElementById("subTotal");
-    const totalAmountEl = document.getElementById("totalAmount");
-
-    if (itemCountEl) itemCountEl.textContent = itemCount;
-    if (subTotalEl) subTotalEl.textContent = `₹${subtotal.toFixed(2)}`;
-    if (totalAmountEl)
-      totalAmountEl.textContent = `₹${order.totalAmount.toFixed(2)}`;
+      // Add status control and configure buttons
+      addStatusControl(order);
+      configureActionButtons(order);
+    } catch (err) {
+      console.error("❌ Error populating order:", err);
+      showNotification("Failed to populate order data", "error");
+    }
   }
 
   function addStatusControl(order) {
     const controlPanel = document.querySelector("[data-control-panel]");
-    if (!controlPanel) return;
+    if (!controlPanel) {
+      console.warn("⚠️ Control panel not found");
+      return;
+    }
 
-    // Remove existing status control if present
+    // Remove existing status control
     const existing = document.getElementById("orderStatusControl");
     if (existing) existing.remove();
 
@@ -255,7 +194,7 @@ export function initPage() {
     ];
 
     const statusHtml = `
-      <div id="orderStatusControl" class="mb-4 p-4 bg-white rounded-lg shadow">
+      <div id="orderStatusControl" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <label class="block text-sm font-medium text-gray-700 mb-2">Order Status</label>
         <select 
           id="orderStatusSelect" 
@@ -281,52 +220,44 @@ export function initPage() {
   }
 
   function configureActionButtons(order) {
-    // Get action buttons container
     const actionContainer = document.querySelector("[data-action-buttons]");
-    if (!actionContainer) return;
+    if (!actionContainer) {
+      console.warn("⚠️ Action buttons container not found");
+      return;
+    }
 
-    // Clear existing buttons
-    actionContainer.innerHTML = "";
+    // Hide default buttons
+    const defaultButtons = actionContainer.querySelectorAll("button");
+    defaultButtons.forEach((btn) => (btn.style.display = "none"));
 
     const status = order.status;
     const paymentStatus = order.paymentStatus;
 
-    // Define button configurations based on status
     let buttons = [];
 
     if (status === "KOT") {
       buttons = [
         {
           label: "Generate Bill",
-          icon: "fa-file-invoice",
           class: "bg-green-500 hover:bg-green-600",
           action: "generateBill",
         },
         {
           label: "Print KOT",
-          icon: "fa-print",
-          class: "bg-gray-500 hover:bg-gray-600",
+          class: "bg-gray-700 hover:bg-gray-800",
           action: "printKOT",
-        },
-        {
-          label: "Cancel Order",
-          icon: "fa-times",
-          class: "bg-red-500 hover:bg-red-600",
-          action: "cancelOrder",
         },
       ];
     } else if (status === "Billed" && paymentStatus === "Unpaid") {
       buttons = [
         {
           label: "Add Payment",
-          icon: "fa-credit-card",
           class: "bg-green-500 hover:bg-green-600",
           action: "addPayment",
         },
         {
           label: "Print Bill",
-          icon: "fa-print",
-          class: "bg-gray-500 hover:bg-gray-600",
+          class: "bg-gray-700 hover:bg-gray-800",
           action: "printBill",
         },
       ];
@@ -334,57 +265,33 @@ export function initPage() {
       buttons = [
         {
           label: "Print Receipt",
-          icon: "fa-print",
-          class: "bg-gray-500 hover:bg-gray-600",
+          class: "bg-gray-700 hover:bg-gray-800",
           action: "printReceipt",
         },
-        {
-          label: "View Details",
-          icon: "fa-eye",
-          class: "bg-blue-500 hover:bg-blue-600",
-          action: "viewDetails",
-        },
       ];
-    } else if (status === "Out For Delivery") {
+    } else if (status === "Payment Due" || paymentStatus === "Unpaid") {
       buttons = [
         {
-          label: "Mark Delivered",
-          icon: "fa-check",
+          label: "Add Payment",
           class: "bg-green-500 hover:bg-green-600",
-          action: "markDelivered",
+          action: "addPayment",
         },
         {
           label: "Print Receipt",
-          icon: "fa-print",
-          class: "bg-gray-500 hover:bg-gray-600",
+          class: "bg-gray-700 hover:bg-gray-800",
           action: "printReceipt",
-        },
-      ];
-    } else if (status === "Delivered" || status === "Cancelled") {
-      buttons = [
-        {
-          label: "Print Receipt",
-          icon: "fa-print",
-          class: "bg-gray-500 hover:bg-gray-600",
-          action: "printReceipt",
-        },
-        {
-          label: "View Details",
-          icon: "fa-eye",
-          class: "bg-blue-500 hover:bg-blue-600",
-          action: "viewDetails",
         },
       ];
     }
 
-    // Render buttons
+    // Clear and add new buttons
+    actionContainer.innerHTML = "";
     buttons.forEach((btn) => {
       const buttonHtml = `
         <button 
-          class="${btn.class} text-white px-6 py-3 rounded-lg font-semibold shadow-md flex items-center gap-2 transition"
+          class="${btn.class} text-white px-6 py-3 rounded-lg font-semibold shadow-md transition col-span-1"
           onclick="handleOrderAction('${btn.action}', '${order._id}')"
         >
-          <i class="fas ${btn.icon}"></i>
           ${btn.label}
         </button>
       `;
@@ -394,11 +301,15 @@ export function initPage() {
 
   function attachOrderClickHandlers() {
     const orderCards = document.querySelectorAll("[data-order-id]");
+    console.log("🔗 Attaching handlers to", orderCards.length, "orders");
+
     orderCards.forEach((card) => {
       card.addEventListener("click", (e) => {
         e.preventDefault();
         const orderId = card.dataset.orderId;
-        loadOrderInPOS(orderId);
+        const branchId = card.dataset.branchId;
+        console.log("🖱️ Clicked order:", orderId);
+        loadOrderInPOS(orderId, branchId);
       });
     });
   }
@@ -406,7 +317,7 @@ export function initPage() {
   // Global functions for order actions
   window.handleOrderStatusChange = async function (newStatus) {
     const orderIdEl = document.querySelector("[data-order-number]");
-    if (!orderIdEl) return;
+    if (!orderIdEl || !orderIdEl.dataset.orderId) return;
 
     const orderId = orderIdEl.dataset.orderId;
 
@@ -425,96 +336,68 @@ export function initPage() {
       const result = await response.json();
       const updatedOrder = result.data || result;
 
+      if (window.currentPOS) {
+        window.currentPOS.currentOrderStatus = newStatus;
+      }
+
       configureActionButtons(updatedOrder);
-      showNotification(
-        result.message || "Order status updated successfully",
-        "success"
-      );
+      showNotification("Status updated successfully", "success");
     } catch (err) {
       console.error("Error updating status:", err);
-      showNotification(err.message || "Failed to update order status", "error");
-
-      const statusSelect = document.getElementById("orderStatusSelect");
-      if (statusSelect) {
-        statusSelect.value = statusSelect.dataset.previousStatus || "KOT";
-      }
+      showNotification("Failed to update status", "error");
     }
   };
 
   window.handleOrderAction = async function (action, orderId) {
     try {
+      console.log("🎬 Action:", action, "for order:", orderId);
+
       switch (action) {
         case "generateBill":
-          await generateBill(orderId);
+          if (window.currentPOS && window.currentPOS.billOrder) {
+            window.currentPOS.billOrder();
+          } else {
+            showNotification("Generate bill functionality", "info");
+          }
           break;
         case "addPayment":
-          showPaymentModal(orderId);
+          if (window.currentPOS && window.currentPOS.showPaymentModal) {
+            window.currentPOS.showPaymentModal();
+          } else {
+            showNotification("Payment modal functionality", "info");
+          }
           break;
         case "printKOT":
-          await printDocument(orderId, "kot");
-          break;
         case "printBill":
-          await printDocument(orderId, "bill");
-          break;
         case "printReceipt":
-          await printDocument(orderId, "receipt");
+          if (window.currentPOS && window.currentPOS.billAndPrint) {
+            window.currentPOS.billAndPrint();
+          } else {
+            showNotification("Print functionality", "info");
+          }
           break;
-        case "markDelivered":
-          await updateOrderStatus(orderId, "Delivered");
-          break;
-        case "viewDetails":
-          window.location.href = `/orders/${orderId}`;
-          break;
-        case "cancelOrder":
-          showCancelOrderModal(orderId);
-          break;
+        default:
+          showNotification(`Action: ${action}`, "info");
       }
     } catch (err) {
-      console.error("Error handling order action:", err);
-      showNotification("Action failed. Please try again.", "error");
+      console.error("Error handling action:", err);
+      showNotification("Action failed", "error");
     }
   };
-
-  async function generateBill(orderId) {
-    // Implementation from original code
-    showNotification("Generate bill functionality", "info");
-  }
-
-  function showPaymentModal(orderId) {
-    // Implementation from original code
-    showNotification("Payment modal functionality", "info");
-  }
-
-  function showCancelOrderModal(orderId) {
-    // Implementation from original code
-    showNotification("Cancel order modal functionality", "info");
-  }
-
-  async function printDocument(orderId, type) {
-    try {
-      window.open(`/api/orders/${orderId}/print/${type}`, "_blank");
-    } catch (err) {
-      console.error("Error printing:", err);
-      showNotification("Failed to print document", "error");
-    }
-  }
-
-  async function updateOrderStatus(orderId, status) {
-    // Implementation from original code
-    showNotification(`Update status to ${status}`, "info");
-  }
 
   function showNotification(message, type = "info") {
     const colors = {
       success: "bg-green-500",
       error: "bg-red-500",
       info: "bg-blue-500",
+      warning: "bg-yellow-500",
     };
 
     const icons = {
       success: "fa-check-circle",
       error: "fa-exclamation-circle",
       info: "fa-info-circle",
+      warning: "fa-exclamation-triangle",
     };
 
     const notification = document.createElement("div");
@@ -537,22 +420,31 @@ export function initPage() {
   const dateFilterSelect = document.getElementById("dateFilter");
   const customDateContainer = document.getElementById("customDateContainer");
 
-  dateFilterSelect.addEventListener("change", handleDateFilterChange);
+  if (dateFilterSelect) {
+    dateFilterSelect.addEventListener("change", handleDateFilterChange);
+  }
 
-  form.addEventListener("change", async (e) => {
-    if (e.target.id === "startDate" || e.target.id === "endDate") {
-      const dateFilter = document.getElementById("dateFilter").value;
-      if (dateFilter === "custom") await applyFilters();
-    } else if (e.target.id !== "dateFilter") {
-      await applyFilters();
-    }
-  });
+  if (form) {
+    form.addEventListener("change", async (e) => {
+      if (e.target.id === "startDate" || e.target.id === "endDate") {
+        const dateFilter = document.getElementById("dateFilter").value;
+        if (dateFilter === "custom") await applyFilters();
+      } else if (e.target.id !== "dateFilter") {
+        await applyFilters();
+      }
+    });
+  }
 
-  if (dateFilterSelect.value === "custom") {
+  if (
+    dateFilterSelect &&
+    dateFilterSelect.value === "custom" &&
+    customDateContainer
+  ) {
     customDateContainer.classList.remove("hidden");
-  } else {
+  } else if (customDateContainer) {
     customDateContainer.classList.add("hidden");
   }
 
   attachOrderClickHandlers();
+  console.log("✅ showOrders.js initialized");
 }

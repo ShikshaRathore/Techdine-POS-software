@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .modal-enter {
+        animation: fadeIn 0.25s ease-in-out;
+      }
+      .modal-leave {
+        animation: fadeOut 0.2s ease-in-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+      }
+      .reservation-card {
+        transition: all 0.2s ease;
+      }
+      .reservation-card:hover {
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl sm:text-3xl font-bold text-gray-900">
+            Reservations <% if (reservations && reservations.length > 0) { %>
+            <span class="text-gray-400">(<%= reservations.length %>)</span>
+            <% } %>
+          </h1>
+          <button
+            onclick="openReservationModal()"
+            class="px-4 sm:px-6 py-2.5 sm:py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 active:scale-95 transition-all shadow-sm flex items-center gap-2"
+          >
+            <i class="fa-solid fa-plus"></i>
+            <span>New Reservation</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Filters -->
+      <section class="mb-6">
+        <div class="flex flex-wrap gap-3">
+          <select
+            id="weekSelector"
+            class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+          >
+            <option value="current">Current Week</option>
+            <option value="next">Next Week</option>
+            <option value="custom">Custom Range</option>
+          </select>
+
+          <input
+            type="date"
+            id="dateFrom"
+            value="<%= startDate || '' %>"
+            class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+          />
+
+          <input
+            type="date"
+            id="dateTo"
+            value="<%= endDate || '' %>"
+            class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+          />
+
+          <button
+            onclick="filterReservations()"
+            class="px-4 py-2.5 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors"
+          >
+            <i class="fa-solid fa-magnifying-glass mr-2"></i>Search
+          </button>
+        </div>
+      </section>
+
+      <!-- Reservations Grid -->
+      <section
+        id="reservationsGrid"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
+      >
+        <% if (reservations && reservations.length > 0) { %> <%
+        reservations.forEach(reservation => { %>
+        <article
+          class="bg-white rounded-xl shadow-sm hover:shadow-md reservation-card"
+        >
+          <!-- Card Header -->
+          <div class="p-5 border-b border-gray-100">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  <i
+                    class="fa-solid fa-calendar-check text-orange-500 text-lg"
+                  ></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 text-base">
+                    Reservation #<%=
+                    reservation._id.toString().slice(-4).toUpperCase() %>
+                  </h3>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 <%= reservation.status === 'Confirmed' ? 'bg-green-100 text-green-700' : reservation.status === 'Cancelled' ? 'bg-red-100 text-red-700' : reservation.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700' %>"
+                  >
+                    <%= reservation.status %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">
+                <%= new
+                Date(reservation.reservationDate).toLocaleDateString('en-US', {
+                weekday: 'short', month: 'short', day: 'numeric' }) %> · <%=
+                reservation.timeSlot %>
+              </span>
+              <span class="font-medium text-gray-900">
+                <%= reservation.numberOfGuests %> Guest<%=
+                reservation.numberOfGuests > 1 ? 's' : '' %>
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-5">
+            <div class="space-y-3 mb-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                  <i class="fa-solid fa-user w-4"></i>
+                  <span><%= reservation.customer.name %></span>
+                </div>
+                <span class="text-sm text-gray-500">Walk-in Customer</span>
+              </div>
+
+              <div class="flex items-start gap-2 text-sm">
+                <i class="fa-solid fa-utensils w-4 text-gray-400 mt-0.5"></i>
+                <div class="flex-1">
+                  <div class="text-gray-700"><%= reservation.mealPeriod %></div>
+                  <div class="text-gray-500 flex items-center gap-3 mt-1">
+                    <span
+                      ><i class="fa-solid fa-map-marker-alt mr-1"></i><%=
+                      reservation.area.name %></span
+                    >
+                    <span
+                      ><i class="fa-solid fa-chair mr-1"></i>Table <%=
+                      reservation.table.tableCode %></span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <i class="fa-solid fa-phone w-4 text-gray-400"></i>
+                <span><%= reservation.customer.phone %></span>
+              </div>
+
+              <% if (reservation.customer.email) { %>
+              <div
+                class="flex items-center gap-2 text-sm text-gray-700 break-all"
+              >
+                <i class="fa-regular fa-envelope w-4 text-gray-400"></i>
+                <span><%= reservation.customer.email %></span>
+              </div>
+              <% } %>
+            </div>
+
+            <% if (reservation.specialRequests) { %>
+            <div
+              class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
+            >
+              <p class="text-xs text-yellow-800">
+                <i class="fa-solid fa-note-sticky mr-1"></i>
+                <strong>Note:</strong> <%= reservation.specialRequests %>
+              </p>
+            </div>
+            <% } %>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+              <button
+                onclick="viewReservation('<%= reservation._id %>')"
+                class="flex-1 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <i class="fa-solid fa-eye mr-1"></i>View
+              </button>
+              <% if (reservation.status === 'Confirmed') { %>
+              <button
+                onclick="cancelReservation('<%= reservation._id %>')"
+                class="flex-1 px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
+              >
+                <i class="fa-solid fa-xmark mr-1"></i>Cancel
+              </button>
+              <% } %>
+            </div>
+          </div>
+        </article>
+        <% }); %> <% } else { %>
+        <div class="col-span-full py-20 text-center">
+          <div
+            class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4"
+          >
+            <i class="fa-regular fa-calendar-xmark text-4xl text-gray-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-1">
+            No reservations found
+          </h3>
+          <p class="text-gray-500 text-sm">
+            Try adjusting your filters or create a new reservation
+          </p>
+        </div>
+        <% } %>
+      </section>
+    </main>
+
+    <!-- Floating Action Button (Mobile) -->
+    <button
+      onclick="openReservationModal()"
+      class="fixed bottom-6 right-6 w-14 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg active:scale-95 transition-all md:hidden flex items-center justify-center z-20"
+    >
+      <i class="fa-solid fa-plus text-xl"></i>
+    </button>
+
+    <!-- Modal -->
+    <div
+      id="reservationModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+    >
+      <div
+        class="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl w-full sm:max-w-2xl sm:mx-auto overflow-y-auto max-h-[90vh] modal-enter"
+      >
+        <div
+          class="sticky top-0 bg-white px-5 py-4 border-b border-gray-200 flex justify-between items-center"
+        >
+          <h2 class="text-xl font-bold text-gray-900">New Reservation</h2>
+          <button
+            onclick="closeReservationModal()"
+            class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <form
+          id="reservationForm"
+          onsubmit="submitReservation(event)"
+          class="p-5 space-y-5"
+        >
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Date *</label
+              >
+              <input
+                type="date"
+                id="reservationDate"
+                name="reservationDate"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Guests *</label
+              >
+              <select
+                id="numberOfGuests"
+                name="numberOfGuests"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              >
+                <% for(let i=1; i<=10; i++){ %>
+                <option value="<%= i %>">
+                  <%= i %> Guest<%= i>1?'s':'' %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Meal *</label
+              >
+              <select
+                id="mealPeriod"
+                name="mealPeriod"
+                onchange="updateTimeSlots(this.value)"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              >
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch" selected>Lunch</option>
+                <option value="Dinner">Dinner</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Time Slot *</label
+            >
+            <div
+              id="timeSlotsContainer"
+              class="grid grid-cols-3 sm:grid-cols-4 gap-2"
+            ></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Select Area *</label
+            >
+            <select
+              id="areaSelect"
+              name="area"
+              onchange="loadAreaTables()"
+              required
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+            >
+              <option value="">Choose area...</option>
+              <% areas.forEach(area => { %>
+              <option value="<%= area._id %>"><%= area.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div id="tableSelectContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Select Table *</label
+            >
+            <select
+              id="tableSelect"
+              name="table"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+            >
+              <option value="">Choose table...</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Name *</label
+              >
+              <input
+                type="text"
+                id="customerName"
+                name="customerName"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Phone *</label
+              >
+              <input
+                type="tel"
+                id="customerPhone"
+                name="customerPhone"
+                pattern="[0-9]{10}"
+                required
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
+                >Email</label
+              >
+              <input
+                type="email"
+                id="customerEmail"
+                name="customerEmail"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Special Request</label
+            >
+            <textarea
+              id="specialRequests"
+              name="specialRequests"
+              rows="3"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+              placeholder="Any special requirements or notes..."
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3.5 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 active:scale-[0.98] transition-all shadow-sm"
+          >
+            <i class="fa-solid fa-check mr-2"></i>Reserve Now
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

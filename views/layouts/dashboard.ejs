@@ -81,26 +81,24 @@
           </svg>
         </button>
 
-        <div class="p-4 sm:p-6 border-b border-gray-700">
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0"
-            >
-              <span class="text-xl font-bold">R</span>
-            </div>
+        <div class="p-4 sm:p-6 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <!-- Restaurant Icon -->
             <div>
-              <h1 class="text-lg sm:text-xl font-bold">
-                <%= user.restaurantName %>
+              <!-- Restaurant Name -->
+              <h1 class="text-xl font-bold text-white flex items-center gap-1">
+                <span> <%= user.restaurantName %></span>
               </h1>
-              <!-- Branch Switcher Dropdown -->
 
-              <div class="relative inline-block w-full max-w-xs">
+              <!-- Branch Switcher -->
+              <div class="relative mt-2">
                 <form action="/dashboard" method="GET" id="branchForm">
                   <div class="relative">
+                    <!-- Dropdown -->
                     <select
                       name="branchId"
                       onchange="window.location.href = '/dashboard/' + this.value"
-                      class="w-full appearance-none border border-orange-500 bg-white text-orange-600 font-semibold rounded-lg px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer"
+                      class="w-56 appearance-none border-2 border-orange-400 bg-white text-orange-600 font-semibold rounded-lg px-10 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer transition-all"
                     >
                       <% branches.forEach(b => { %> <option value="<%= b._id %>"
                       <%= branch && branch._id.toString() === b._id.toString() ?
@@ -108,12 +106,37 @@
                       %> <% }) %>
                     </select>
 
-                    <!-- Dropdown Icon -->
+                    <!-- Location Icon -->
                     <div
-                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none"
+                      class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-orange-500"
                     >
                       <svg
-                        class="w-4 h-4 text-orange-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 22s8-7.58 8-13a8 8 0 10-16 0c0 5.42 8 13 8 13z"
+                        />
+                      </svg>
+                    </div>
+
+                    <!-- Dropdown Arrow -->
+                    <div
+                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-orange-500"
+                    >
+                      <svg
+                        class="w-4 h-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -194,25 +217,8 @@
             >
           </a>
 
-          <a
-            href="#"
-            class="flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span class="font-medium text-sm sm:text-base">Reservations</span>
-          </a>
+          <%- include("../includes/Reservations.ejs", {branch: branch, branches:
+          branches, branchId: branchId}) %>
 
           <a
             href="#"
@@ -234,25 +240,8 @@
             <span class="font-medium text-sm sm:text-base">Customers</span>
           </a>
 
-          <a
-            href="#"
-            class="flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <span class="font-medium text-sm sm:text-base">Staff</span>
-          </a>
+          <%- include("../includes/staff.ejs", { branch: branch, branches:
+          branches, branchId: branchId }) %>
 
           <a
             href="#"

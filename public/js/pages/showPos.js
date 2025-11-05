@@ -12,6 +12,9 @@ export function initPage(branchId) {
     customerData: null,
 
     init() {
+      // --- 📱 Mobile Cart Toggle (ADD THIS) ---
+      this.initMobileCart();
+
       // --- 🔍 Search Functionality ---
       const searchInput = document.getElementById("searchInput");
       if (searchInput) {
@@ -38,7 +41,7 @@ export function initPage(branchId) {
             const item = JSON.parse(card.dataset.item);
             this.addToOrder(item);
           } catch (err) {
-            console.error("Invalid menu item data:", err);
+            req.flash("success", err.message);
           }
         });
       });
@@ -96,6 +99,78 @@ export function initPage(branchId) {
       this.filterCategory("all");
     },
 
+    // 📱 Initialize Mobile Cart
+    initMobileCart() {
+      const cartSection = document.querySelector(".cart-section");
+      const cartToggle = document.getElementById("cartToggle");
+      const cartBackdrop = document.getElementById("cartBackdrop");
+
+      // Only initialize mobile behavior on mobile devices
+      const isMobile = () => window.innerWidth < 768;
+
+      if (isMobile()) {
+        // Toggle cart on click
+        if (cartToggle) {
+          cartToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Cart toggle clicked");
+
+            const isOpen = cartSection?.classList.contains("open");
+
+            if (isOpen) {
+              this.closeMobileCart();
+            } else {
+              this.openMobileCart();
+            }
+          });
+        }
+
+        // Close cart when clicking backdrop
+        if (cartBackdrop) {
+          cartBackdrop.addEventListener("click", () => {
+            this.closeMobileCart();
+          });
+        }
+      }
+
+      // Handle window resize
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 768) {
+          // Desktop view - ensure cart is visible and reset mobile classes
+          cartSection?.classList.remove("open");
+          cartBackdrop?.classList.remove("active");
+        }
+      });
+    },
+
+    // 📱 Open Mobile Cart
+    openMobileCart() {
+      if (window.innerWidth < 768) {
+        const cartSection = document.querySelector(".cart-section");
+        const cartBackdrop = document.getElementById("cartBackdrop");
+        cartSection?.classList.add("open");
+        cartBackdrop?.classList.add("active");
+      }
+    },
+
+    // 📱 Close Mobile Cart
+    closeMobileCart() {
+      const cartSection = document.querySelector(".cart-section");
+      const cartBackdrop = document.getElementById("cartBackdrop");
+      cartSection?.classList.remove("open");
+      cartBackdrop?.classList.remove("active");
+    },
+
+    // 📱 Update Mobile Item Count
+    updateMobileItemCount() {
+      const count = this.orderItems.reduce((sum, i) => sum + i.quantity, 0);
+      const mobileCount = document.getElementById("mobileItemCount");
+      if (mobileCount) {
+        mobileCount.textContent = count;
+      }
+    },
+
     // 🔹 Filter Categories
     filterCategory(category) {
       const buttons = document.querySelectorAll(".category-btn");
@@ -124,6 +199,11 @@ export function initPage(branchId) {
       if (existing) existing.quantity++;
       else this.orderItems.push({ ...item, quantity: 1 });
       this.updateOrder();
+
+      // Open cart on mobile when item is added (ADD THIS)
+      if (window.innerWidth < 768) {
+        this.openMobileCart();
+      }
     },
 
     changeQty(index, delta) {
@@ -145,9 +225,10 @@ export function initPage(branchId) {
 
       if (this.orderItems.length === 0) {
         tbody.innerHTML = `
-          <tr><td colspan="5" class="text-center py-12 text-gray-500">No items yet</td></tr>
+          <tr><td colspan="5" class="text-center py-8 md:py-12 text-gray-500 text-sm">No items yet</td></tr>
         `;
         this.updateTotals();
+        this.updateMobileItemCount(); // ADD THIS
         return;
       }
 
@@ -155,18 +236,22 @@ export function initPage(branchId) {
         .map(
           (i, idx) => `
             <tr class="border-b">
-              <td class="px-4 py-3 font-medium">${i.name}</td>
-              <td class="px-4 py-3 text-center">
-                <button class="px-2 bg-gray-100 rounded hover:bg-gray-200" data-action="dec" data-idx="${idx}">-</button>
-                <span class="px-2">${i.quantity}</span>
-                <button class="px-2 bg-gray-100 rounded hover:bg-gray-200" data-action="inc" data-idx="${idx}">+</button>
+              <td class="px-2 md:px-4 py-2 md:py-3 font-medium text-sm">${
+                i.name
+              }</td>
+              <td class="px-2 md:px-4 py-2 md:py-3 text-center">
+                <button class="px-1.5 md:px-2 bg-gray-100 rounded hover:bg-gray-200 text-sm" data-action="dec" data-idx="${idx}">-</button>
+                <span class="px-1.5 md:px-2 text-sm">${i.quantity}</span>
+                <button class="px-1.5 md:px-2 bg-gray-100 rounded hover:bg-gray-200 text-sm" data-action="inc" data-idx="${idx}">+</button>
               </td>
-              <td class="px-4 py-3 text-right">₹${i.price.toFixed(2)}</td>
-              <td class="px-4 py-3 text-right font-semibold">₹${(
+              <td class="px-2 md:px-4 py-2 md:py-3 text-right hidden md:table-cell text-sm">₹${i.price.toFixed(
+                2
+              )}</td>
+              <td class="px-2 md:px-4 py-2 md:py-3 text-right font-semibold text-sm">₹${(
                 i.price * i.quantity
               ).toFixed(2)}</td>
-              <td class="px-4 py-3 text-right">
-                <button class="text-red-500 hover:text-red-700 text-xl" data-action="remove" data-idx="${idx}">×</button>
+              <td class="px-2 md:px-4 py-2 md:py-3 text-right">
+                <button class="text-red-500 hover:text-red-700 text-lg md:text-xl" data-action="remove" data-idx="${idx}">×</button>
               </td>
             </tr>
           `
@@ -185,6 +270,7 @@ export function initPage(branchId) {
       });
 
       this.updateTotals();
+      this.updateMobileItemCount(); // ADD THIS
     },
 
     updateTotals() {
@@ -202,6 +288,9 @@ export function initPage(branchId) {
       if (subEl) subEl.textContent = `₹${total.toFixed(2)}`;
       if (totalEl) totalEl.textContent = `₹${total.toFixed(2)}`;
     },
+
+    // ... rest of your existing methods remain the same ...
+    // (showCustomerDetailsForm, kotOrder, billOrder, etc.)
 
     // 👤 Show Customer Details Form
     showCustomerDetailsForm() {
@@ -832,4 +921,6 @@ export function initPage(branchId) {
 
   // Initialize POS page
   POS.init();
+
+  window.currentPOS = POS;
 }

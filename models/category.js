@@ -5,4 +5,6 @@ const categorySchema = new mongoose.Schema({
   menu: { type: mongoose.Schema.Types.ObjectId, ref: "Menu", required: true },
 });
 
+categorySchema.index({ name: 1, menu: 1 }, { unique: true });
+
 module.exports = mongoose.model("Category", categorySchema);

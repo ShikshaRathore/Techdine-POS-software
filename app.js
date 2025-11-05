@@ -130,15 +130,15 @@ app.use("/restaurant", customerRoutes);
 //--------------API---------------------
 
 app.get("/", (req, res) => {
-  res.render("./layouts/index.ejs");
+  res.render("layouts/index.ejs");
 });
 
 app.get("/Techdine", (req, res) => {
-  res.render("./layouts/index.ejs");
+  res.render("layouts/index.ejs");
 });
 
 app.get("/signup", (req, res) => {
-  res.render("./users/signup.ejs");
+  res.render("users/signup.ejs");
 });
 
 // ========== SIGNUP ROUTE ==========

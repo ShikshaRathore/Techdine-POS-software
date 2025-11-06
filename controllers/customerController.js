@@ -5,6 +5,7 @@ const Menu = require("../models/menu");
 const MenuItem = require("../models/menuItem");
 const Order = require("../models/order");
 const KOT = require("../models/kot");
+const Area = require("../models/area");
 
 /**
  * Display customer dashboard with menu
@@ -114,14 +115,7 @@ exports.placeOrder = async (req, res) => {
     }
 
     // Generate unique order number with date prefix
-    const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    const orderCount = await Order.countDocuments({
-      branch: branchId,
-      createdAt: { $gte: new Date().setHours(0, 0, 0, 0) },
-    });
-    const orderNumber = `${today}-${(orderCount + 1)
-      .toString()
-      .padStart(3, "0")}`;
+    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     // Create the order
     const newOrder = new Order({
@@ -139,14 +133,7 @@ exports.placeOrder = async (req, res) => {
 
     await newOrder.save();
 
-    // Generate KOT number with date prefix
-    const kotCount = await KOT.countDocuments({
-      branch: branchId,
-      createdAt: { $gte: new Date().setHours(0, 0, 0, 0) },
-    });
-    const kotNumber = `KOT-${today}-${(kotCount + 1)
-      .toString()
-      .padStart(3, "0")}`;
+    const kotNumber = `KOT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     // Create KOT
     const newKOT = new KOT({

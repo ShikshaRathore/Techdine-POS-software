@@ -70,9 +70,10 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() * 7 * 24 * 60 * 60 * 1000,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // important for render
   },
 };
 
@@ -1995,7 +1996,7 @@ app.get("/logout", (req, res) => {
       return next(err);
     }
     req.flash("success", "User logged Out!");
-    res.redirect("/techdine");
+    res.redirect("/Techdine");
   });
 });
 const PORT = process.env.PORT;

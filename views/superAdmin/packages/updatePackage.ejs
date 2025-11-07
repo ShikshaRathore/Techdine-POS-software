@@ -1,0 +1,148 @@
+<!-- UPDATE MODAL -->
+<div
+  id="updatePackageModal"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+  >
+    <div
+      class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl"
+    >
+      <h3 class="text-2xl font-bold text-gray-900">Update Package</h3>
+      <button
+        onclick="closeUpdateModal()"
+        class="text-gray-400 hover:text-gray-600 transition"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form
+      action="/admin-dashboard/packages/update"
+      method="POST"
+      class="p-6 space-y-6"
+    >
+      <input type="hidden" id="update_packageId" name="packageId" />
+
+      <div>
+        <label class="block font-medium text-gray-700 mb-1">Package Name</label>
+        <input
+          type="text"
+          id="update_packageName"
+          name="name"
+          required
+          class="border w-full px-4 py-2 rounded-lg"
+        />
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <input
+          type="number"
+          id="update_monthlyPrice"
+          name="monthlyPrice"
+          placeholder="Monthly"
+          class="border w-full px-3 py-2 rounded"
+        />
+        <input
+          type="number"
+          id="update_annualPrice"
+          name="annualPrice"
+          placeholder="Annual"
+          class="border w-full px-3 py-2 rounded"
+        />
+        <input
+          type="number"
+          id="update_lifetimePrice"
+          name="lifetimePrice"
+          placeholder="Lifetime"
+          class="border w-full px-3 py-2 rounded"
+        />
+      </div>
+
+      <label class="flex items-center gap-2"
+        ><input
+          type="checkbox"
+          id="update_isRecommended"
+          name="isRecommended"
+        />
+        Recommended</label
+      >
+      <label class="flex items-center gap-2"
+        ><input type="checkbox" id="update_isTrial" name="isTrial" />
+        Trial</label
+      >
+      <input
+        type="number"
+        id="update_trialDays"
+        name="trialDays"
+        placeholder="Trial Days"
+        class="border w-full px-3 py-2 rounded"
+      />
+      <label class="flex items-center gap-2"
+        ><input type="checkbox" id="update_isPrivate" name="isPrivate" />
+        Private</label
+      >
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <%
+        ["menu","staff","orders","table","kot","customer","payment","settings","waiter","menu-items","area","reservation","order","staff-mgmt","report","delivery"].forEach(function(m){
+        %>
+
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="modules"
+            value="<%= m %>"
+            class="update-module-checkbox"
+          />
+          <span><%= m %></span>
+        </label>
+        <% }) %>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t">
+        <button
+          type="button"
+          onclick="closeUpdateModal()"
+          class="px-4 py-2 bg-gray-200 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-orange-500 text-white rounded"
+        >
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openUpdateModal(pkg) {
+    document.getElementById("updatePackageModal").classList.remove("hidden");
+
+    document.getElementById("update_packageId").value = pkg._id;
+    document.getElementById("update_packageName").value = pkg.name;
+    document.getElementById("update_monthlyPrice").value =
+      pkg.monthlyPrice || "";
+    document.getElementById("update_annualPrice").value = pkg.annualPrice || "";
+    document.getElementById("update_lifetimePrice").value =
+      pkg.lifetimePrice || "";
+
+    document.getElementById("update_isRecommended").checked = pkg.isRecommended;
+    document.getElementById("update_isTrial").checked = pkg.isTrial;
+    document.getElementById("update_trialDays").value = pkg.trialDays || "";
+    document.getElementById("update_isPrivate").checked = pkg.isPrivate;
+
+    document.querySelectorAll(".update-module-checkbox").forEach((cb) => {
+      cb.checked = pkg.modules.includes(cb.value);
+    });
+  }
+
+  function closeUpdateModal() {
+    document.getElementById("updatePackageModal").classList.add("hidden");
+  }
+</script>

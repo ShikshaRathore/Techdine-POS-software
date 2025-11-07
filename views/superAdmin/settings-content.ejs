@@ -1,0 +1,508 @@
+<div class="space-y-6">
+  <!-- Settings Tabs -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px overflow-x-auto">
+        <a
+          href="/admin-dashboard/settings?tab=app"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'app' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          App Settings
+        </a>
+        <a
+          href="/admin-dashboard/settings?tab=email"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'email' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          Email Settings
+        </a>
+        <a
+          href="/admin-dashboard/settings?tab=language"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'language' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          Language Settings
+        </a>
+        <a
+          href="/admin-dashboard/settings?tab=payment"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'payment' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          Payment Gateways
+        </a>
+        <a
+          href="/admin-dashboard/settings?tab=push"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'push' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          Push Notification Settings
+        </a>
+        <a
+          href="/admin-dashboard/settings?tab=currencies"
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'currencies' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>"
+        >
+          Currencies
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6">
+      <% if (currentTab === 'app') { %>
+      <!-- App Settings -->
+      <div class="space-y-6 max-w-2xl">
+        <h3 class="text-lg font-semibold text-gray-800">App Settings</h3>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >App Name</label
+          >
+          <input
+            type="text"
+            value="<%= appSettings.name %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Logo</label
+          >
+          <div class="flex items-center gap-4">
+            <img
+              src="<%= appSettings.logo %>"
+              alt="Logo"
+              class="w-20 h-20 object-contain rounded-lg border border-gray-300"
+            />
+            <div class="flex gap-2">
+              <button
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Upload Logo
+              </button>
+              <button
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Remove Logo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Theme Color</label
+          >
+          <div class="flex items-center gap-3">
+            <input
+              type="color"
+              value="<%= appSettings.themeColor %>"
+              class="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
+            />
+            <span class="text-sm text-gray-600"
+              ><%= appSettings.themeColor %></span
+            >
+          </div>
+        </div>
+
+        <button
+          class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+
+      <% } else if (currentTab === 'email') { %>
+      <!-- Email Settings -->
+      <div class="space-y-6 max-w-2xl">
+        <h3 class="text-lg font-semibold text-gray-800">Email Settings</h3>
+
+        <div
+          class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-2"
+        >
+          <i class="fas fa-check-circle text-green-500"></i>
+          <span class="text-sm text-green-800"
+            >Your SMTP details are correct</span
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Mail From Name</label
+          >
+          <input
+            type="text"
+            value="<%= emailSettings.fromName %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Mail From Email</label
+          >
+          <input
+            type="email"
+            value="<%= emailSettings.fromEmail %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Enable Email Queue</label
+          >
+          <select
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option>No</option>
+            <option>Yes</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Mail Driver</label
+          >
+          <select
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option>SMTP</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >SMTP Host</label
+          >
+          <input
+            type="text"
+            value="<%= emailSettings.smtpHost %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >SMTP Port</label
+          >
+          <input
+            type="text"
+            value="<%= emailSettings.smtpPort %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Mail Username</label
+          >
+          <input
+            type="text"
+            value="<%= emailSettings.username %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Mail Password</label
+          >
+          <input
+            type="password"
+            value="••••••••••••••"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >SMTP Mail Encryption</label
+          >
+          <select
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option value="tls">tls</option>
+            <option value="ssl">ssl</option>
+          </select>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Save
+          </button>
+          <button
+            class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Test SMTP
+          </button>
+        </div>
+      </div>
+
+      <% } else if (currentTab === 'language') { %>
+      <!-- Language Settings -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">
+            Manage Translations
+          </h3>
+          <button
+            class="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Manage Translations
+          </button>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Language Code
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Language Name
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Active
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  RTL
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% languages.forEach(lang => { %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= lang.code %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= lang.name %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" <%= lang.active ? 'checked' : '' %>
+                  class="w-4 h-4 text-orange-500 border-gray-300 rounded
+                  focus:ring-orange-500">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" <%= lang.rtl ? 'checked' : '' %>
+                  class="w-4 h-4 text-orange-500 border-gray-300 rounded
+                  focus:ring-orange-500">
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <button
+          class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+
+      <% } else if (currentTab === 'payment') { %>
+      <!-- Payment Gateways -->
+      <div class="space-y-6 max-w-2xl">
+        <h3 class="text-lg font-semibold text-gray-800">Payment Gateways</h3>
+        <p class="text-sm text-gray-600">
+          Enter payment gateway credentials to receive subscription payments.
+        </p>
+
+        <div class="flex gap-4 border-b border-gray-200 pb-4">
+          <button
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-600 border-b-2 border-orange-500"
+          >
+            <i class="fas fa-credit-card"></i>
+            Razorpay
+          </button>
+          <button
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500"
+          >
+            <i class="fab fa-stripe"></i>
+            Stripe
+          </button>
+          <button
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500"
+          >
+            <i class="fas fa-money-check"></i>
+            Offline Payment Method
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="enableRazorpay" <%=
+          paymentGateways.razorpay ? 'checked' : '' %> class="w-4 h-4
+          text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+          <label for="enableRazorpay" class="text-sm font-medium text-gray-700"
+            >Enable Razorpay</label
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Select Environment</label
+          >
+          <select
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option value="TEST" <%= paymentGateways.environment === 'TEST' ?
+            'selected' : '' %>>TEST
+            <option value="LIVE">LIVE</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Test Razorpay KEY</label
+          >
+          <input
+            type="text"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Test Razorpay SECRET</label
+          >
+          <input
+            type="password"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <button
+          class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+
+      <% } else if (currentTab === 'push') { %>
+      <!-- Push Notifications -->
+      <div class="space-y-6 max-w-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">
+            Push Notification Settings
+          </h3>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-700">BEAMS</span>
+            <a href="#" class="text-sm text-blue-600 hover:underline"
+              >Generate Credentials</a
+            >
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="enablePush" <%= pushNotifications.enabled ?
+          'checked' : '' %> class="w-4 h-4 text-orange-500 border-gray-300
+          rounded focus:ring-orange-500">
+          <label for="enablePush" class="text-sm font-medium text-gray-700"
+            >Enable Push Notifications</label
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Pusher Instance ID</label
+          >
+          <input
+            type="text"
+            value="<%= pushNotifications.instanceId %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Pusher Beams Secret</label
+          >
+          <input
+            type="text"
+            value="<%= pushNotifications.beamsSecret %>"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <button
+          class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+
+      <% } else if (currentTab === 'currencies') { %>
+      <!-- Currencies -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">Currencies</h3>
+          <button
+            class="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Add Currency
+          </button>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Currency
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Currency Symbol
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% currencies.forEach(currency => { %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= currency.name %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= currency.symbol %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div class="flex gap-2">
+                    <button
+                      class="px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                    >
+                      <i class="fas fa-edit mr-1"></i>
+                      Update
+                    </button>
+                    <button
+                      class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>

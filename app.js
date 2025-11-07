@@ -20,6 +20,8 @@ const kotController = require("./controllers/kotController.js");
 const posController = require("./controllers/posController.js");
 const reservationRoutes = require("./routes/reservation.js");
 const customerRoutes = require("./routes/customerRoutes");
+const superAdminRoutes = require("./routes/superAdminRoutes");
+const deliveryExecutiveRoutes = require("./routes/deliveryExecutiveRoutes");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -131,6 +133,8 @@ app.use((req, res, next) => {
 
 app.use("/reservations", reservationRoutes);
 app.use("/restaurant", customerRoutes);
+app.use("/admin-dashboard", superAdminRoutes);
+app.use("/deliveryExecutive", deliveryExecutiveRoutes);
 
 //--------------API---------------------
 
@@ -179,7 +183,7 @@ app.post("/login", (req, res, next) => {
       passport.authenticate("admin-local", (err, user, info) => {
         if (err) return next(err);
         if (!user) {
-          req.flash("success", "Invalid credentials for Super Admin");
+          req.flash("error", "Invalid credentials for Super Admin");
           return res.redirect("/login");
         }
         req.logIn(user, (err) => {
@@ -310,42 +314,42 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
   }
 });
 
-app.get("/admin-dashboard", isLoggedIn, async (req, res) => {
-  try {
-    if (req.user.role !== "superadmin") {
-      req.flash("error", "Access denied!");
-      return res.redirect("/login");
-    }
+// app.get("/admin-dashboard", isLoggedIn, async (req, res) => {
+//   try {
+//     if (req.user.role !== "superadmin") {
+//       req.flash("error", "Access denied!");
+//       return res.redirect("/login");
+//     }
 
-    const allUsers = await User.find({})
-      .select("restaurantName username email")
-      .lean();
+//     const allUsers = await User.find({})
+//       .select("restaurantName username email")
+//       .lean();
 
-    const allBranches = await Branch.find({})
-      .populate("owner", "restaurantName username email")
-      .lean();
+//     const allBranches = await Branch.find({})
+//       .populate("owner", "restaurantName username email")
+//       .lean();
 
-    const usersWithBranchCount = allUsers.map((user) => {
-      const count = allBranches.filter(
-        (branch) =>
-          branch.owner && branch.owner._id.toString() === user._id.toString()
-      ).length;
+//     const usersWithBranchCount = allUsers.map((user) => {
+//       const count = allBranches.filter(
+//         (branch) =>
+//           branch.owner && branch.owner._id.toString() === user._id.toString()
+//       ).length;
 
-      return { ...user, branchCount: count };
-    });
+//       return { ...user, branchCount: count };
+//     });
 
-    // Render to EJS
-    res.render("./layouts/super-admin-dashboard.ejs", {
-      admin: req.user,
-      users: usersWithBranchCount,
-      branches: allBranches,
-    });
-  } catch (err) {
-    console.error("Error loading admin dashboard:", err);
-    req.flash("success", "Something went wrong while loading dashboard!");
-    res.redirect("/login");
-  }
-});
+//     // Render to EJS
+//     res.render("./layouts/super-admin-dashboard.ejs", {
+//       admin: req.user,
+//       users: usersWithBranchCount,
+//       branches: allBranches,
+//     });
+//   } catch (err) {
+//     console.error("Error loading admin dashboard:", err);
+//     req.flash("success", "Something went wrong while loading dashboard!");
+//     res.redirect("/login");
+//   }
+// });
 
 app.get("/showMenu/:id", async (req, res) => {
   try {

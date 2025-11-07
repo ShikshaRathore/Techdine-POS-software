@@ -9,6 +9,16 @@ const isLoggedIn = (req, res, next) => {
   next();
 };
 
+// Middleware to check if user is superAdmin
+const isSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "superadmin") {
+    return next();
+  }
+
+  req.flash("success", "Login as Super Admin to continue to dashboard");
+  return res.redirect("/login");
+};
+
 // 🔹 Middleware 2: Attach statistics
 const attachStatistics = async (req, res, next) => {
   res.locals.statistics = null;
@@ -198,4 +208,5 @@ const attachStatistics = async (req, res, next) => {
 module.exports = {
   isLoggedIn,
   attachStatistics,
+  isSuperAdmin,
 };

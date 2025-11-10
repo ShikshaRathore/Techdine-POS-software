@@ -8,7 +8,10 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const bcrypt = require("bcrypt");
+
+const cookieParser = require("cookie-parser");
+const { startSessionCleanup } = require("./jobs/sessionCleanup");
+const { afterStatusUpdate } = require("./services/orderStatusService");
 
 const { isLoggedIn, attachStatistics } = require("./middleware.js");
 const session = require("express-session");
@@ -19,9 +22,11 @@ const LocalStrategy = require("passport-local");
 const kotController = require("./controllers/kotController.js");
 const posController = require("./controllers/posController.js");
 const reservationRoutes = require("./routes/reservation.js");
-const customerRoutes = require("./routes/customerRoutes");
+const customerSiteRoutes = require("./routes/customerSiteRoutes.js");
 const superAdminRoutes = require("./routes/superAdminRoutes");
 const deliveryExecutiveRoutes = require("./routes/deliveryExecutiveRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const tableRoutes = require("./routes/tableRoutes.js");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -43,10 +48,13 @@ app.set("trust proxy", 1);
 // ---------- Basic setup ----------
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
+app.use(methodOverride("_method"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
+
+app.use(cookieParser());
 
 const multer = require("multer");
 const { storage } = require("./cloudConfig.js");
@@ -131,10 +139,19 @@ app.use((req, res, next) => {
   next();
 });
 
+mongoose.connection.once("open", () => {
+  console.log("✅ Database connected");
+
+  // Start session cleanup
+  startSessionCleanup();
+});
+
 app.use("/reservations", reservationRoutes);
-app.use("/restaurant", customerRoutes);
+app.use("/restaurant", customerSiteRoutes);
 app.use("/admin-dashboard", superAdminRoutes);
 app.use("/deliveryExecutive", deliveryExecutiveRoutes);
+app.use("/customers", customerRoutes);
+app.use("/tables", tableRoutes);
 
 //--------------API---------------------
 
@@ -812,89 +829,6 @@ app.post("/addArea/:branchId", async (req, res) => {
   }
 });
 
-// ---------------------tables-------------------------
-
-app.get("/showTables/:id", async (req, res) => {
-  try {
-    const branchId = req.params.id;
-
-    const branch = await Branch.findById(branchId);
-    if (!branch) {
-      req.flash("error", "Branch not found!");
-      return res.redirect("/dashboard");
-    }
-
-    const areas = await Area.find({ branch: branchId }).populate("tables");
-
-    res.render("dashboard/showTables.ejs", {
-      branch,
-      branchId,
-      areas,
-    });
-  } catch (err) {
-    console.error("Error loading tables:", err);
-    req.flash("error", "Unable to load tables at this moment.");
-    res.redirect("/dashboard");
-  }
-});
-
-app.get("/addTable/:branchId", async (req, res) => {
-  const { branchId } = req.params;
-  const areas = await Area.find({ branch: branchId }).lean();
-  res.render("dashboard/addTable.ejs", { branchId, areas });
-});
-
-app.post("/addTable/:branchId", async (req, res) => {
-  try {
-    const { branchId } = req.params;
-    const { area, tableCode, seatingCapacity, availabilityStatus, status } =
-      req.body;
-
-    if (!area || !tableCode || !seatingCapacity) {
-      req.flash("error", "Please fill all required fields!");
-      return res.redirect(`/addTable/${branchId}`);
-    }
-
-    const areaDoc = await Area.findOne({ _id: area, branch: branchId });
-    if (!areaDoc) {
-      req.flash("error", "Selected area not found for this branch!");
-      return res.redirect(`/addTable/${branchId}`);
-    }
-
-    const existingTable = await Table.findOne({
-      area,
-      tableCode: tableCode.trim(),
-    });
-    if (existingTable) {
-      req.flash(
-        "error",
-        "A table with this code already exists in the selected area!"
-      );
-      return res.redirect(`/addTable/${branchId}`);
-    }
-
-    const newTable = new Table({
-      area,
-      tableCode: tableCode.trim(),
-      seatingCapacity: parseInt(seatingCapacity),
-      availabilityStatus: availabilityStatus || "Available",
-      status: status || "Active",
-    });
-
-    await newTable.save();
-    await Area.findByIdAndUpdate(area, { $push: { tables: newTable._id } });
-
-    req.flash("success", "New table added successfully!");
-    res.redirect(`/dashboard/${branchId}`);
-  } catch (err) {
-    console.error("Error adding table:", err);
-    req.flash("error", "Failed to add table!");
-    res.redirect(`/dashboard/${branchId}`);
-  }
-});
-
-// ---------------------tables-------------------------
-
 app.get("/pos/:id", async (req, res) => {
   try {
     const branchId = req.params.id;
@@ -1112,6 +1046,8 @@ app.post("/updateOrderStatus/:orderId", async (req, res) => {
     }
 
     console.log("✅ Order status updated:", order);
+    await afterStatusUpdate(orderId);
+
     res.json({ success: true, order });
   } catch (err) {
     console.error("❌ Error updating order status:", err);
@@ -1165,6 +1101,8 @@ app.post("/completePayment/:orderId", async (req, res) => {
     }
 
     console.log("✅ Payment completed:", order);
+    await afterStatusUpdate(orderId);
+
     res.json({ success: true, order });
   } catch (err) {
     console.error("❌ Error completing payment:", err);

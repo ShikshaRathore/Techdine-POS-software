@@ -11,5 +11,9 @@ router.get("/areas/:areaId/tables", reservationController.getAreaTables);
 router.post("/", reservationController.createReservation);
 router.patch("/:id/cancel", reservationController.cancelReservation);
 router.patch("/:id/complete", reservationController.completeReservation);
+// Add this route to your reservations router file
+
+// PATCH route to update reservation status
+router.patch("/:id/status", reservationController.updateReservationStatus);
 
 module.exports = router;

@@ -21,10 +21,17 @@ router.get(
 // Update delivery executive
 router.post("/edit/:id/:branchId", deliveryExecutiveController.updateExecutive);
 
-// View delivery executive details
-router.get("/view/:id/:branchId", deliveryExecutiveController.viewExecutive);
+// DELETE confirmation page (GET request)
+router.get(
+  "/delete/:id/:branchId",
+  deliveryExecutiveController.deleteExecutivePage
+);
 
-// Delete delivery executive
+// Actual DELETE action (POST/DELETE request)
+router.post(
+  "/delete/:id/:branchId",
+  deliveryExecutiveController.deleteExecutive
+);
 router.delete(
   "/delete/:id/:branchId",
   deliveryExecutiveController.deleteExecutive

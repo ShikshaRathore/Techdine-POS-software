@@ -46,7 +46,7 @@ const kotSchema = new mongoose.Schema(
 
     createdByModel: {
       type: String,
-      enum: ["Staff", "Customer"],
+      enum: ["Admin", "Staff", "Customer"],
       required: true,
     },
 

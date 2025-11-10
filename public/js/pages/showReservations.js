@@ -212,6 +212,30 @@ export function initPage(branchId) {
     }
   };
 
+  window.updateReservationStatus = async function (reservationId, newStatus) {
+    if (!newStatus) return;
+
+    try {
+      const response = await fetch(`/reservations/${reservationId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        // Reload the page to show updated status
+        window.location.reload();
+      } else {
+        alert("Failed to update reservation status");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error updating reservation status");
+    }
+  };
+
   // Make updateTimeSlots available globally for the select onchange
   window.updateTimeSlots = updateTimeSlots;
 

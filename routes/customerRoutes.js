@@ -1,40 +1,20 @@
-// routes/customerRoutes.js
-
+// ============================================
+// FILE: routes/customerRoutes.js
+// ============================================
 const express = require("express");
 const router = express.Router();
-const customerController = require("../controllers/customerController");
+const customerController = require("../controllers/cutomerController");
 
-/**
- * @route   GET /restaurant/:branchId/info
- * @desc    Get branch info for QR code generation
- * @access  Public
- */
-router.get("/:branchId/info", customerController.getBranchInfo);
+// Show all customers for a branch
+router.get("/show/:branchId", customerController.showCustomers);
 
-/**
- * @route   GET /restaurant/:branchId/order/:orderId/status
- * @desc    Get order status
- * @access  Public
- */
-router.get(
-  "/:branchId/order/:orderId/status",
-  customerController.getOrderStatus
-);
+// Create new customer
+router.post("/create/:branchId", customerController.createCustomer);
 
-router.get("/:branchId/reservations", customerController.getReservationPage);
-/**
- * @route   POST /restaurant/:branchId/place-order
- * @desc    Place a new order
- * @access  Public
- */
+// Update customer
+router.post("/update/:branchId", customerController.updateCustomer);
 
-router.post("/:branchId/place-order", customerController.placeOrder);
-router.post("/:branchId/reservations", customerController.createReservation);
-/**
- * @route   GET /restaurant/:branchId
- * @desc    Display customer dashboard with menu
- * @access  Public
- */
-router.get("/:branchId", customerController.getCustomerDashboard);
+// Delete customer
+router.post("/delete/:branchId", customerController.deleteCustomer);
 
 module.exports = router;

@@ -6,7 +6,7 @@ exports.showExecutives = async (req, res) => {
     const { branchId } = req.params;
 
     const executives = await DeliveryExecutive.find({ branch: branchId })
-      .populate("branch", "name")
+      .populate("branch", "branchName")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -39,7 +39,6 @@ exports.addExecutivePage = (req, res) => {
   res.render("dashboard/addDeliveryExecutive", { branchId });
 };
 
-// Create new delivery executive
 exports.createExecutive = async (req, res) => {
   try {
     const { branchId } = req.params;
@@ -52,10 +51,11 @@ exports.createExecutive = async (req, res) => {
       branch: branchId,
     });
 
-    res.redirect(`/deliveryExecutive/show/${branchId}`);
+    req.flash("success", "Delivery Executive created successfully");
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error("Error creating delivery executive:", error);
-    res.status(500).send("Error creating delivery executive");
+    req.flash("error", error.message);
+    res.redirect(`/dashboard`);
   }
 };
 
@@ -69,20 +69,20 @@ exports.editExecutivePage = async (req, res) => {
       return res.status(404).send("Executive not found");
     }
 
-    res.render("edit-delivery-executive", { executive, branchId });
+    res.render("dashboard/editDeliveryExecutive", { executive, branchId });
   } catch (error) {
     console.error("Error fetching executive:", error);
     res.status(500).send("Error loading executive");
   }
 };
 
-// Update delivery executive  ✅ UPDATED (NO bcrypt)
+// Update this function in your controller
 exports.updateExecutive = async (req, res) => {
   try {
     const { id, branchId } = req.params;
-    const { name, email, phone, status, password } = req.body;
+    const { name, phone, status } = req.body;
 
-    const updateData = { name, email, phone, status };
+    const updateData = { name, phone, status };
 
     const executive = await DeliveryExecutive.findById(id);
 
@@ -90,57 +90,44 @@ exports.updateExecutive = async (req, res) => {
       return res.status(404).send("Executive not found");
     }
 
-    // update simple fields
     Object.assign(executive, updateData);
 
-    // only set new password if provided
-    if (password && password.trim() !== "") {
-      await executive.setPassword(password); // passport-local-mongoose method
-    }
-
     await executive.save();
-
-    res.redirect(`/deliveryExecutive/show/${branchId}`);
+    req.flash("success", "Updated Delivery Executive");
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error("Error updating delivery executive:", error);
-    res.status(500).send("Error updating delivery executive");
+    req.flash("error", error.message);
+    res.redirect(`/dashboard`);
   }
 };
 
-// View delivery executive
-exports.viewExecutive = async (req, res) => {
+// Delete executive page (confirmation)
+exports.deleteExecutivePage = async (req, res) => {
   try {
     const { id, branchId } = req.params;
-    const executive = await DeliveryExecutive.findById(id)
-      .populate("branch", "name")
-      .lean();
+    const executive = await DeliveryExecutive.findById(id).lean();
 
     if (!executive) {
       return res.status(404).send("Executive not found");
     }
 
-    const totalOrders = 0;
-
-    res.render("view-delivery-executive", {
-      executive,
-      branchId,
-      totalOrders,
-    });
+    res.render("dashboard/deleteDeliveryExecutive", { executive, branchId });
   } catch (error) {
     console.error("Error fetching executive:", error);
     res.status(500).send("Error loading executive");
   }
 };
 
-// Delete delivery executive
+// Delete delivery executive (already exists, just update the redirect)
 exports.deleteExecutive = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, branchId } = req.params;
     await DeliveryExecutive.findByIdAndDelete(id);
-    res.json({ success: true, message: "Executive deleted successfully" });
+    req.flash("success", "Delivery Executive Deleted");
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error("Error deleting executive:", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).send("Error deleting executive");
   }
 };
 
@@ -149,18 +136,17 @@ exports.exportExecutives = async (req, res) => {
   try {
     const { branchId } = req.params;
     const executives = await DeliveryExecutive.find({ branch: branchId })
-      .populate("branch", "name")
+      .populate("branch", "branchName")
       .lean();
 
     const csv = [
-      ["Name", "Email", "Phone", "Status", "Branch"].join(","),
+      ["Name", "Phone", "Status", "Branch"].join(","),
       ...executives.map((exec) =>
         [
           exec.name,
-          exec.email,
           exec.phone,
           exec.status,
-          exec.branch?.name || "N/A",
+          exec.branch?.branchName || "N/A",
         ].join(",")
       ),
     ].join("\n");

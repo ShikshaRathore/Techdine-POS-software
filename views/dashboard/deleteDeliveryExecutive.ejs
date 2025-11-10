@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delete Executive Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-4px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(4px);
+        }
+      }
+
+      @keyframes scaleIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .animate-shake {
+        animation: shake 0.5s ease-in-out;
+      }
+
+      .animate-scale-in {
+        animation: scaleIn 0.3s ease-out;
+      }
+
+      .backdrop-blur-custom {
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Modal Overlay -->
+    <div
+      id="modalOverlay"
+      class="fixed inset-0 bg-gradient-to-br from-gray-900/70 to-slate-900/70 backdrop-blur-sm z-40 transition-all duration-500"
+    ></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      id="deleteModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-custom"
+    >
+      <!-- Modal Content -->
+      <div
+        class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 animate-scale-in"
+        id="deleteModalContent"
+      >
+        <!-- Warning Icon Header -->
+        <div class="relative pt-8 pb-6 px-6">
+          <!-- Animated Warning Icon -->
+          <div
+            class="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4 animate-shake"
+          >
+            <div
+              class="w-16 h-16 bg-red-200 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-10 h-10 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-2xl font-bold text-gray-900 text-center mb-2">
+            Delete Executive?
+          </h3>
+
+          <!-- Executive Name Display -->
+          <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-4">
+            <div class="flex items-center justify-center gap-2 text-red-900">
+              <i class="fas fa-user text-red-600"></i>
+              <span class="font-semibold text-lg"><%= executive.name %></span>
+            </div>
+          </div>
+
+          <!-- Warning Message -->
+          <p class="text-gray-600 text-center leading-relaxed">
+            This action
+            <span class="font-semibold text-red-600">cannot be undone</span>.
+            All associated data and order history will be permanently removed.
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200"></div>
+
+        <!-- Action Buttons -->
+        <div class="px-6 py-5 bg-gray-50 rounded-b-2xl">
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick="closeModal()"
+              class="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl border-2 border-gray-300 transition-all duration-200 hover:border-gray-400 hover:shadow-md transform hover:scale-[1.02]"
+            >
+              <span class="flex items-center justify-center gap-2">
+                <i class="fas fa-times"></i>
+                Cancel
+              </span>
+            </button>
+            <button
+              type="button"
+              onclick="confirmDelete()"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transform hover:scale-[1.02]"
+            >
+              <span class="flex items-center justify-center gap-2">
+                <i class="fas fa-trash-alt"></i>
+                Delete
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Close button (X) -->
+        <button
+          onclick="closeModal()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all duration-200 hover:rotate-90 transform"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden form for actual deletion -->
+    <form
+      id="deleteForm"
+      action="/deliveryExecutive/delete/<%= executive._id %>/<%= branchId %>?_method=DELETE"
+      method="POST"
+      style="display: none"
+    >
+      <input type="hidden" name="_method" value="DELETE" />
+    </form>
+
+    <script>
+      function closeModal() {
+        // Go back to the executives list page
+        window.history.back();
+      }
+
+      function confirmDelete() {
+        // Submit the delete form
+        document.getElementById("deleteForm").submit();
+      }
+
+      // Close modal on Escape key
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeModal();
+        }
+      });
+
+      // Auto-open modal when page loads
+      window.addEventListener("DOMContentLoaded", function () {
+        // Modal is already visible, no need to open
+      });
+    </script>
+  </body>
+</html>

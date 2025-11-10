@@ -15,27 +15,48 @@ exports.getReservationsPage = async (req, res) => {
 
     if (!startDate && !endDate) {
       // Set to start of current week (Monday)
-      start.setDate(start.getDate() - start.getDay() + 1);
+      const currentDay = start.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // If Sunday, go back 6 days
+      start.setDate(start.getDate() - daysFromMonday);
       start.setHours(0, 0, 0, 0);
 
       // Set to end of current week (Sunday)
-      end.setDate(end.getDate() - end.getDay() + 7);
+      end = new Date(start);
+      end.setDate(start.getDate() + 6); // Add 6 days to Monday to get Sunday
       end.setHours(23, 59, 59, 999);
     } else {
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
     }
 
+    // First, let's check all reservations without filters
+    const allReservations = await Reservation.find({ branch: branchId });
+
     // Fetch reservations for the date range AND specific branch
     const reservations = await Reservation.find({
       branch: branchId,
       reservationDate: { $gte: start, $lte: end },
-      status: { $ne: "Cancelled" },
+      // status: { $ne: "Cancelled" },
     })
       .populate("customer")
       .populate("area")
       .populate("table")
       .sort({ reservationDate: 1, timeSlot: 1 });
+
+    // If no reservations found, let's debug further
+    if (reservations.length === 0 && allReservations.length > 0) {
+      // Check date range issue
+      const reservationsInRange = await Reservation.find({
+        branch: branchId,
+        reservationDate: { $gte: start, $lte: end },
+      });
+
+      // Check status issue
+      const confirmedReservations = await Reservation.find({
+        branch: branchId,
+        status: { $ne: "Cancelled" },
+      });
+    }
 
     // Fetch all active areas for the dropdown (branch-specific)
     const areas = await Area.find({
@@ -64,12 +85,13 @@ exports.getAreaTables = async (req, res) => {
     // Verify area belongs to the branch
     const area = await Area.findOne({ _id: areaId, branch: branchId });
     if (!area) {
+      console.log("Area not found for this branch");
       return res
         .status(404)
         .json({ message: "Area not found for this branch" });
     }
 
-    // ✅ Get all tables for this area (no branch filter)
+    // Get all tables for this area
     const tables = await Table.find({
       area: areaId,
       status: "Active",
@@ -97,10 +119,13 @@ exports.createReservation = async (req, res) => {
       customer: customerData,
     } = req.body;
 
+    console.log("Creating reservation:", req.body);
+
     // Verify that area and table belong to the branch
     const areaDoc = await Area.findOne({ _id: area, branch: branchId });
 
     if (!areaDoc) {
+      console.log("Invalid area for this branch");
       return res.status(400).json({
         message: "Invalid area for this branch",
       });
@@ -116,6 +141,7 @@ exports.createReservation = async (req, res) => {
     });
 
     if (existingReservation) {
+      console.log("Table already reserved");
       return res.status(400).json({
         message:
           "This table is already reserved for the selected date and time",
@@ -138,7 +164,7 @@ exports.createReservation = async (req, res) => {
       });
       await customer.save();
     } else {
-      // Update customer info if provided
+      console.log("🔍 Updating existing customer");
       customer.name = customerData.name;
       if (customerData.email) {
         customer.email = customerData.email;
@@ -168,11 +194,13 @@ exports.createReservation = async (req, res) => {
       availabilityStatus: "Reserved",
     });
 
+    req.flash("success", "Reservation created successfully!");
     res.status(201).json({
       message: "Reservation created successfully",
       reservation,
     });
   } catch (error) {
+    req.flash("success", error.message);
     console.error("Error creating reservation:", error);
     res.status(500).json({ message: "Failed to create reservation" });
   }
@@ -191,6 +219,7 @@ exports.cancelReservation = async (req, res) => {
     );
 
     if (!reservation) {
+      console.log("Reservation not found");
       return res.status(404).json({ message: "Reservation not found" });
     }
 
@@ -199,6 +228,8 @@ exports.cancelReservation = async (req, res) => {
       availabilityStatus: "Available",
     });
 
+    console.log("Reservation cancelled");
+    req.flash("success", "Reservation cancelled successfully!");
     res.json({
       message: "Reservation cancelled successfully",
       reservation,
@@ -257,6 +288,7 @@ exports.completeReservation = async (req, res) => {
       availabilityStatus: "Available",
     });
 
+    req.flash("success", "Reservation completed successfully!");
     res.json({
       message: "Reservation completed successfully",
       reservation,
@@ -264,6 +296,51 @@ exports.completeReservation = async (req, res) => {
   } catch (error) {
     console.error("Error completing reservation:", error);
     res.status(500).json({ message: "Failed to complete reservation" });
+  }
+};
+
+exports.updateReservationStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = ["Confirmed", "Cancelled", "Completed", "No-Show"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        error:
+          "Invalid status. Must be one of: Confirmed, Cancelled, Completed, No-Show",
+      });
+    }
+
+    // Find and update the reservation
+    const reservation = await Reservation.findByIdAndUpdate(
+      id,
+      { status: status },
+      { new: true, runValidators: true }
+    );
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found" });
+    }
+
+    // Update table status back to Available
+    await Table.findByIdAndUpdate(reservation.table, {
+      availabilityStatus: "Available",
+    });
+
+    // Send success response
+    res.json({
+      success: true,
+      message: "Reservation status updated successfully",
+      reservation: reservation,
+    });
+  } catch (error) {
+    console.error("Error updating reservation status:", error);
+    res.status(500).json({
+      error: "Failed to update reservation status",
+      details: error.message,
+    });
   }
 };
 

@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema(
 
     customer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Optional: logged-in customer
+      ref: "Customer", // Optional: logged-in customer
     },
 
     table: {

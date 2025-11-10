@@ -14,10 +14,6 @@ const customerSchema = new mongoose.Schema(
       sparse: true, // allows multiple nulls
     },
 
-    password: {
-      type: String,
-    },
-
     phone: {
       type: Number,
       required: true,

@@ -42,6 +42,7 @@
   </head>
 
   <body class="bg-gray-50">
+    <%- include("../includes/flash.ejs") %>
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -106,72 +107,68 @@
         <% if (reservations && reservations.length > 0) { %> <%
         reservations.forEach(reservation => { %>
         <article
-          class="bg-white rounded-xl shadow-sm hover:shadow-md reservation-card"
+          class="bg-white rounded-xl shadow-sm hover:shadow reservation-card border"
         >
           <!-- Card Header -->
-          <div class="p-5 border-b border-gray-100">
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0"
+          <div class="p-5">
+            <div class="flex items-start gap-3 mb-4">
+              <div
+                class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0"
+              >
+                <i
+                  class="fa-solid fa-calendar-check text-orange-500 text-xl"
+                ></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 text-base mb-1.5">
+                  Reservation #<%=
+                  reservation._id.toString().slice(-4).toUpperCase() %>
+                </h3>
+                <span
+                  class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium <%= reservation.status === 'Confirmed' ? 'bg-green-100 text-green-700' : reservation.status === 'Cancelled' ? 'bg-red-100 text-red-700' : reservation.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700' %>"
                 >
-                  <i
-                    class="fa-solid fa-calendar-check text-orange-500 text-lg"
-                  ></i>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900 text-base">
-                    Reservation #<%=
-                    reservation._id.toString().slice(-4).toUpperCase() %>
-                  </h3>
-                  <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 <%= reservation.status === 'Confirmed' ? 'bg-green-100 text-green-700' : reservation.status === 'Cancelled' ? 'bg-red-100 text-red-700' : reservation.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700' %>"
-                  >
-                    <%= reservation.status %>
-                  </span>
-                </div>
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5"></i>
+                  <%= reservation.status %>
+                </span>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-sm">
+            <!-- Date and Guests Row -->
+            <div
+              class="flex items-center justify-between text-sm mb-4 pb-4 border-b border-gray-100"
+            >
               <span class="text-gray-600">
                 <%= new
                 Date(reservation.reservationDate).toLocaleDateString('en-US', {
                 weekday: 'short', month: 'short', day: 'numeric' }) %> · <%=
                 reservation.timeSlot %>
               </span>
-              <span class="font-medium text-gray-900">
+              <span class="text-gray-900 font-semibold">
                 <%= reservation.numberOfGuests %> Guest<%=
                 reservation.numberOfGuests > 1 ? 's' : '' %>
               </span>
             </div>
-          </div>
 
-          <!-- Card Body -->
-          <div class="p-5">
-            <div class="space-y-3 mb-4">
+            <% if (reservation.specialRequests) { %>
+            <!-- Special Request Banner -->
+            <div
+              class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg"
+            >
+              <p class="text-xs text-amber-800">
+                <i class="fa-solid fa-note-sticky mr-1"></i>
+                <strong>Note:</strong> <%= reservation.specialRequests %>
+              </p>
+            </div>
+            <% } %>
+
+            <!-- Customer Details -->
+            <div class="space-y-2.5 mb-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-sm text-gray-700">
-                  <i class="fa-solid fa-user w-4"></i>
-                  <span><%= reservation.customer.name %></span>
-                </div>
-                <span class="text-sm text-gray-500">Walk-in Customer</span>
-              </div>
-
-              <div class="flex items-start gap-2 text-sm">
-                <i class="fa-solid fa-utensils w-4 text-gray-400 mt-0.5"></i>
-                <div class="flex-1">
-                  <div class="text-gray-700"><%= reservation.mealPeriod %></div>
-                  <div class="text-gray-500 flex items-center gap-3 mt-1">
-                    <span
-                      ><i class="fa-solid fa-map-marker-alt mr-1"></i><%=
-                      reservation.area.name %></span
-                    >
-                    <span
-                      ><i class="fa-solid fa-chair mr-1"></i>Table <%=
-                      reservation.table.tableCode %></span
-                    >
-                  </div>
+                  <i class="fa-solid fa-user w-4 text-gray-400"></i>
+                  <span class="font-medium"
+                    ><%= reservation.customer.name %></span
+                  >
                 </div>
               </div>
 
@@ -181,42 +178,49 @@
               </div>
 
               <% if (reservation.customer.email) { %>
-              <div
-                class="flex items-center gap-2 text-sm text-gray-700 break-all"
-              >
+              <div class="flex items-center gap-2 text-sm text-gray-700">
                 <i class="fa-regular fa-envelope w-4 text-gray-400"></i>
-                <span><%= reservation.customer.email %></span>
+                <span class="break-all"><%= reservation.customer.email %></span>
               </div>
               <% } %>
-            </div>
 
-            <% if (reservation.specialRequests) { %>
-            <div
-              class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
-            >
-              <p class="text-xs text-yellow-800">
-                <i class="fa-solid fa-note-sticky mr-1"></i>
-                <strong>Note:</strong> <%= reservation.specialRequests %>
-              </p>
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <i class="fa-solid fa-utensils w-4 text-gray-400"></i>
+                <span><%= reservation.mealPeriod %></span>
+              </div>
+
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <i class="fa-solid fa-map-marker-alt w-4 text-gray-400"></i>
+                <span><%= reservation.area.name %></span>
+              </div>
+
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <i class="fa-solid fa-chair w-4 text-gray-400"></i>
+                <span>Table <%= reservation.table.tableCode %></span>
+              </div>
             </div>
-            <% } %>
 
             <!-- Action Buttons -->
-            <div class="flex gap-2">
+            <div class="flex gap-2 pt-3 border-t border-gray-100">
               <button
                 onclick="viewReservation('<%= reservation._id %>')"
                 class="flex-1 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
               >
                 <i class="fa-solid fa-eye mr-1"></i>View
               </button>
-              <% if (reservation.status === 'Confirmed') { %>
-              <button
-                onclick="cancelReservation('<%= reservation._id %>')"
-                class="flex-1 px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
+              <select
+                onchange="updateReservationStatus('<%= reservation._id %>', this.value)"
+                class="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors cursor-pointer"
               >
-                <i class="fa-solid fa-xmark mr-1"></i>Cancel
-              </button>
-              <% } %>
+                <option value="" disabled selected>Change Status</option>
+                <option value="Confirmed" <%= reservation.status === 'Confirmed'
+                ? 'disabled' : '' %>>Confirmed <option value="Cancelled" <%=
+                reservation.status === 'Cancelled' ? 'disabled' : ''
+                %>>Cancelled <option value="Completed" <%= reservation.status
+                === 'Completed' ? 'disabled' : '' %>>Completed <option
+                value="No-Show" <%= reservation.status === 'No-Show' ?
+                'disabled' : '' %>>No-Show
+              </select>
             </div>
           </div>
         </article>

@@ -1,0 +1,68 @@
+<div class="p-6">
+  <h2 class="text-2xl font-semibold mb-4 text-red-600">
+    Due Payments ($<%= duePayments.reduce((sum, o) => sum + o.totalAmount, 0)
+    %>)
+  </h2>
+
+  <div class="flex justify-between items-center mb-4">
+    <input
+      type="text"
+      id="searchDue"
+      placeholder="Search payments by amount or order #"
+      class="border border-gray-300 rounded-lg px-4 py-2 w-1/2 focus:ring-2 focus:ring-red-500"
+    />
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-sm">
+    <table class="min-w-full text-left" id="duePaymentsTable">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="px-6 py-3">Amount</th>
+          <th class="px-6 py-3">Payment Method</th>
+          <th class="px-6 py-3">Order</th>
+          <th class="px-6 py-3">Date & Time</th>
+          <th class="px-6 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (duePayments.length === 0) { %>
+        <tr>
+          <td colspan="5" class="text-center text-gray-500 py-6">
+            No Payment Found
+          </td>
+        </tr>
+        <% } else { %> <% duePayments.forEach(p => { %>
+        <tr class="border-b hover:bg-gray-50">
+          <td class="px-6 py-3">$<%= p.totalAmount %></td>
+          <td class="px-6 py-3"><%= p.paymentMethod || "—" %></td>
+          <td class="px-6 py-3 text-blue-600 underline">
+            Order #<%= p.orderNumber %>
+          </td>
+          <td class="px-6 py-3 text-gray-500">
+            <%= new Date(p.createdAt).toLocaleString("en-IN", { day: "2-digit",
+            month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+            }) %>
+          </td>
+          <td class="px-6 py-3">
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+            >
+              Mark Paid
+            </button>
+          </td>
+        </tr>
+        <% }) %> <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.getElementById("searchDue")?.addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll("#duePaymentsTable tbody tr").forEach((row) => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(term) ? "" : "none";
+    });
+  });
+</script>

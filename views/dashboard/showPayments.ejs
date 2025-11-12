@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payments Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load XLSX and jsPDF for export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  </head>
+
+  <body class="bg-gray-50 text-gray-900">
+    <div class="p-4 bg-gray-50 min-h-screen">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+          Payments
+        </h2>
+        <button
+          id="exportBtn"
+          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-md transition-all duration-300"
+        >
+          Export
+        </button>
+      </div>
+
+      <div class="relative mb-6 w-full md:w-1/2">
+        <input
+          id="searchPayments"
+          type="text"
+          placeholder="Search by amount, method, or TX ID..."
+          class="border border-gray-300 rounded-xl px-5 py-3 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition"
+        />
+      </div>
+
+      <div
+        class="overflow-x-auto bg-white rounded-2xl shadow-lg border border-gray-100"
+      >
+        <table id="paymentsTable" class="min-w-full text-left border-collapse">
+          <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
+            <tr>
+              <th class="px-6 py-4 font-semibold">#</th>
+              <th class="px-6 py-4 font-semibold">Amount</th>
+              <th class="px-6 py-4 font-semibold">Payment Method</th>
+              <th class="px-6 py-4 font-semibold">Transaction ID</th>
+              <th class="px-6 py-4 font-semibold">Order</th>
+              <th class="px-6 py-4 font-semibold">Date & Time</th>
+            </tr>
+          </thead>
+
+          <tbody class="text-gray-700">
+            <% if (payments && payments.length > 0) { %> <% payments.forEach((p,
+            index) => { %>
+            <tr
+              class="border-b hover:bg-blue-50 transition-all duration-200 text-sm"
+            >
+              <td class="px-6 py-4 font-medium text-gray-800">
+                <%= index + 1 %>
+              </td>
+              <td class="px-6 py-4 font-semibold text-green-600">
+                ₹<%= p.totalAmount %>
+              </td>
+              <td class="px-6 py-4"><%= p.paymentMethod %></td>
+              <td class="px-6 py-4 text-gray-500">
+                <%= p.transactionId || "—" %>
+              </td>
+              <td class="px-6 py-4 text-blue-600 underline">
+                Order #<%= p.orderNumber %>
+              </td>
+              <td class="px-6 py-4 text-gray-500">
+                <%= new Date(p.createdAt).toLocaleString("en-IN", { day:
+                "2-digit", month: "short", year: "numeric", hour: "2-digit",
+                minute: "2-digit", }) %>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="6" class="text-center py-6 text-gray-500 italic">
+                No payments found
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

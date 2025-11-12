@@ -1,0 +1,289 @@
+<!-- Reservation Settings Section -->
+<div
+  class="bg-white rounded-lg shadow-sm p-6 hidden settings-content"
+  id="reservation-settings"
+>
+  <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+    Reservation Settings
+  </h2>
+
+  <form
+    action="/dashboard/<%= branchId %>/settings/reservation-slots"
+    method="POST"
+  >
+    <!-- Day Selector -->
+    <div class="mb-8">
+      <div class="flex gap-3 overflow-x-auto pb-2">
+        <% const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+        'Saturday', 'Sunday']; %> <% days.forEach((day, index) => { %>
+        <button
+          type="button"
+          onclick="switchDay('<%= day %>')"
+          id="day-btn-<%= day %>"
+          class="day-btn px-6 py-3 rounded-lg font-medium text-sm whitespace-nowrap transition-all duration-200 <%= index === 0 ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:border-orange-300' %>"
+        >
+          <%= day %>
+        </button>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Day Content Sections -->
+    <% days.forEach((day, dayIndex) => { const daySlots = reservationSlots ?
+    reservationSlots.find(slot => slot.day === day) : null; %>
+    <div
+      id="content-<%= day %>"
+      class="day-content <%= dayIndex !== 0 ? 'hidden' : '' %>"
+    >
+      <h3 class="text-xl font-semibold text-gray-800 mb-6"><%= day %></h3>
+
+      <!-- Slots Table -->
+      <div class="overflow-x-auto mb-6">
+        <table class="min-w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40"
+              >
+                Slot Type
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Start Time
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                End Time
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Time Slot Difference
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-right"
+              >
+                Available
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Breakfast Row -->
+            <% const breakfastSlot = daySlots?.slots?.find(s => s.type ===
+            'Breakfast') || {}; %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-900"
+                    >Breakfast</span
+                  >
+                  <% if (!breakfastSlot.available) { %>
+                  <span class="text-xs text-red-600 font-medium"
+                    >Unavailable</span
+                  >
+                  <% } %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_breakfast_startTime"
+                    value="<%= breakfastSlot.startTime || '08:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_breakfast_endTime"
+                    value="<%= breakfastSlot.endTime || '11:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <input
+                    type="number"
+                    name="<%= day %>_breakfast_slotDuration"
+                    value="<%= breakfastSlot.slotDuration || '30' %>"
+                    min="15"
+                    max="120"
+                    step="15"
+                    class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <span class="text-sm text-gray-600">Minutes</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" name="<%= day %>_breakfast_available"
+                  <%= breakfastSlot.available !== false ? 'checked' : '' %>
+                  class="sr-only peer">
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"
+                  ></div>
+                </label>
+              </td>
+            </tr>
+
+            <!-- Lunch Row -->
+            <% const lunchSlot = daySlots?.slots?.find(s => s.type === 'Lunch')
+            || {}; %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-900">Lunch</span>
+                  <% if (!lunchSlot.available) { %>
+                  <span class="text-xs text-red-600 font-medium"
+                    >Unavailable</span
+                  >
+                  <% } %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_lunch_startTime"
+                    value="<%= lunchSlot.startTime || '12:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_lunch_endTime"
+                    value="<%= lunchSlot.endTime || '17:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <input
+                    type="number"
+                    name="<%= day %>_lunch_slotDuration"
+                    value="<%= lunchSlot.slotDuration || '60' %>"
+                    min="15"
+                    max="120"
+                    step="15"
+                    class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <span class="text-sm text-gray-600">Minutes</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" name="<%= day %>_lunch_available" <%=
+                  lunchSlot.available !== false ? 'checked' : '' %>
+                  class="sr-only peer">
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"
+                  ></div>
+                </label>
+              </td>
+            </tr>
+
+            <!-- Dinner Row -->
+            <% const dinnerSlot = daySlots?.slots?.find(s => s.type ===
+            'Dinner') || {}; %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-900">Dinner</span>
+                  <% if (!dinnerSlot.available) { %>
+                  <span class="text-xs text-red-600 font-medium"
+                    >Unavailable</span
+                  >
+                  <% } %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_dinner_startTime"
+                    value="<%= dinnerSlot.startTime || '18:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="relative">
+                  <input
+                    type="time"
+                    name="<%= day %>_dinner_endTime"
+                    value="<%= dinnerSlot.endTime || '22:00' %>"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <i
+                    class="fas fa-clock absolute right-3 top-3 text-gray-400 pointer-events-none"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <input
+                    type="number"
+                    name="<%= day %>_dinner_slotDuration"
+                    value="<%= dinnerSlot.slotDuration || '60' %>"
+                    min="15"
+                    max="120"
+                    step="15"
+                    class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <span class="text-sm text-gray-600">Minutes</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" name="<%= day %>_dinner_available" <%=
+                  dinnerSlot.available !== false ? 'checked' : '' %>
+                  class="sr-only peer">
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"
+                  ></div>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <% }); %>
+
+    <!-- Save Button -->
+    <div class="flex justify-start mt-6">
+      <button
+        type="submit"
+        class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-8 rounded-lg transition duration-200 flex items-center"
+      >
+        <i class="fas fa-save mr-2"></i>
+        Save
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,4 +1,6 @@
-const Order = require("./models/order.js"); // Adjust path as needed
+const mongoose = require("mongoose");
+const Order = require("./models/order.js");
+const Reservation = require("./models/reservation.js");
 
 // 🔹 Middleware 1: Auth check
 const isLoggedIn = (req, res, next) => {
@@ -25,8 +27,16 @@ const attachStatistics = async (req, res, next) => {
   res.locals.todayOrders = [];
 
   try {
-    const branchId = req.params.id;
+    const branchId = req.params.branchId; // ✅ Match the route parameter name
     if (!branchId) return next();
+
+    // 🔥 FIX: Convert string to ObjectId
+    if (!mongoose.Types.ObjectId.isValid(branchId)) {
+      console.error("Invalid branch ID format:", branchId);
+      return next();
+    }
+
+    const branchObjectId = new mongoose.Types.ObjectId(branchId);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -55,7 +65,7 @@ const attachStatistics = async (req, res, next) => {
 
     const todayOrders =
       (await Order.find({
-        branch: branchId,
+        branch: branchObjectId, // ✅ Changed
         createdAt: { $gte: today, $lt: tomorrow },
         status: { $ne: "cancelled" },
       }).lean()) || [];
@@ -65,9 +75,16 @@ const attachStatistics = async (req, res, next) => {
       0
     );
 
+    // ✅ ADD THIS: Count today's reservations
+    const todayReservations = await Reservation.countDocuments({
+      branch: branchObjectId,
+      reservationDate: { $gte: today, $lt: tomorrow },
+      status: { $in: ["Confirmed", "Completed"] },
+    });
+
     const yesterdayOrders =
       (await Order.find({
-        branch: branchId,
+        branch: branchObjectId, // ✅ Changed
         createdAt: { $gte: yesterday, $lt: today },
         status: { $ne: "cancelled" },
       }).lean()) || [];
@@ -86,7 +103,7 @@ const attachStatistics = async (req, res, next) => {
 
     const thisMonthOrders =
       (await Order.find({
-        branch: branchId,
+        branch: branchObjectId, // ✅ Changed
         createdAt: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
         status: { $ne: "cancelled" },
       }).lean()) || [];
@@ -98,7 +115,7 @@ const attachStatistics = async (req, res, next) => {
 
     const lastMonthOrders =
       (await Order.find({
-        branch: branchId,
+        branch: branchObjectId, // ✅ Changed
         createdAt: { $gte: firstDayOfLastMonth, $lte: lastDayOfLastMonth },
         status: { $ne: "cancelled" },
       }).lean()) || [];
@@ -117,14 +134,14 @@ const attachStatistics = async (req, res, next) => {
 
     const paymentMethods = {
       cash: todayOrders
-        .filter((o) => o.paymentMethod === "cash")
+        .filter((o) => o.paymentMethod === "Cash") // ✅ Changed to match schema enum
         .reduce((sum, o) => sum + (o.totalAmount || 0), 0),
       card: todayOrders
-        .filter((o) => o.paymentMethod === "card")
+        .filter((o) => o.paymentMethod === "Card") // ✅ Changed
         .reduce((sum, o) => sum + (o.totalAmount || 0), 0),
       upi: todayOrders
-        .filter((o) =>
-          ["upi", "digital", "online"].includes(o.paymentMethod?.toLowerCase())
+        .filter(
+          (o) => ["UPI", "Online"].includes(o.paymentMethod) // ✅ Changed to match schema enum
         )
         .reduce((sum, o) => sum + (o.totalAmount || 0), 0),
     };
@@ -183,6 +200,8 @@ const attachStatistics = async (req, res, next) => {
       salesDirection: salesChange >= 0 ? "up" : "down",
 
       todayOrdersCount: todayOrders.length,
+      paymentMethods,
+      todayReservationsCount: todayReservations, // ✅ ADD THIS
       paymentMethods,
 
       currentMonth: today.toLocaleString("en-US", { month: "long" }),

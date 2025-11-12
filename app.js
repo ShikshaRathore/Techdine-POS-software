@@ -27,6 +27,8 @@ const superAdminRoutes = require("./routes/superAdminRoutes");
 const deliveryExecutiveRoutes = require("./routes/deliveryExecutiveRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const tableRoutes = require("./routes/tableRoutes.js");
+const settingsRoutes = require("./routes/settingsRoutes");
+const paymentsRoutes = require("./routes/paymentsRoutes");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -152,6 +154,8 @@ app.use("/admin-dashboard", superAdminRoutes);
 app.use("/deliveryExecutive", deliveryExecutiveRoutes);
 app.use("/customers", customerRoutes);
 app.use("/tables", tableRoutes);
+app.use("/payments", paymentsRoutes);
+app.use("/dashboard/:branchId/settings", settingsRoutes);
 
 //--------------API---------------------
 
@@ -781,7 +785,12 @@ app.get("/showAreas/:branchId", async (req, res) => {
       return res.redirect("/dashboard");
     }
 
-    const areas = await Area.find({ branch: branchId });
+    let areas = await Area.find({ branch: branchId }).lean(); // use lean()
+
+    // ✅ add count for each area
+    areas.forEach((area) => {
+      area.tableCount = area.tables?.length || 0;
+    });
     res.render("dashboard/showAreas.ejs", { branch, branchId, areas });
   } catch (err) {
     console.error("Error loading areas:", err);

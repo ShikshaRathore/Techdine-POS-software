@@ -26,7 +26,7 @@ const staffSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Hotel-Admin", "Branch Head", "Chef", "Waiter"],
+      enum: ["Hotel-Admin", "Branch-Head", "Chef", "Waiter"],
       required: true,
     },
     branch: {

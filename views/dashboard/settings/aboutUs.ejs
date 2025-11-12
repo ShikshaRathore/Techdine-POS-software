@@ -1,0 +1,243 @@
+<!-- About Us Settings Section -->
+<div
+  class="settings-content bg-white rounded-lg shadow-sm p-6 hidden"
+  id="About-Us"
+>
+  <h2 class="text-2xl font-semibold text-gray-800 mb-6">About Us</h2>
+
+  <form action="/dashboard/<%= branchId %>/settings/about-us" method="POST">
+    <!-- Rich Text Editor Toolbar -->
+    <div class="mb-2 flex items-center gap-2 border-b border-gray-200 pb-2">
+      <button
+        type="button"
+        onclick="formatText('bold')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Bold"
+      >
+        <i class="fas fa-bold"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('italic')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Italic"
+      >
+        <i class="fas fa-italic"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('createLink')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Insert Link"
+      >
+        <i class="fas fa-link"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('fontSize')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Font Size"
+      >
+        <i class="fas fa-text-height"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('formatBlock', 'blockquote')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Quote"
+      >
+        <i class="fas fa-quote-right"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('insertUnorderedList')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Bullet List"
+      >
+        <i class="fas fa-list-ul"></i>
+      </button>
+      <button
+        type="button"
+        onclick="formatText('insertOrderedList')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Numbered List"
+      >
+        <i class="fas fa-list-ol"></i>
+      </button>
+      <div class="border-l border-gray-300 h-6 mx-2"></div>
+      <button
+        type="button"
+        onclick="document.execCommand('undo')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Undo"
+      >
+        <i class="fas fa-undo"></i>
+      </button>
+      <button
+        type="button"
+        onclick="document.execCommand('redo')"
+        class="p-2 hover:bg-gray-100 rounded text-gray-700"
+        title="Redo"
+      >
+        <i class="fas fa-redo"></i>
+      </button>
+    </div>
+
+    <!-- Editable Content Area -->
+    <div
+      id="aboutUsEditor"
+      contenteditable="true"
+      class="min-h-[400px] p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-900 leading-relaxed"
+      style="max-height: 600px; overflow-y: auto"
+    >
+      <% if (branch.aboutUs) { %> <%- branch.aboutUs %> <% } else { %>
+      <p>
+        Welcome to our restaurant, where great food and good vibes come
+        together! We're a local, family-owned spot that loves bringing people
+        together over delicious meals and unforgettable moments. Whether you're
+        here for a quick bite, a family dinner, or a celebration, we're all
+        about making your time with us special.
+      </p>
+      <br />
+      <p>
+        Our menu is packed with dishes made from fresh, quality ingredients
+        because we believe food should taste as good as it makes you feel. From
+        our signature dishes to seasonal specials, there's always something to
+        excite your taste buds.
+      </p>
+      <br />
+      <p>
+        But we're not just about the food—we're about community. We love seeing
+        familiar faces and welcoming new ones. Our team is a fun, friendly bunch
+        dedicated to serving you with a smile and making sure every visit feels
+        like coming home.
+      </p>
+      <br />
+      <p>
+        So, come on in, grab a seat, and let us take care of the rest. We can't
+        wait to share our love of food with you!
+      </p>
+      <br />
+      <p><strong>See you soon!</strong> 👋 ✨</p>
+      <% } %>
+    </div>
+
+    <!-- Hidden input to store the HTML content -->
+    <input type="hidden" name="aboutUs" id="aboutUsContent" />
+
+    <!-- Emoji Picker (Optional) -->
+    <div class="mt-4 flex items-center gap-2">
+      <button
+        type="button"
+        onclick="insertEmoji('👋')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        👋
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('✨')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        ✨
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('🍽️')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        🍽️
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('❤️')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        ❤️
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('🎉')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        🎉
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('😊')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        😊
+      </button>
+      <button
+        type="button"
+        onclick="insertEmoji('🌟')"
+        class="px-3 py-1 text-2xl hover:bg-gray-100 rounded"
+      >
+        🌟
+      </button>
+    </div>
+
+    <!-- Character Count -->
+    <div class="mt-2 text-sm text-gray-500" id="charCount">0 characters</div>
+
+    <!-- Save Button -->
+    <div class="flex justify-start mt-6">
+      <button
+        type="submit"
+        class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-8 rounded-lg transition duration-200 flex items-center"
+      >
+        <i class="fas fa-save mr-2"></i>
+        Save
+      </button>
+    </div>
+  </form>
+</div>
+
+<style>
+  #aboutUsEditor {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  #aboutUsEditor:focus {
+    outline: none;
+  }
+
+  #aboutUsEditor p {
+    margin-bottom: 1em;
+  }
+
+  #aboutUsEditor strong {
+    font-weight: 600;
+  }
+
+  #aboutUsEditor em {
+    font-style: italic;
+  }
+
+  #aboutUsEditor blockquote {
+    border-left: 4px solid #f97316;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  #aboutUsEditor ul,
+  #aboutUsEditor ol {
+    margin-left: 2rem;
+    margin-bottom: 1em;
+  }
+
+  #aboutUsEditor a {
+    color: #f97316;
+    text-decoration: underline;
+  }
+
+  #aboutUsEditor a:hover {
+    color: #ea580c;
+  }
+</style>

@@ -85,6 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
         pageName = "showDeliveryExecutive";
       else if (url.includes("/customers")) pageName = "showCustomers";
       else if (url.includes("/showQRCodes")) pageName = "showQRCodes";
+      // Add after the existing conditions:
+      else if (url.includes("/showPayments")) pageName = "showPayments";
+      else if (url.includes("/duePayments")) pageName = "duePayments";
       else {
         const match = url.match(/\/([a-zA-Z0-9_-]+)(?:\?|$)/);
         pageName = match ? match[1] : null;

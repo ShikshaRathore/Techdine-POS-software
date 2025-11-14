@@ -174,20 +174,35 @@ class TableSessionService {
       const cutoffTime = new Date();
       cutoffTime.setHours(cutoffTime.getHours() - hoursInactive);
 
+      // Find abandoned sessions
       const abandonedSessions = await TableSession.find({
         status: "Active",
         lastActivityAt: { $lt: cutoffTime },
       }).populate("table");
 
-      for (const session of abandonedSessions) {
-        session.status = "Abandoned";
-        await session.save();
-
-        // Free the table
-        if (session.table) {
-          await session.table.free();
-        }
+      if (abandonedSessions.length === 0) {
+        return { cleaned: 0, sessions: [] };
       }
+
+      // 1️⃣ Bulk update all sessions at once
+      await TableSession.updateMany(
+        {
+          status: "Active",
+          lastActivityAt: { $lt: cutoffTime },
+        },
+        { $set: { status: "Abandoned" } }
+      );
+
+      // 2️⃣ Bulk update all tables in parallel
+      const tableIds = abandonedSessions
+        .filter((s) => s.table)
+        .map((s) => s.table._id);
+
+      await Promise.all(
+        tableIds.map((id) =>
+          Table.findByIdAndUpdate(id, { status: "Available" })
+        )
+      );
 
       return {
         cleaned: abandonedSessions.length,

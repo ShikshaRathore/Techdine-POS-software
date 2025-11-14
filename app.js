@@ -29,6 +29,7 @@ const customerRoutes = require("./routes/customerRoutes");
 const tableRoutes = require("./routes/tableRoutes.js");
 const settingsRoutes = require("./routes/settingsRoutes");
 const paymentsRoutes = require("./routes/paymentsRoutes");
+const reportRoutes = require("./routes/reportRoutes.js");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -156,6 +157,7 @@ app.use("/customers", customerRoutes);
 app.use("/tables", tableRoutes);
 app.use("/payments", paymentsRoutes);
 app.use("/dashboard/:branchId/settings", settingsRoutes);
+app.use("/reports", reportRoutes);
 
 //--------------API---------------------
 
@@ -372,6 +374,8 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
 //   }
 // });
 
+//-----------------Menu--------------------------
+
 app.get("/showMenu/:id", async (req, res) => {
   try {
     const branchId = req.params.id;
@@ -444,6 +448,109 @@ app.post("/addMenu/:branchId", async (req, res) => {
     }
   }
 });
+
+// ============================================
+// UPDATE MENU ROUTE
+// ============================================
+app.post("/menu/updateMenu/:branchId/:menuId", async (req, res) => {
+  try {
+    const { branchId, menuId } = req.params;
+    const { menuName } = req.body;
+
+    console.log("📝 Update Menu Request:", { branchId, menuId, menuName });
+
+    // Validation
+    if (!menuName || menuName.trim() === "") {
+      console.log("❌ Validation failed: Menu name is empty");
+      return res.status(400).send(`
+        <script>
+          alert('Menu name cannot be empty');
+          window.location.href = '/showMenu/${branchId}';
+        </script>
+      `);
+    }
+
+    // Find and update the menu
+    const updatedMenu = await Menu.findOneAndUpdate(
+      {
+        _id: menuId,
+        branch: branchId, // Ensure menu belongs to this branch
+      },
+      {
+        menuName: menuName.trim(),
+        updatedAt: Date.now(),
+      },
+      {
+        new: true, // Return updated document
+        runValidators: true, // Run schema validators
+      }
+    );
+
+    if (!updatedMenu) {
+      console.log("❌ Menu not found");
+      return res.status(404).send(`
+        <script>
+          alert('Menu not found or does not belong to this branch');
+          window.location.href = '/showMenu/${branchId}';
+        </script>
+      `);
+    }
+
+    req.flash("success", "Menu updated successfully:", updatedMenu.menuName);
+    res.redirect(`/dashboard/${branchId}`);
+  } catch (error) {
+    req.flash("error", "Error Updating Menu");
+    res.status(500).send(`
+      <script>
+        alert('Failed to update menu: ${error.message}');
+        window.location.href = '/dashboard/${branchId}';
+      </script>
+    `);
+  }
+});
+
+// ============================================
+// DELETE MENU ROUTE (Only delete menu, not items)
+// ============================================
+app.post("/menu/deleteMenu/:branchId/:menuId", async (req, res) => {
+  try {
+    const { branchId, menuId } = req.params;
+
+    console.log("🗑️ Delete Menu Request:", { branchId, menuId });
+
+    // Find and delete the menu
+    const deletedMenu = await Menu.findOneAndDelete({
+      _id: menuId,
+      branch: branchId, // Ensure menu belongs to this branch
+    });
+
+    if (!deletedMenu) {
+      console.log("❌ Menu not found");
+      return res.status(404).send(`
+        <script>
+          alert('Menu not found or does not belong to this branch');
+          window.location.href = '/showMenu/${branchId}';
+        </script>
+      `);
+    }
+
+    console.log("✅ Menu deleted successfully:", deletedMenu.menuName);
+
+    // Redirect back to menu page with success message
+    res.redirect(`/showMenu/${branchId}?success=deleted`);
+  } catch (error) {
+    req.flash("error", "Error deleting menu:");
+    res.status(500).send(`
+      <script>
+        alert('Failed to delete menu: ${error.message}');
+        window.location.href = '/dashboard/${branchId}';
+      </script>
+    `);
+  }
+});
+//-----------------Menu--------------------------
+
+//-----------------MenuItems--------------------------
 
 app.get("/showMenuItems/:id", async (req, res) => {
   try {
@@ -577,7 +684,7 @@ app.post(
 );
 
 // ---------------------------------
-// ✅ Fetch categories for selected menu
+//Fetch categories for selected menu
 app.get("/getCategories/:menuId", isLoggedIn, async (req, res) => {
   try {
     const { menuId } = req.params;
@@ -773,6 +880,121 @@ app.post("/addCategory/:branchId", isLoggedIn, async (req, res) => {
   }
 });
 
+// POST - Update Category
+app.post("/dashboard/categories/edit", async (req, res) => {
+  try {
+    const { categoryId, categoryName } = req.body;
+
+    // Validate inputs
+    if (!categoryId || !categoryName || categoryName.trim() === "") {
+      req.flash("error", "Category name is required");
+      return res.redirect(`dashboard/${branchId}`);
+    }
+
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      req.flash("error", "Invalid category ID");
+      return res.redirect(`dashboard/${branchId}`);
+    }
+
+    // Get the current category to find its menu
+    const currentCategory = await Category.findById(categoryId);
+    if (!currentCategory) {
+      req.flash("error", "Category not found");
+      return res.redirect(`dashboard/${branchId}`);
+    }
+
+    // Check for duplicate name within the same menu (excluding current category)
+    const duplicate = await Category.findOne({
+      name: categoryName.trim(),
+      menu: currentCategory.menu,
+      _id: { $ne: categoryId },
+    });
+
+    if (duplicate) {
+      req.flash(
+        "error",
+        "A category with this name already exists in this menu"
+      );
+      return res.redirect(`dashboard/${branchId}`);
+    }
+
+    // Update category in MongoDB
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      { name: categoryName.trim() },
+      { new: true, runValidators: true }
+    );
+
+    req.flash("success", "Category updated successfully");
+    res.redirect(`dashboard/${branchId}`);
+  } catch (error) {
+    console.error("Error updating category:", error);
+    if (error.code === 11000) {
+      req.flash(
+        "error",
+        "A category with this name already exists in this menu"
+      );
+    } else {
+      req.flash("error", "Failed to update category");
+    }
+    res.redirect(`dashboard/${branchId}`);
+  }
+});
+
+// POST - Delete Category
+app.post("/dashboard/categories/delete", async (req, res) => {
+  try {
+    const { categoryId } = req.body;
+
+    if (!categoryId) {
+      req.flash("error", "Invalid category");
+      return res.redirect(`/dashboard`);
+    }
+
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      req.flash("error", "Invalid category ID");
+      return res.redirect(`/dashboard`);
+    }
+
+    // Check if category exists
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      req.flash("error", "Category not found");
+      return res.redirect(`/dashboard`);
+    }
+
+    // Count menu items with this category
+    const itemCount = await MenuItem.countDocuments({ category: categoryId });
+
+    // Remove category reference from all menu items
+    if (itemCount > 0) {
+      await MenuItem.updateMany(
+        { category: categoryId },
+        { $unset: { category: "" } }
+      );
+    }
+
+    // Delete the category
+    await Category.findByIdAndDelete(categoryId);
+
+    if (itemCount > 0) {
+      req.flash(
+        "success",
+        `Category deleted successfully. ${itemCount} menu item(s) no longer have a category.`
+      );
+    } else {
+      req.flash("success", "Category deleted successfully");
+    }
+    res.redirect(`/dashboard`);
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    req.flash("error", "Failed to delete category");
+    res.redirect(`/dashboard`);
+  }
+});
+
 // -------------------- areas ---------------------------------
 
 app.get("/showAreas/:branchId", async (req, res) => {
@@ -837,6 +1059,78 @@ app.post("/addArea/:branchId", async (req, res) => {
     res.redirect("/dashboard");
   }
 });
+
+// Update Area
+app.post("/updateArea/:id", async (req, res) => {
+  try {
+    const areaId = req.params.id;
+    const { name, description, status } = req.body;
+
+    // Find and update the area
+    const updatedArea = await Area.findByIdAndUpdate(
+      areaId,
+      {
+        name,
+        description,
+        status,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedArea) {
+      return res.status(404).json({ error: "Area not found" });
+    }
+    req.flash("success", "Area Updated Successfully");
+    res.redirect("/dashboard"); // or wherever you want to redirect
+    // Or if you want JSON response: res.json({ success: true, area: updatedArea });
+  } catch (error) {
+    console.error("Error updating area:", error);
+    res.status(500).json({ error: "Failed to update area" });
+  }
+});
+
+// Delete Area (and all its tables)
+app.post("/deleteArea/:id", async (req, res) => {
+  try {
+    const areaId = req.params.id;
+
+    // Find the area first
+    const area = await Area.findById(areaId);
+
+    if (!area) {
+      return res.status(404).json({ error: "Area not found" });
+    }
+
+    // Check if any table in this area is currently occupied
+    const occupiedTables = await Table.find({
+      area: areaId,
+      availabilityStatus: "Occupied",
+    });
+
+    if (occupiedTables.length > 0) {
+      return res.status(400).json({
+        error:
+          "Cannot delete area with occupied tables. Please free all tables first.",
+      });
+    }
+
+    // Delete all tables in this area
+    await Table.deleteMany({ area: areaId });
+
+    // Delete the area
+    await Area.findByIdAndDelete(areaId);
+    req.flash("success", "Area Deleted Successfully");
+    res.redirect("/dashboard"); // or wherever you want to redirect
+    // Or if you want JSON response: res.json({ success: true, message: 'Area and all tables deleted' });
+  } catch (error) {
+    console.error("Error deleting area:", error);
+    res.status(500).json({ error: "Failed to delete area" });
+  }
+});
+
+// -----------------Areas----------------
+
+// ----------------POS--------------------
 
 app.get("/pos/:id", async (req, res) => {
   try {

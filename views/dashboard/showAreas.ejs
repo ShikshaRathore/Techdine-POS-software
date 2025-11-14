@@ -1,120 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All Areas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
 
-  <body class="bg-gray-50 min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">All Areas</h1>
-        <form action="/addArea/<%= branchId %>" method="GET">
-          <button
-            type="submit"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-colors"
-          >
-            Add Area
-          </button>
-        </form>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Areas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">All Areas</h1>
+      <form action="/addArea/<%= branchId %>" method="GET">
+        <button type="submit"
+          class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-colors">
+          Add Area
+        </button>
+      </form>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200">
+      <!-- Table Header -->
+      <div class="grid grid-cols-12 bg-gray-50 border-b border-gray-200 px-4 py-3">
+        <div class="col-span-6 text-sm font-semibold text-gray-600 uppercase">
+          Area Name
+        </div>
+        <div class="col-span-3 text-sm font-semibold text-gray-600 uppercase">
+          No of Tables
+        </div>
+        <div class="col-span-3 text-right text-sm font-semibold text-gray-600 uppercase">
+          Action
+        </div>
       </div>
 
-      <!-- Table Container -->
-      <div
-        class="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200"
-      >
-        <!-- Table Header -->
-        <div
-          class="grid grid-cols-12 bg-gray-50 border-b border-gray-200 px-4 py-3"
-        >
-          <div class="col-span-6 text-sm font-semibold text-gray-600 uppercase">
-            Area Name
-          </div>
-          <div class="col-span-3 text-sm font-semibold text-gray-600 uppercase">
-            No of Tables
-          </div>
-          <div
-            class="col-span-3 text-right text-sm font-semibold text-gray-600 uppercase"
-          >
-            Action
-          </div>
-        </div>
+      <!-- Table Body -->
+      <div>
+        <% if (areas && areas.length> 0) { %>
+          <% areas.forEach(area=> { %>
+            <div
+              class="grid grid-cols-12 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <!-- Area Name -->
+              <div class="col-span-6 text-gray-800 font-medium">
+                <%= area.name %>
+              </div>
 
-        <!-- Table Body -->
-        <div>
-          <% if (areas && areas.length > 0) { %> <% areas.forEach(area => { %>
-          <div
-            class="grid grid-cols-12 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-          >
-            <!-- Area Name -->
-            <div class="col-span-6 text-gray-800 font-medium">
-              <%= area.name %>
-            </div>
+              <!-- No of Tables -->
+              <div class="col-span-3 text-gray-700">
+                <%= area.tableCount || 0 %>
+              </div>
 
-            <!-- No of Tables -->
-            <div class="col-span-3 text-gray-700">
-              <%= area.tableCount || 0 %>
-            </div>
-
-            <!-- Actions -->
-            <div class="col-span-3 flex justify-end gap-3">
-              <form action="/updateArea/<%= area._id %>" method="GET">
-                <button
-                  type="submit"
-                  class="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
+              <!-- Actions -->
+              <div class="col-span-3 flex justify-end gap-3">
+                <!-- Update Button -->
+                <button data-action="edit" data-area-id="<%= area._id %>" data-area-name="<%= area.name %>"
+                  type="button"
+                  class="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   Update
                 </button>
-              </form>
 
-              <form action="/deleteArea/<%= area._id %>" method="POST">
-                <button
-                  type="submit"
-                  class="flex items-center gap-1 px-3 py-1.5 border border-red-300 rounded-md text-red-600 hover:bg-red-50 transition"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
+                <!-- Delete Button -->
+                <button data-action="delete" data-area-id="<%= area._id %>" data-area-name="<%= area.name %>"
+                  data-table-count="<%= area.tableCount || 0 %>" type="button"
+                  class="flex items-center gap-1 px-3 py-1.5 border border-red-300 rounded-md text-red-600 hover:bg-red-50 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Delete
                 </button>
-              </form>
+              </div>
             </div>
-          </div>
-          <% }) %> <% } else { %>
-          <div class="text-center text-gray-500 py-6 text-sm">
-            No areas found.
-          </div>
-          <% } %>
-        </div>
+            <% }) %>
+              <% } else { %>
+                <div class="text-center text-gray-500 py-6 text-sm">
+                  No areas found.
+                </div>
+                <% } %>
       </div>
     </div>
-  </body>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div class="relative mx-auto p-6 border w-full max-w-md shadow-2xl rounded-xl bg-white">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Edit Area</h3>
+        <button data-close="edit-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Changed: Remove hardcoded action, add id to form -->
+      <form id="editForm" method="POST" class="space-y-4">
+        <input type="hidden" id="editAreaId" name="areaId">
+
+        <div>
+          <label for="editAreaName" class="block text-sm font-medium text-gray-700 mb-2">
+            Area Name
+          </label>
+          <input type="text" id="editAreaName" name="name" required
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+            placeholder="Enter area name">
+        </div>
+
+        <div class="flex gap-3 mt-6 pt-2">
+          <button type="button" data-close="edit-modal"
+            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all font-medium">
+            Cancel
+          </button>
+          <button type="submit"
+            class="flex-1 bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all font-medium shadow-sm">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="deleteModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div class="relative mx-auto p-6 border w-full max-w-md shadow-2xl rounded-xl bg-white">
+      <div class="flex flex-col items-center">
+        <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100 mb-4">
+          <svg class="h-7 w-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+            </path>
+          </svg>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Delete Area</h3>
+
+        <div class="text-center mb-6">
+          <p class="text-sm text-gray-600 mb-2">
+            Are you sure you want to delete <span id="deleteAreaName" class="font-semibold text-gray-900"></span>?
+          </p>
+          <div id="deleteWarning" class="hidden mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm text-yellow-800 font-medium">
+              ⚠️ This will also delete <span id="deleteTableCount" class="font-bold"></span> table(s) in this area.
+            </p>
+          </div>
+          <p class="text-sm text-red-600 mt-3 font-medium">
+            This action cannot be undone.
+          </p>
+        </div>
+
+        <!-- Changed: Remove hardcoded action, add id to form -->
+        <form id="deleteForm" method="POST" class="flex gap-3 w-full">
+          <input type="hidden" id="deleteAreaId" name="areaId">
+
+          <button type="button" data-close="delete-modal"
+            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all font-medium">
+            Cancel
+          </button>
+          <button type="submit"
+            class="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all font-medium shadow-sm">
+            Delete Area
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+</body>
+
 </html>

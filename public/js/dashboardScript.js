@@ -88,6 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add after the existing conditions:
       else if (url.includes("/showPayments")) pageName = "showPayments";
       else if (url.includes("/duePayments")) pageName = "duePayments";
+      else if (url.includes("/salesReport")) pageName = "showSalesReport";
+      else if (url.includes("/itemReport")) pageName = "showItemReport";
+      else if (url.includes("/categoryReport")) pageName = "showCategoryReport";
+      else if (url.includes("/showMenu")) pageName = "showMenu";
+      else if (url.includes("/showItemCategories"))
+        pageName = "showItemCategories";
+      else if (url.includes("/showAreas")) pageName = "showArea";
       else {
         const match = url.match(/\/([a-zA-Z0-9_-]+)(?:\?|$)/);
         pageName = match ? match[1] : null;

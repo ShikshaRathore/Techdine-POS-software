@@ -81,8 +81,6 @@ const tableSessionSchema = new mongoose.Schema(
 
 // Index for quick lookups
 tableSessionSchema.index({ table: 1, status: 1 });
-tableSessionSchema.index({ sessionToken: 1 });
-tableSessionSchema.index({ branch: 1, status: 1 });
 
 // Method to check if session is active
 tableSessionSchema.methods.isActive = function () {

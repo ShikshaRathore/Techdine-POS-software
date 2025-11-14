@@ -1,0 +1,79 @@
+<!-- Reports with submenu -->
+<div class="menu-item">
+  <a
+    href="#"
+    class="menu-toggle flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+    data-menu="reports"
+  >
+    <div class="flex items-center space-x-3">
+      <svg
+        class="w-5 h-5 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6v14h16M4 14l4-4 4 4 6-6"
+        />
+      </svg>
+      <span class="font-medium text-sm sm:text-base">Reports</span>
+    </div>
+    <svg
+      class="w-4 h-4 transition-transform transform"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 9l-7 7-7-7"
+      />
+    </svg>
+  </a>
+
+  <!-- Submenu for Reports -->
+  <div class="submenu pl-8" id="submenu-reports">
+    <form
+      action="/reports/salesReport/<%=branchId%>"
+      method="GET"
+      class="content-form"
+    >
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Sales Report</span>
+      </button>
+    </form>
+
+    <form
+      action="/reports/itemReports/<%=branchId%>"
+      method="GET"
+      class="content-form"
+    >
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Item Report</span>
+      </button>
+    </form>
+    <form
+      action="/reports/categoryReport/<%=branchId%>"
+      method="GET"
+      class="content-form"
+    >
+      <button
+        type="submit"
+        class="w-full text-left submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+      >
+        <span class="font-medium text-sm">Category Report</span>
+      </button>
+    </form>
+  </div>
+</div>

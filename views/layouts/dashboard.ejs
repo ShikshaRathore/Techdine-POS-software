@@ -1,310 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rajbhog - Restaurant Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rajbhog - Restaurant Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-    <style>
-      body {
-        font-family: "Inter", sans-serif;
-      }
-      .sidebar-backdrop {
-        transition: opacity 0.3s ease;
-      }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .sidebar-backdrop {
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar {
+      transition: transform 0.3s ease;
+    }
+
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .submenu.open {
+      max-height: 500px;
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
       .sidebar {
-        transition: transform 0.3s ease;
-      }
-      .submenu {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out;
-      }
-      .submenu.open {
-        max-height: 500px;
-      }
-      .loading {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 50;
-        align-items: center;
-        justify-content: center;
-      }
-      .loading.active {
-        display: flex;
+        width: 280px;
+        max-width: 85vw;
       }
 
-      /* Mobile optimizations */
-      @media (max-width: 640px) {
-        .sidebar {
-          width: 280px;
-          max-width: 85vw;
-        }
-
-        html {
-          scroll-behavior: smooth;
-        }
-
-        button,
-        a {
-          min-height: 44px;
-        }
+      html {
+        scroll-behavior: smooth;
       }
 
-      @media (max-width: 640px) {
-        select {
-          font-size: 14px;
-        }
+      button,
+      a {
+        min-height: 44px;
       }
+    }
 
-      .sidebar nav {
-        -webkit-user-select: none;
-        user-select: none;
+    @media (max-width: 640px) {
+      select {
+        font-size: 14px;
       }
-    </style>
-  </head>
-  <body class="bg-gray-50">
-    <!-- Sidebar Backdrop (Mobile) -->
-    <div
-      id="sidebar-backdrop"
-      class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden sidebar-backdrop"
-    ></div>
+    }
 
-    <!-- Main Container -->
-    <div class="flex h-screen overflow-hidden">
-      <!-- Sidebar -->
-      <aside
-        id="sidebar"
-        class="fixed lg:static inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex-shrink-0 shadow-2xl z-40 transform -translate-x-full lg:translate-x-0 sidebar overflow-y-auto"
-      >
-        <!-- Close Button (Mobile Only) -->
-        <button
-          id="close-sidebar"
-          class="absolute top-4 right-4 lg:hidden text-gray-400 hover:text-white z-50"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+    .sidebar nav {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  </style>
+</head>
 
-        <div class="p-4 sm:p-6 border-b border-gray-700">
-          <div class="flex items-center gap-3">
-            <div class="w-full">
-              <!-- Restaurant Name -->
-              <h1
-                class="text-lg sm:text-xl font-bold text-white flex items-center gap-1"
-              >
-                <span><%= user.restaurantName %></span>
-              </h1>
+<body class="bg-gray-50">
+  <!-- Sidebar Backdrop (Mobile) -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden sidebar-backdrop"></div>
 
-              <!-- Branch Switcher -->
-              <div class="relative mt-3">
-                <form action="/dashboard" method="GET" id="branchForm">
-                  <div class="relative">
-                    <!-- Dropdown -->
-                    <select
-                      name="branchId"
-                      onchange="window.location.href = '/dashboard/' + this.value"
-                      class="w-full appearance-none border-2 border-orange-400 bg-white text-orange-600 font-semibold rounded-lg px-9 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer transition-all text-sm"
-                    >
-                      <% branches.forEach(b => { %> <option value="<%= b._id %>"
-                      <%= branch && branch._id.toString() === b._id.toString() ?
-                      'selected' : '' %>> <%= b.branchName || 'Unnamed Branch'
-                      %> <% }) %>
-                    </select>
+  <!-- Main Container -->
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="fixed lg:static inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex-shrink-0 shadow-2xl z-40 transform -translate-x-full lg:translate-x-0 sidebar overflow-y-auto">
+      <!-- Close Button (Mobile Only) -->
+      <button id="close-sidebar" class="absolute top-4 right-4 lg:hidden text-gray-400 hover:text-white z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
-                    <!-- Location Icon -->
-                    <div
-                      class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-orange-500"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 22s8-7.58 8-13a8 8 0 10-16 0c0 5.42 8 13 8 13z"
-                        />
-                      </svg>
-                    </div>
+      <div class="p-4 sm:p-6 border-b border-gray-700">
+        <div class="flex items-center gap-3">
+          <div class="w-full">
+            <!-- Restaurant Name -->
+            <h1 class="text-lg sm:text-xl font-bold text-white flex items-center gap-1">
+              <span>
+                <%= user.restaurantName %>
+              </span>
+            </h1>
 
-                    <!-- Dropdown Arrow -->
-                    <div
-                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-orange-500"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
+            <!-- Branch Switcher -->
+            <div class="relative mt-3">
+              <form action="/dashboard" method="GET" id="branchForm">
+                <div class="relative">
+                  <!-- Dropdown -->
+                  <select name="branchId" onchange="window.location.href = '/dashboard/' + this.value"
+                    class="w-full appearance-none border-2 border-orange-400 bg-white text-orange-600 font-semibold rounded-lg px-9 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer transition-all text-sm">
+                    <% branches.forEach(b=> { %> <option value="<%= b._id %>" <%=branch &&
+                        branch._id.toString()===b._id.toString() ? 'selected' : '' %>> <%= b.branchName
+                          || 'Unnamed Branch' %>
+                          <% }) %>
+                  </select>
+
+                  <!-- Location Icon -->
+                  <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-orange-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z" />
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 22s8-7.58 8-13a8 8 0 10-16 0c0 5.42 8 13 8 13z" />
+                    </svg>
                   </div>
-                </form>
-              </div>
+
+                  <!-- Dropdown Arrow -->
+                  <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-orange-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
+      </div>
 
-        <nav class="p-3 sm:p-4 space-y-1 pb-20">
-          <!-- Dashboard -->
-          <div class="menu-item">
-            <a
-              href="#"
-              class="flex items-center justify-between px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white transition-all shadow-md"
-            >
-              <div class="flex items-center space-x-3">
-                <svg
-                  class="w-5 h-5 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                <span class="font-medium text-sm sm:text-base">Dashboard</span>
-              </div>
-            </a>
-          </div>
+      <nav class="p-3 sm:p-4 space-y-1 pb-20">
+        <!-- Dashboard -->
+        <div class="menu-item">
+          <a href="#"
+            class="flex items-center justify-between px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white transition-all shadow-md">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span class="font-medium text-sm sm:text-base">Dashboard</span>
+            </div>
+          </a>
+        </div>
 
-          <!-- Menu -->
-          <%- include("../includes/menu.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
+        <!-- Menu -->
+        <%- include("../includes/menu.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
 
           <!-- Tables -->
-          <%- include("../includes/tables.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
+          <%- include("../includes/tables.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
 
-          <!-- POS -->
-          <%- include("../includes/pos.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
+            <!-- POS -->
+            <%- include("../includes/pos.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
 
-          <!-- Orders -->
-          <%- include("../includes/orders.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
+              <!-- Orders -->
+              <%- include("../includes/orders.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
 
-          <a
-            href="#"
-            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 text-gray-300 hover:text-white transition-all"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-            <span class="font-medium text-sm sm:text-base"
-              >Waiter Requests</span
-            >
-          </a>
+                <a href="#"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 text-gray-300 hover:text-white transition-all">
+                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  <span class="font-medium text-sm sm:text-base">Waiter Requests</span>
+                </a>
 
-          <%- include("../includes/reservations.ejs", {branch: branch, branches:
-          branches, branchId: branchId}) %>
-          <!-- Customers-->
-          <%- include("../includes/customers.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
-          <!-- Staff -->
-          <%- include("../includes/staff.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
-          <!-- delivery executive -->
-          <%- include("../includes/delivery-executive.ejs") %>
-          <!-- Payments -->
-          <%- include("../includes/payments.ejs",{ branch: branch, branches:
-          branches, branchId: branchId }) %>
-          <!-- settings -->
-          <%- include("../includes/settings.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
-        </nav>
-        <!-- customer-site -->
-        <%- include("../includes/customer-site.ejs", { branch: branch, branches:
-        branches, branchId: branchId }) %>
-      </aside>
+                <%- include("../includes/reservations.ejs", {branch: branch, branches: branches, branchId: branchId}) %>
+                  <!-- Customers-->
+                  <%- include("../includes/customers.ejs", { branch: branch, branches: branches, branchId: branchId })
+                    %>
+                    <!-- Staff -->
+                    <%- include("../includes/staff.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
+                      <!-- delivery executive -->
+                      <%- include("../includes/delivery-executive.ejs") %>
+                        <!-- Payments -->
+                        <%- include("../includes/payments.ejs",{ branch: branch, branches: branches, branchId: branchId
+                          }) %>
+                          <!-- Reports -->
+                          <%- include("../includes/reports.ejs",{ branch: branch, branches: branches, branchId: branchId
+                            }) %>
+                            <!-- settings -->
+                            <%- include("../includes/settings.ejs", { branch: branch, branches: branches, branchId:
+                              branchId }) %>
+      </nav>
+      <!-- customer-site -->
+      <%- include("../includes/customer-site.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
+    </aside>
 
-      <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto w-full">
-        <%- include("../includes/flash.ejs") %>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto w-full">
+      <%- include("../includes/flash.ejs") %>
 
         <!-- Header -->
         <header id="header" class="bg-white shadow-sm sticky top-0 z-20">
-          <div
-            class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4"
-          >
+          <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
             <div class="flex items-center space-x-3 sm:space-x-4">
               <!-- Hamburger Menu (Mobile) -->
-              <button
-                id="open-sidebar"
-                class="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none p-1"
-              >
-                <svg
-                  class="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+              <button id="open-sidebar" class="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none p-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
 
               <div>
-                <h2
-                  class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800"
-                >
+                <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">
                   Dashboard
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 hidden sm:block">
@@ -317,15 +230,11 @@
               <!-- Notification Badges (Hidden on small mobile) -->
               <div class="hidden sm:flex items-center space-x-2">
                 <span
-                  class="px-2 sm:px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-medium whitespace-nowrap"
-                  >Orders: <%= statistics ? statistics.todayOrdersCount : 0
-                  %></span
-                >
+                  class="px-2 sm:px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-medium whitespace-nowrap">Orders:
+                  <%= statistics ? statistics.todayOrdersCount : 0 %></span>
                 <span
-                  class="px-2 sm:px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium whitespace-nowrap"
-                >
-                  Reservations: <%= statistics ?
-                  statistics.todayReservationsCount : 0 %>
+                  class="px-2 sm:px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium whitespace-nowrap">
+                  Reservations: <%= statistics ? statistics.todayReservationsCount : 0 %>
                 </span>
               </div>
 
@@ -334,26 +243,17 @@
                 <!-- Profile Dropdown Container -->
                 <div class="relative">
                   <!-- Profile Icon Button -->
-                  <button
-                    id="profileBtn"
-                    class="w-10 h-10 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 overflow-hidden"
-                  >
+                  <button id="profileBtn"
+                    class="w-10 h-10 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 overflow-hidden">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
                       <circle cx="12" cy="8" r="4" fill="white" />
-                      <path
-                        d="M4 20c0-4 3.5-7 8-7s8 3 8 7"
-                        stroke="white"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
+                      <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round" />
                     </svg>
                   </button>
 
                   <!-- Dropdown Menu -->
-                  <div
-                    id="dropdownMenu"
-                    class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-                  >
+                  <div id="dropdownMenu"
+                    class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                     <!-- User Email -->
                     <div class="px-4 py-3 border-b border-gray-100">
                       <p class="text-sm text-gray-500">Signed in as</p>
@@ -363,28 +263,14 @@
                     </div>
 
                     <!-- Settings Option -->
-                    <a
-                      href="#settings"
-                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <svg
-                        class="w-4 h-4 mr-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        ></path>
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        ></path>
+                    <a href="#settings"
+                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       </svg>
                       Settings
                     </a>
@@ -392,20 +278,11 @@
                     <!-- Logout Option -->
                     <form action="/logout" method="GET">
                       <button
-                        class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
-                      >
-                        <svg
-                          class="w-4 h-4 mr-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          ></path>
+                        class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100">
+                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                          </path>
                         </svg>
                         Logout
                       </button>
@@ -417,32 +294,27 @@
           </div>
 
           <!-- Mobile Badges -->
-          <div
-            class="sm:hidden px-4 pb-3 flex items-center gap-2 overflow-x-auto"
-          >
+          <div class="sm:hidden px-4 pb-3 flex items-center gap-2 overflow-x-auto">
             <span
-              class="px-3 py-1.5 bg-orange-100 text-orange-600 rounded-full text-xs font-medium whitespace-nowrap"
-              >Orders: 0</span
-            >
+              class="px-3 py-1.5 bg-orange-100 text-orange-600 rounded-full text-xs font-medium whitespace-nowrap">Orders:
+              0</span>
             <span
-              class="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium whitespace-nowrap"
-              >Reservations: 0</span
-            >
+              class="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium whitespace-nowrap">Reservations:
+              0</span>
             <span
-              class="px-3 py-1.5 bg-purple-100 text-purple-600 rounded-full text-xs font-medium whitespace-nowrap"
-              >Requests: 0</span
-            >
+              class="px-3 py-1.5 bg-purple-100 text-purple-600 rounded-full text-xs font-medium whitespace-nowrap">Requests:
+              0</span>
           </div>
         </header>
 
         <!-- Dashboard Content -->
         <div id="dashboard-content" class="p-4 sm:p-6 lg:p-4">
-          <%- include("../includes/statistics.ejs", { branch: branch, branches:
-          branches, branchId: branchId }) %>
+          <%- include("../includes/statistics.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
         </div>
-      </main>
-    </div>
+    </main>
+  </div>
 
-    <script type="module" src="/js/dashboardScript.js"></script>
-  </body>
+  <script type="module" src="/js/dashboardScript.js"></script>
+</body>
+
 </html>

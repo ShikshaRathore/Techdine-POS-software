@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waiter Requests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Waiter Requests</h1>
+            <p class="text-gray-600 mt-1">Manage all pending customer requests</p>
+        </div>
+
+        <!-- Group requests by area -->
+        <% if (requests && requests.length> 0) { %>
+            <% const groupedRequests={}; requests.forEach(req=> {
+                const areaName = req.area?.name || 'Unknown Area';
+                if (!groupedRequests[areaName]) {
+                groupedRequests[areaName] = [];
+                }
+                groupedRequests[areaName].push(req);
+                });
+                %>
+
+                <% Object.keys(groupedRequests).forEach(areaName=> { %>
+                    <div class="mb-8">
+                        <!-- Area Header -->
+                        <div class="flex items-center gap-3 mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">
+                                <%= areaName %>
+                            </h2>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                                <%= groupedRequests[areaName].length %> Table<%= groupedRequests[areaName].length !==1
+                                        ? 's' : '' %>
+                            </span>
+                        </div>
+
+                        <!-- Request Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <% groupedRequests[areaName].forEach(request=> { %>
+                                <div class="waiter-request-card bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer"
+                                    data-request-id="<%= request._id %>" data-table-id="<%= request.table?._id || '' %>"
+                                    data-table-code="<%= request.table?.tableCode || 'N/A' %>"
+                                    data-branch-id="<%= branchId %>">
+
+                                    <!-- Table Badge -->
+                                    <div class="inline-block mb-4">
+                                        <div
+                                            class="bg-teal-100 text-teal-700 px-4 py-2 rounded-lg font-semibold text-lg">
+                                            <%= request.table?.tableCode || 'N/A' %>
+                                        </div>
+                                    </div>
+
+                                    <!-- Time Info -->
+                                    <div class="flex items-center gap-2 text-gray-600 text-sm mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span>
+                                            <% const now=new Date(); const createdAt=new Date(request.createdAt); const
+                                                diffInSeconds=Math.floor((now - createdAt) / 1000); const
+                                                diffInMinutes=Math.floor(diffInSeconds / 60); let timeAgo; if
+                                                (diffInSeconds < 60) { timeAgo=`${diffInSeconds} second${diffInSeconds
+                                                !==1 ? 's' : '' } ago`; } else if (diffInMinutes < 60) {
+                                                timeAgo=`${diffInMinutes} minute${diffInMinutes !==1 ? 's' : '' } ago`;
+                                                } else { const diffInHours=Math.floor(diffInMinutes / 60);
+                                                timeAgo=`${diffInHours} hour${diffInHours !==1 ? 's' : '' } ago`; } %>
+                                                <%= timeAgo %>
+                                        </span>
+                                    </div>
+
+                                    <!-- Assigned Waiter (if any) -->
+                                    <% if (request.assignedTo) { %>
+                                        <div
+                                            class="flex items-center gap-2 text-gray-700 text-sm mb-4 pb-4 border-b border-gray-100">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                            <span>
+                                                <%= request.assignedTo.name %>
+                                            </span>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="text-gray-400 text-sm mb-4 pb-4 border-b border-gray-100">
+                                                Not assigned
+                                            </div>
+                                            <% } %>
+
+                                                <!-- Click to Open POS hint -->
+                                                <div
+                                                    class="text-xs text-gray-500 text-center mb-3 flex items-center justify-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                                    </svg>
+                                                    Click to open POS
+                                                </div>
+
+                                                <!-- Mark Attended Button -->
+                                                <form
+                                                    action="/waiterRequest/<%=branchId%>/markAttended/<%= request._id %>"
+                                                    method="POST" class="w-full">
+                                                    <button type="submit"
+                                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors font-medium">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        Mark Attended
+                                                    </button>
+                                                </form>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div>
+                    <% }); %>
+
+                        <% } else { %>
+                            <!-- Empty State -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">No Pending Requests</h3>
+                                <p class="text-gray-500">All requests have been attended to</p>
+                            </div>
+                            <% } %>
+    </div>
+</body>
+
+</html>

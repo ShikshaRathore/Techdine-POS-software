@@ -30,6 +30,7 @@ const tableRoutes = require("./routes/tableRoutes.js");
 const settingsRoutes = require("./routes/settingsRoutes");
 const paymentsRoutes = require("./routes/paymentsRoutes");
 const reportRoutes = require("./routes/reportRoutes.js");
+const waiterRequestRoutes = require("./routes/waiterRequestRoutes.js");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -44,6 +45,8 @@ const Order = require("./models/order.js");
 const KOT = require("./models/kot.js");
 const Customer = require("./models/customer.js");
 const Staff = require("./models/staff.js");
+const Tax = require("./models/tax.js");
+const Reservation = require("./models/reservation.js");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -56,6 +59,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
+app.use("/favicon.ico", express.static("public/favicon.ico"));
 
 app.use(cookieParser());
 
@@ -158,7 +162,7 @@ app.use("/tables", tableRoutes);
 app.use("/payments", paymentsRoutes);
 app.use("/dashboard/:branchId/settings", settingsRoutes);
 app.use("/reports", reportRoutes);
-
+app.use("/waiterRequest/:branchId", waiterRequestRoutes);
 //--------------API---------------------
 
 app.get("/", (req, res) => {
@@ -1136,6 +1140,7 @@ app.get("/pos/:id", async (req, res) => {
   try {
     const branchId = req.params.id;
     const orderId = req.query.orderId; // optional existing order
+    const { tableId, tableCode, requestId } = req.query; // ADD THIS LINE - Get table params
 
     // Find branch
     const branch = await Branch.findById(branchId);
@@ -1160,7 +1165,17 @@ app.get("/pos/:id", async (req, res) => {
       existingOrder = await Order.findById(orderId)
         .populate("customer")
         .populate("items.menuItem", "itemName price")
+        .populate("table", "tableCode") // ADD THIS - Populate table for existing orders
         .lean();
+    }
+
+    // ADD THIS - Log table parameters for debugging
+    if (tableId && tableCode) {
+      console.log("🔵 POS Route - Table params received:", {
+        tableId,
+        tableCode,
+        requestId,
+      });
     }
 
     // Render POS page
@@ -1175,6 +1190,10 @@ app.get("/pos/:id", async (req, res) => {
         ? existingOrder.orderNumber
         : Math.floor(Math.random() * 1000),
       existingOrder: existingOrder || null,
+      // ADD THESE LINES - Pass table parameters to template
+      tableId: tableId || existingOrder?.table?._id || null,
+      tableCode: tableCode || existingOrder?.table?.tableCode || null,
+      requestId: requestId || null,
     });
   } catch (err) {
     console.error("POS Load Error:", err);
@@ -1183,53 +1202,92 @@ app.get("/pos/:id", async (req, res) => {
   }
 });
 
+// -----------------Assign Table---------------
+
+// Add this route
+app.get("/dashboard/assignTables/available/:branchId", async (req, res) => {
+  try {
+    const { branchId } = req.params;
+
+    // Fetch all areas with their tables
+    const areas = await Area.find({ branch: branchId })
+      .populate({
+        path: "tables",
+        match: { status: "Active" },
+      })
+      .lean();
+
+    // Get today's reservations
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const reservations = await Reservation.find({
+      branch: branchId,
+      reservationDate: {
+        $gte: today,
+        $lt: tomorrow,
+      },
+      status: "Confirmed",
+    })
+      .populate("table", "tableCode")
+      .populate("area", "areaName")
+      .sort({ timeSlot: 1 })
+      .lean();
+
+    res.json({
+      success: true,
+      areas,
+      reservations,
+    });
+  } catch (err) {
+    console.error("Error fetching tables:", err);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch tables",
+    });
+  }
+});
+
+// ---------------------TAXES-----------------------
+// GET - Fetch taxes for a branch from branch.tax field
+app.get("/dashboard/taxes/:branchId", async (req, res) => {
+  try {
+    const { branchId } = req.params;
+
+    // Fetch branch and populate tax references
+    const branch = await Branch.findById(branchId).populate("tax");
+
+    if (!branch) {
+      return res.status(404).json({
+        success: false,
+        error: "Branch not found",
+      });
+    }
+
+    // Get taxes from branch.tax array
+    const taxes = branch.tax || [];
+
+    res.json({
+      success: true,
+      taxes: taxes.map((tax) => ({
+        _id: tax._id,
+        name: tax.name,
+        percentage: tax.percentage,
+      })),
+    });
+  } catch (error) {
+    console.error("Error fetching taxes:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch taxes",
+      details: error.message,
+    });
+  }
+});
+
 // ---------------------------------------------------------
-
-// app.get("/pos/:id", async (req, res) => {
-//   try {
-//     const branchId = req.params.id;
-
-//     // 1️⃣ Find branch
-//     const branch = await Branch.findById(branchId);
-//     if (!branch) {
-//       req.flash("error", "Branch not found!");
-//       return res.redirect("/dashboard");
-//     }
-
-//     // 2️⃣ Find menu for this branch
-//     const menu = await Menu.findOne({ branch: branchId });
-//     if (!menu) {
-//       req.flash("error", "Menu not found for this branch!");
-//       return res.redirect("/dashboard");
-//     }
-
-//     // 3️⃣ Find all categories linked to this menu
-//     const categories = await Category.find({ menu: menu._id });
-
-//     // 4️⃣ Find all menu items linked to these categories
-//     const categoryIds = categories.map((c) => c._id);
-//     const menuItems = await MenuItem.find({
-//       category: { $in: categoryIds },
-//     }).populate("category");
-
-//     // 5️⃣ Find areas (optional — for table selection)
-//     const areas = await Area.find({ branch: branchId }).populate("tables");
-
-//     // 6️⃣ Render POS page
-//     res.render("dashboard/showPos.ejs", {
-//       branch,
-//       branchId,
-//       areas,
-//       categories,
-//       menuItems,
-//       orderNumber: Math.floor(Math.random() * 1000),
-//     });
-//   } catch (err) {
-//     console.error("POS Load Error:", err);
-//     req.flash("error", "Unable to load POS page at this moment.");
-//     res.redirect("/dashboard");
-//   }
-// });
 
 app.post("/createOrderKOT", isLoggedIn, posController.createOrderKOT);
 
@@ -1648,13 +1706,22 @@ function generateKOTTemplate(order) {
 }
 
 function generateBillTemplate(order) {
-  // Calculate subtotal from items
-  const subtotal = order.items.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
-  }, 0);
+  const subtotal = order.subtotal || 0;
+  const taxes = order.taxes || [];
+  const totalTax = order.totalTax || 0;
+  const grandTotal = order.totalAmount || 0;
 
-  const tax = order.tax || 0;
-  const discount = order.discount || 0;
+  // Generate tax rows HTML
+  const taxRowsHTML = taxes
+    .map(
+      (tax) => `
+    <div class="item">
+      <span>${tax.name} (${tax.percentage}%):</span>
+      <span>₹${tax.amount.toFixed(2)}</span>
+    </div>
+  `
+    )
+    .join("");
 
   return `
     <!DOCTYPE html>
@@ -1700,30 +1767,11 @@ function generateBillTemplate(order) {
         <span>Subtotal:</span>
         <span>₹${subtotal.toFixed(2)}</span>
       </div>
-      ${
-        tax > 0
-          ? `
-        <div class="item">
-          <span>Tax:</span>
-          <span>₹${tax.toFixed(2)}</span>
-        </div>
-      `
-          : ""
-      }
-      ${
-        discount > 0
-          ? `
-        <div class="item">
-          <span>Discount:</span>
-          <span>-₹${discount.toFixed(2)}</span>
-        </div>
-      `
-          : ""
-      }
+      ${taxRowsHTML}
       <div class="divider"></div>
       <div class="item total">
         <span>TOTAL:</span>
-        <span>₹${order.totalAmount.toFixed(2)}</span>
+        <span>₹${grandTotal.toFixed(2)}</span>
       </div>
       <div class="divider"></div>
       <p style="text-align: center; margin-top: 20px;">Thank you for your visit!</p>

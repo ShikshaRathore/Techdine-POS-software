@@ -1,1499 +1,1464 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= branch.branchName %> - Order Now</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      .line-clamp-1 {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        line-clamp: 1;
-      }
-      .category-scroll {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .category-scroll::-webkit-scrollbar {
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= branch.branchName %> - Order Now
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .line-clamp-1 {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      line-clamp: 1;
+    }
+
+    .category-scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .category-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .group:hover .group-hover\:block {
+      display: block;
+    }
+
+    /* Add to existing styles */
+    .floating-buttons {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    @media (min-width: 768px) {
+      .floating-buttons {
         display: none;
       }
-      .group:hover .group-hover\:block {
-        display: block;
+    }
+
+    /* < !-- Add this to the <head>section of your existing page --> */
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
       }
-      /* Add to existing styles */
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes ring {
+
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      10%,
+      30% {
+        transform: rotate(-10deg);
+      }
+
+      20%,
+      40% {
+        transform: rotate(10deg);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+    }
+
+    .popup-overlay {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .popup-content {
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .bell-ring {
+      animation: ring 0.5s ease-in-out;
+    }
+
+    .success-pulse {
+      animation: pulse 0.6s ease-in-out;
+    }
+
+    /* ==================== MOBILE OPTIMIZATIONS ==================== */
+    @media (max-width: 768px) {
+
+      /* Compact Mobile Navbar */
+      .md\:hidden nav {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .md\:hidden nav .px-4 {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+      }
+
+      .md\:hidden nav .py-3 {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+      }
+
+      /* Smaller Logo */
+      .md\:hidden .w-10.h-10 {
+        width: 2rem;
+        height: 2rem;
+      }
+
+      .md\:hidden .w-10.h-10 svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      /* Compact Branch Dropdown */
+      .md\:hidden .max-w-\[140px\] button {
+        font-size: 0.875rem;
+        max-width: 120px;
+      }
+
+      /* Smaller Icons */
+      .md\:hidden .w-6.h-6 {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      /* Compact Hero Banner */
+      .bg-orange-50.py-6 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+      }
+
+      .bg-orange-50 h2 {
+        font-size: 1rem !important;
+        line-height: 1.4 !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+      }
+
+      /* Compact Search Bar */
+      .max-w-7xl.px-4.py-4 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+      }
+
+      #searchInput {
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+        font-size: 0.875rem !important;
+        padding-left: 2rem !important;
+      }
+
+      #searchInput::placeholder {
+        font-size: 0.813rem;
+      }
+
+      /* Veg Toggle Compact */
+      .flex.items-center.space-x-2.ml-4 span {
+        font-size: 0.813rem;
+      }
+
+      .w-11.h-6 {
+        width: 2.5rem !important;
+        height: 1.375rem !important;
+      }
+
+      /* Compact Category Tabs */
+      .category-scroll {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .category-filter-btn {
+        font-size: 0.813rem !important;
+        padding-bottom: 0.5rem !important;
+        white-space: nowrap;
+      }
+
+      /* Compact Menu Items */
+      .menu-item {
+        padding: 0.75rem !important;
+        margin-bottom: 0.5rem;
+      }
+
+      .menu-item .w-16.h-16 {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+      }
+
+      .menu-item h3 {
+        font-size: 0.938rem !important;
+      }
+
+      .menu-item .text-gray-600 {
+        font-size: 0.75rem !important;
+      }
+
+      .menu-item .text-lg.font-bold {
+        font-size: 1rem !important;
+      }
+
+      .menu-item .text-xs {
+        font-size: 0.688rem !important;
+      }
+
+      /* Compact Veg/Non-Veg Icons */
+      .menu-item .w-5.h-5 {
+        width: 1rem !important;
+        height: 1rem !important;
+      }
+
+      .menu-item .w-2.h-2 {
+        width: 0.438rem !important;
+        height: 0.438rem !important;
+      }
+
+      /* Compact Add Button */
+      .menu-item .add-btn {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        font-size: 0.875rem !important;
+      }
+
+      /* Compact Quantity Controls */
+      .menu-item button[onclick*="updateQuantity"] {
+        width: 1.75rem !important;
+        height: 1.75rem !important;
+        padding: 0 !important;
+      }
+
+      .menu-item button[onclick*="updateQuantity"] svg {
+        width: 0.875rem !important;
+        height: 0.875rem !important;
+      }
+
+      .menu-item span.font-semibold {
+        font-size: 0.875rem !important;
+        min-width: 1.75rem !important;
+      }
+
+      /* Compact Bottom Navigation */
+      .md\:hidden.fixed.bottom-0 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+      }
+
+      .md\:hidden.fixed.bottom-0 .w-6.h-6 {
+        width: 1.375rem !important;
+        height: 1.375rem !important;
+      }
+
+      .md\:hidden.fixed.bottom-0 .text-xs {
+        font-size: 0.688rem !important;
+        margin-top: 0.125rem !important;
+      }
+
+      /* Compact Floating Buttons */
       .floating-buttons {
-        position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: 70px !important;
+        gap: 0.5rem !important;
+      }
+
+      .floating-buttons button {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+        font-size: 0.875rem !important;
+        box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4) !important;
+      }
+
+      .floating-buttons button svg {
+        width: 1.125rem !important;
+        height: 1.125rem !important;
+      }
+
+      .floating-buttons button span {
+        font-size: 0.875rem !important;
+      }
+
+      /* Compact Session Alert */
+      .bg-green-50.border-l-4,
+      .bg-yellow-50.border-l-4 {
+        padding: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      .bg-green-50 .h-5.w-5,
+      .bg-yellow-50 .h-5.w-5 {
+        height: 1.125rem !important;
+        width: 1.125rem !important;
+      }
+
+      .bg-green-50 .text-sm,
+      .bg-yellow-50 .text-sm {
+        font-size: 0.813rem !important;
+      }
+
+      /* Compact Active Session Card */
+      .bg-white.rounded-lg.shadow-sm.border.p-4 {
+        padding: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      .bg-white.rounded-lg h3 {
+        font-size: 0.938rem !important;
+      }
+
+      .bg-white.rounded-lg .text-sm {
+        font-size: 0.75rem !important;
+      }
+
+      .bg-white.rounded-lg .text-lg {
+        font-size: 1rem !important;
+      }
+
+      /* Reduce Spacing Between Elements */
+      .max-w-7xl.px-4 {
+        padding-left: 0.875rem !important;
+        padding-right: 0.875rem !important;
+      }
+
+      .pb-20.md\:pb-12 {
+        padding-bottom: 5rem !important;
+      }
+
+      .space-y-4>*+* {
+        margin-top: 0.5rem !important;
+      }
+
+      /* Cart Sidebar Improvements */
+      #cartSidebar .p-4 {
+        padding: 0.875rem !important;
+      }
+
+      #cartSidebar h2 {
+        font-size: 1.125rem !important;
+      }
+
+      #cartSidebar .text-sm {
+        font-size: 0.813rem !important;
+      }
+
+      #cartSidebar button {
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+        font-size: 0.938rem !important;
+      }
+
+      /* Checkout Modal */
+      #checkoutModal .p-4 {
+        padding: 0.875rem !important;
+      }
+
+      #checkoutModal h2,
+      #checkoutModal h3 {
+        font-size: 1rem !important;
+      }
+
+      #checkoutModal label {
+        padding: 0.75rem !important;
+        font-size: 0.875rem !important;
+      }
+
+      /* Success/Error Popups */
+      .popup-content {
+        padding: 1.5rem !important;
+      }
+
+      .popup-content h3 {
+        font-size: 1.25rem !important;
+        margin-top: 1rem !important;
+      }
+
+      .popup-content p {
+        font-size: 0.875rem !important;
+        margin-top: 0.5rem !important;
+      }
+
+      .popup-content .w-20.h-20 {
+        width: 4rem !important;
+        height: 4rem !important;
+      }
+
+      .popup-content button {
+        margin-top: 1.25rem !important;
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+        font-size: 0.938rem !important;
+      }
+    }
+
+    /* ==================== ENHANCED VISUAL POLISH ==================== */
+    @media (max-width: 768px) {
+
+      /* Smooth Transitions */
+      .menu-item,
+      .category-filter-btn,
+      .add-btn,
+      button {
+        transition: all 0.2s ease;
+      }
+
+      /* Card Hover Effects */
+      .menu-item:active {
+        transform: scale(0.98);
+        background-color: #FFF7ED;
+      }
+
+      /* Button Press Effects */
+      button:active {
+        transform: scale(0.95);
+      }
+
+      /* Improved Shadows */
+      .menu-item {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+
+      .menu-item:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      }
+
+      /* Badge Styling */
+      #cartCount,
+      #mobileCartCount {
+        font-size: 0.625rem !important;
+        min-width: 1.125rem;
+        height: 1.125rem;
         display: flex;
-        gap: 12px;
-        z-index: 40;
+        align-items: center;
+        justify-content: center;
       }
-      @media (min-width: 768px) {
-        .floating-buttons {
-          display: none;
-        }
-      }
-    </style>
-  </head>
 
-  <body class="bg-white">
-    <!-- MOBILE NAVBAR -->
-    <nav
-      class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm md:hidden"
-    >
-      <div class="px-4 py-3">
-        <div class="flex justify-between items-center">
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6 text-orange-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z"
-                />
+      /* Rounded Corners Enhancement */
+      .menu-item,
+      .add-btn,
+      #searchInput,
+      .floating-buttons button {
+        border-radius: 0.625rem;
+      }
+
+      /* Text Hierarchy */
+      h1,
+      h2,
+      h3 {
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      /* Better Spacing */
+      .menu-item .flex.items-center {
+        gap: 0.625rem;
+      }
+
+      /* Icon Alignment */
+      .flex.items-center svg {
+        flex-shrink: 0;
+      }
+    }
+
+    /* ==================== EXTRA SMALL DEVICES ==================== */
+    @media (max-width: 375px) {
+      .bg-orange-50 h2 {
+        font-size: 0.875rem !important;
+      }
+
+      .floating-buttons button span {
+        display: none;
+      }
+
+      .floating-buttons button {
+        padding: 0.625rem !important;
+        border-radius: 50%;
+        width: 2.75rem;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu-item h3 {
+        font-size: 0.875rem !important;
+      }
+
+      .menu-item .text-lg.font-bold {
+        font-size: 0.938rem !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white">
+  <!-- MOBILE NAVBAR -->
+  <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm md:hidden">
+    <div class="px-4 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z" />
+            </svg>
+          </div>
+
+          <!-- DYNAMIC BRANCH DROPDOWN - MOBILE -->
+          <div class="relative group max-w-[140px]">
+            <button class="flex items-center space-x-1 text-gray-800 font-semibold">
+              <span class="truncate">
+                <%= branch.branchName %>
+              </span>
+              <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
               </svg>
-            </div>
+            </button>
 
-            <!-- DYNAMIC BRANCH DROPDOWN - MOBILE -->
-            <div class="relative group max-w-[140px]">
-              <button
-                class="flex items-center space-x-1 text-gray-800 font-semibold"
-              >
-                <span class="truncate"><%= branch.branchName %></span>
-                <svg
-                  class="w-4 h-4 flex-shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-
-              <div
-                class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-56 max-h-64 overflow-y-auto"
-              >
-                <% allBranches.forEach(b => { %>
-                <a
-                  href="/restaurant/<%= b._id %>"
-                  class="block px-4 py-2.5 text-sm hover:bg-gray-100 <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 text-orange-600 font-semibold' : 'text-gray-700' %>"
-                >
-                  <%= b.branchName %> <% if (b._id.toString() ===
-                  branch._id.toString()) { %>
-                  <span class="text-xs text-orange-500 ml-1">(Current)</span>
-                  <% } %> <% if (b.address) { %>
-                  <div class="text-xs text-gray-500 mt-0.5">
-                    <%= b.address %>
-                  </div>
-                  <% } %>
+            <div
+              class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-56 max-h-64 overflow-y-auto">
+              <% allBranches.forEach(b=> { %>
+                <a href="/restaurant/<%= b._id %>"
+                  class="block px-4 py-2.5 text-sm hover:bg-gray-100 <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 text-orange-600 font-semibold' : 'text-gray-700' %>">
+                  <%= b.branchName %>
+                    <% if (b._id.toString()===branch._id.toString()) { %>
+                      <span class="text-xs text-orange-500 ml-1">(Current)</span>
+                      <% } %>
+                        <% if (b.address) { %>
+                          <div class="text-xs text-gray-500 mt-0.5">
+                            <%= b.address %>
+                          </div>
+                          <% } %>
                 </a>
                 <% }) %>
-              </div>
             </div>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <button
-              onclick="openCart()"
-              class="relative text-gray-600 hover:text-orange-500"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span
-                id="cartCount"
-                class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2"
-                >0</span
-              >
-            </button>
-
-            <button id="mobileMenuButton" class="text-gray-600">
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
           </div>
         </div>
 
-        <div id="mobileMenu" class="hidden mt-4 pt-4 border-t border-gray-200">
-          <div class="flex flex-col space-y-4">
-            <a
-              href="#"
-              class="text-orange-500 font-semibold border-l-4 border-orange-500 pl-3 py-1"
-              >Home</a
-            >
-            <form
-              action="/restaurant/<%= branch._id %>/reservations"
-              method="GET"
-            >
-              <button
-                type="submit"
-                class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1 text-left w-full"
-              >
-                Book a Table
-              </button>
-            </form>
+        <div class="flex items-center space-x-3">
+          <button onclick="openCart()" class="relative text-gray-600 hover:text-orange-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span id="cartCount"
+              class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2">0</span>
+          </button>
 
-            <a
-              href="#"
-              class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1"
-              >About</a
-            >
-            <a
-              href="#"
-              class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1"
-              >Contact</a
-            >
-          </div>
-
-          <div class="mt-4 pt-4 border-t border-gray-200">
-            <a
-              href="#"
-              class="bg-orange-500 text-white w-full text-center py-2 rounded-lg font-semibold block"
-              >Login</a
-            >
-          </div>
+          <button id="mobileMenuButton" class="text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
-    </nav>
 
-    <!-- DESKTOP NAVBAR -->
-    <nav
-      class="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm"
-    >
-      <div class="max-w-7xl mx-auto px-6 py-3">
-        <div class="flex justify-between items-center">
-          <div class="flex items-center space-x-8">
-            <div class="flex items-center space-x-2">
-              <div
-                class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
-              >
-                <svg
-                  class="w-6 h-6 text-orange-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z"
-                  />
-                </svg>
-              </div>
-              <h1 class="text-xl font-bold text-gray-900">Rajbhog</h1>
+      <div id="mobileMenu" class="hidden mt-4 pt-4 border-t border-gray-200">
+        <div class="flex flex-col space-y-4">
+          <a href="#" class="text-orange-500 font-semibold border-l-4 border-orange-500 pl-3 py-1">Home</a>
+          <form action="/restaurant/<%= branch._id %>/reservations" method="GET">
+            <button type="submit" class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1 text-left w-full">
+              Book a Table
+            </button>
+          </form>
+
+          <a href="#" class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1">About</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900 font-medium pl-3 py-1">Contact</a>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <a href="#" class="bg-orange-500 text-white w-full text-center py-2 rounded-lg font-semibold block">Login</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- DESKTOP NAVBAR -->
+  <nav class="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-8">
+          <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75zM10 18a5 5 0 100-10 5 5 0 000 10z" />
+              </svg>
             </div>
+            <h1 class="text-xl font-bold text-gray-900">Rajbhog</h1>
+          </div>
 
-            <!-- DYNAMIC BRANCH DROPDOWN - DESKTOP -->
-            <div class="relative group">
-              <button
-                class="flex items-center space-x-2 text-gray-600 hover:text-orange-500 transition-colors"
-              >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span class="font-medium"><%= branch.branchName %></span>
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
+          <!-- DYNAMIC BRANCH DROPDOWN - DESKTOP -->
+          <div class="relative group">
+            <button class="flex items-center space-x-2 text-gray-600 hover:text-orange-500 transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                  clip-rule="evenodd" />
+              </svg>
+              <span class="font-medium">
+                <%= branch.branchName %>
+              </span>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
+              </svg>
+            </button>
 
-              <div
-                class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-64 max-h-80 overflow-y-auto"
-              >
-                <% allBranches.forEach(b => { %>
-                <a
-                  href="/restaurant/<%= b._id %>"
-                  class="block px-4 py-3 text-sm hover:bg-gray-100 transition-colors <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 border-l-4 border-orange-500' : 'text-gray-700' %>"
-                >
+            <div
+              class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg border mt-2 py-1 w-64 max-h-80 overflow-y-auto">
+              <% allBranches.forEach(b=> { %>
+                <a href="/restaurant/<%= b._id %>"
+                  class="block px-4 py-3 text-sm hover:bg-gray-100 transition-colors <%= b._id.toString() === branch._id.toString() ? 'bg-orange-50 border-l-4 border-orange-500' : 'text-gray-700' %>">
                   <div class="flex items-center justify-between">
                     <span
-                      class="font-medium <%= b._id.toString() === branch._id.toString() ? 'text-orange-600' : 'text-gray-900' %>"
-                    >
+                      class="font-medium <%= b._id.toString() === branch._id.toString() ? 'text-orange-600' : 'text-gray-900' %>">
                       <%= b.branchName %>
                     </span>
-                    <% if (b._id.toString() === branch._id.toString()) { %>
-                    <svg
-                      class="w-5 h-5 text-orange-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <% } %>
+                    <% if (b._id.toString()===branch._id.toString()) { %>
+                      <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clip-rule="evenodd" />
+                      </svg>
+                      <% } %>
                   </div>
                   <% if (b.address) { %>
-                  <div class="text-xs text-gray-500 mt-1"><%= b.address %></div>
-                  <% } %>
+                    <div class="text-xs text-gray-500 mt-1">
+                      <%= b.address %>
+                    </div>
+                    <% } %>
                 </a>
                 <% }) %>
-              </div>
             </div>
           </div>
+        </div>
 
-          <div class="flex items-center space-x-8">
-            <a
-              href="#"
-              class="text-orange-500 font-semibold border-b-2 border-orange-500 pb-1"
-              >Home</a
-            >
-            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium"
-              >Book a Table</a
-            >
-            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium"
-              >About</a
-            >
-            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium"
-              >Contact</a
-            >
-          </div>
+        <div class="flex items-center space-x-8">
+          <a href="#" class="text-orange-500 font-semibold border-b-2 border-orange-500 pb-1">Home</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Book a Table</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">About</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Contact</a>
+        </div>
 
-          <div class="flex items-center space-x-4">
-            <button
-              onclick="openCart()"
-              class="relative text-gray-600 hover:text-orange-500"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
+        <div class="flex items-center space-x-4">
+          <button onclick="openCart()" class="relative text-gray-600 hover:text-orange-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span id="cartCountDesktop"
+              class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2">0</span>
+          </button>
+
+          <div class="relative">
+            <!-- Dropdown Trigger Button -->
+            <button id="accountDropdown"
+              class="bg-orange-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2">
+              My Account
+              <svg id="dropdownArrow" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
-              <span
-                id="cartCountDesktop"
-                class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-2 -right-2"
-                >0</span
-              >
             </button>
 
-            <div class="relative">
-              <!-- Dropdown Trigger Button -->
-              <button
-                id="accountDropdown"
-                class="bg-orange-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
-              >
-                My Account
-                <svg
-                  id="dropdownArrow"
-                  class="w-4 h-4 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                id="dropdownMenu"
-                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50"
-              >
-                <ul class="py-2">
-                  <li>
-                    <a
-                      href="/profile"
-                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                    >
-                      Profile
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/my-orders"
-                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                    >
-                      My Orders
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/my-bookings"
-                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                    >
-                      My Bookings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/logout"
-                      class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors border-t border-gray-100"
-                    >
-                      Logout
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <!-- Dropdown Menu -->
+            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+              <ul class="py-2">
+                <li>
+                  <a href="/profile"
+                    class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors">
+                    Profile
+                  </a>
+                </li>
+                <li>
+                  <a href="/my-orders"
+                    class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors">
+                    My Orders
+                  </a>
+                </li>
+                <li>
+                  <a href="/my-bookings"
+                    class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors">
+                    My Bookings
+                  </a>
+                </li>
+                <li>
+                  <a href="/logout"
+                    class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors border-t border-gray-100">
+                    Logout
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <% if (session && !isTableInUse) { %>
+  <% if (session && !isTableInUse) { %>
     <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
       <div class="max-w-7xl mx-auto px-4">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <svg
-              class="h-5 w-5 text-green-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fill-rule="evenodd"
+            <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"
-              />
+                clip-rule="evenodd" />
             </svg>
           </div>
           <div class="ml-3">
             <p class="text-sm font-medium text-green-800">
-              Table session started! You can now place orders for <%= tableCode
-              %>
+              Table session started! You can now place orders for <%= tableCode %>
             </p>
           </div>
         </div>
       </div>
     </div>
     <% } else if (isTableInUse) { %>
-    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-5 w-5 text-yellow-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium text-yellow-800">
-              This table (<%= tableCode %>) is currently in use. You can join
-              the existing session and add orders.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <% } %> <% if (session) { %>
-    <div class="max-w-7xl mx-auto px-4 mb-4">
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-gray-900">Active Session</h3>
-            <p class="text-sm text-gray-600">Table: <%= tableCode %></p>
-          </div>
-          <div class="text-right">
-            <p class="text-lg font-bold text-gray-900">
-              $<span id="sessionTotal"
-                ><%= session.totalAmount.toFixed(2) %></span
-              >
-            </p>
-            <p class="text-xs text-gray-500">
-              <span id="sessionOrderCount"><%= session.orders.length %></span>
-              order(s)
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <% } %>
-
-    <script>
-      // Add session handling to existing JavaScript
-      const sessionToken = "<%= session ? session.sessionToken : '' %>";
-      const tableId = "<%= tableId || '' %>";
-
-      // Check session status periodically
-      if (sessionToken && tableId) {
-        setInterval(async () => {
-          try {
-            const response = await fetch(
-              `/restaurant/<%= branch._id %>/session-status?tableId=${tableId}`
-            );
-            const data = await response.json();
-
-            if (data.hasSession && data.session) {
-              document.getElementById("sessionTotal").textContent =
-                data.session.totalAmount.toFixed(2);
-              document.getElementById("sessionOrderCount").textContent =
-                data.session.orderCount;
-            }
-          } catch (error) {
-            console.error("Error checking session status:", error);
-          }
-        }, 30000); // Check every 30 seconds
-      }
-
-      // Update place order function to include tableId
-      const originalPlaceOrder = window.placeOrder;
-      window.placeOrder = async function () {
-        if (cart.length === 0) {
-          showNotification("Your cart is empty!");
-          return;
-        }
-
-        const orderType = document.querySelector(
-          'input[name="orderType"]:checked'
-        ).value;
-        const specialInstructions = document.getElementById(
-          "specialInstructions"
-        ).value;
-        const totalAmount = cart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
-
-        const orderData = {
-          branchId: branchId,
-          tableId: tableId || null, // Include table ID
-          orderType: orderType,
-          items: cart.map((item) => ({
-            menuItem: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          totalAmount: totalAmount,
-          specialInstructions: specialInstructions,
-        };
-
-        try {
-          const response = await fetch(`/restaurant/${branchId}/place-order`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(orderData),
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            closeCheckout();
-            showSuccessModal(result.order, result.kot);
-
-            // Update session info if available
-            if (result.session) {
-              if (document.getElementById("sessionTotal")) {
-                document.getElementById("sessionTotal").textContent =
-                  result.session.totalAmount.toFixed(2);
-              }
-              if (document.getElementById("sessionOrderCount")) {
-                const currentCount = parseInt(
-                  document.getElementById("sessionOrderCount").textContent
-                );
-                document.getElementById("sessionOrderCount").textContent =
-                  currentCount + 1;
-              }
-            }
-
-            cart = [];
-            updateCart();
-
-            document
-              .querySelectorAll('[class*="item-controls-"]')
-              .forEach((control) => {
-                const itemId = control.className.match(
-                  /item-controls-([\w]+)/
-                )[1];
-                updateItemControls(itemId);
-              });
-          } else {
-            showNotification("Failed to place order. Please try again.");
-          }
-        } catch (error) {
-          console.error("Error placing order:", error);
-          showNotification("Failed to place order. Please try again.");
-        }
-      };
-    </script>
-
-    <!-- REST OF THE PAGE REMAINS THE SAME -->
-    <div class="max-w-7xl mx-auto px-4 mt-4">
-      <div class="bg-orange-50 py-6 px-4 rounded-lg shadow-sm text-center">
-        <h2 class="text-xl md:text-3xl font-bold text-gray-900 px-4">
-          Ready to Satisfy Your Cravings? Place Your Order Now!
-        </h2>
-      </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 py-4">
-      <div class="flex justify-between items-center">
-        <div class="relative flex-1">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search your menu item here"
-            class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            onkeyup="searchItems()"
-          />
-          <svg
-            class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-
-        <div class="flex items-center space-x-2 ml-4">
-          <span class="text-gray-700 font-medium">Veg</span>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" value="" class="sr-only peer" />
-            <div
-              class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 peer-checked:bg-green-600"
-            ></div>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex space-x-6 overflow-x-auto category-scroll">
-          <button
-            onclick="filterByCategory('all')"
-            class="category-filter-btn text-orange-500 font-bold border-b-2 border-orange-500 pb-2 whitespace-nowrap flex-shrink-0"
-          >
-            Show All
-          </button>
-          <% if (menuItems && menuItems.length > 0) { %> <% const categories =
-          {}; menuItems.forEach(item => { const cat = item.category?.name ||
-          'Uncategorized'; if (!categories[cat]) categories[cat] = 0;
-          categories[cat]++; }); %> <% Object.keys(categories).forEach(cat => {
-          %>
-          <button
-            onclick="filterByCategory(this.dataset.category)"
-            data-category="<%= cat %>"
-            class="category-filter-btn text-gray-500 pb-2 whitespace-nowrap hover:text-orange-500 transition-colors flex-shrink-0"
-          >
-            <%= cat %> (<%= categories[cat] %>)
-          </button>
-          <% }) %> <% } %>
-        </div>
-      </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 pb-20 md:pb-12 mt-4">
-      <% if (menuItems && menuItems.length > 0) { %>
-      <div id="menuGrid" class="space-y-4">
-        <% menuItems.forEach(item => { %>
-        <div
-          class="menu-item bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow flex items-center justify-between"
-          data-category="<%= item.category?.name || 'Uncategorized' %>"
-          data-name="<%= item.itemName.toLowerCase() %>"
-          data-id="<%= item._id %>"
-          data-price="<%= item.price %>"
-          data-prep-time="<%= item.preparationTime || 0 %>"
-        >
-          <div class="flex items-center space-x-4">
+      <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex items-center">
             <div class="flex-shrink-0">
-              <div
-                class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden relative"
-              >
-                <% if (item.menuItemImage?.url) { %>
-                <img
-                  src="<%= item.menuItemImage.url %>"
-                  class="w-full h-full object-cover"
-                  alt="<%= item.itemName %>"
-                />
-                <% } else { %>
-                <div class="w-full h-full flex items-center justify-center">
-                  <svg
-                    class="w-8 h-8 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <% } %>
-              </div>
+              <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd" />
+              </svg>
             </div>
-
-            <div class="min-w-0">
-              <div class="flex items-center space-x-2">
-                <div>
-                  <% if (item.type === 'Veg') { %>
-                  <div
-                    class="w-5 h-5 bg-white rounded border-2 border-green-600 flex items-center justify-center"
-                  >
-                    <div class="w-2 h-2 rounded-full bg-green-600"></div>
-                  </div>
-                  <% } else if (item.type === 'Non Veg') { %>
-                  <div
-                    class="w-5 h-5 bg-white rounded border-2 border-red-600 flex items-center justify-center"
-                  >
-                    <div class="w-2 h-2 bg-red-600"></div>
-                  </div>
-                  <% } else if (item.type === 'Egg') { %>
-                  <div
-                    class="w-5 h-5 bg-white rounded border-2 border-yellow-600 flex items-center justify-center"
-                  >
-                    <div class="w-2 h-2 bg-yellow-600"></div>
-                  </div>
-                  <% } %>
-                </div>
-
-                <h3 class="font-bold text-gray-900 text-lg truncate">
-                  <%= item.itemName %>
-                </h3>
-              </div>
-
-              <% if (item.description) { %>
-              <p class="text-gray-600 line-clamp-1 mt-1 text-sm">
-                <%= item.description %>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-yellow-800">
+                This table (<%= tableCode %>) is currently in use. You can join
+                  the existing session and add orders.
               </p>
-              <% } %>
-
-              <span class="text-lg font-bold text-gray-900 block mt-1"
-                >$<%= item.price %></span
-              >
-
-              <% if (item.preparationTime > 0) { %>
-              <p class="text-xs text-gray-500 mt-1">
-                Preparation Time: <%= item.preparationTime %> Minutes
-              </p>
-              <% } %>
             </div>
-          </div>
-
-          <div
-            class="item-controls-<%= item._id %> flex items-center space-x-2"
-          >
-            <button
-              onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)"
-              data-id="<%= item._id %>"
-              data-name="<%= item.itemName %>"
-              data-price="<%= item.price %>"
-              data-prep-time="<%= item.preparationTime || 0 %>"
-              class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-2 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors"
-            >
-              Add
-            </button>
           </div>
         </div>
-        <% }) %>
-      </div>
-      <% } else { %>
-      <div class="text-center py-16">
-        <p class="text-gray-500 text-lg">No menu items available.</p>
       </div>
       <% } %>
-    </div>
-
-    <!-- Cart Sidebar, Checkout Modal, Success Modal, Bottom Navigation - SAME AS ORIGINAL -->
-    <div
-      id="cartSidebar"
-      class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col"
-    >
-      <div class="flex items-center justify-between p-4 border-b">
-        <h2 class="text-xl font-bold">My Cart</h2>
-        <button onclick="closeCart()" class="text-gray-500 hover:text-gray-700">
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
-      <div id="cartItems" class="flex-1 overflow-y-auto p-4"></div>
-      <div class="border-t p-4 space-y-4">
-        <div class="flex justify-between text-sm">
-          <span>Item(s)</span>
-          <span id="cartItemCount">0</span>
-        </div>
-        <div class="flex justify-between text-sm">
-          <span>Sub Total</span>
-          <span id="cartSubTotal">$0</span>
-        </div>
-        <div class="flex justify-between text-lg font-bold">
-          <span>Total</span>
-          <span id="cartTotal">$0</span>
-        </div>
-        <button
-          onclick="proceedToCheckout()"
-          class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
-        >
-          Place Order
-        </button>
-        <button
-          onclick="closeCart()"
-          class="w-full border-2 border-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-        >
-          Back
-        </button>
-      </div>
-    </div>
-
-    <div
-      id="checkoutModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
-    >
-      <div
-        class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-      >
-        <div class="p-4 border-b sticky top-0 bg-white">
-          <h2 class="text-xl font-bold">Checkout</h2>
-        </div>
-        <div class="p-4 space-y-6">
-          <div>
-            <h3 class="font-bold mb-3">Select Order Type</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label
-                class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="orderType"
-                  value="Dine In"
-                  checked
-                  class="mr-2"
-                />
-                <span class="font-semibold">Dine In</span>
-              </label>
-              <label
-                class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="orderType"
-                  value="Delivery"
-                  class="mr-2"
-                />
-                <span class="font-semibold">Delivery</span>
-              </label>
-              <label
-                class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="orderType"
-                  value="Pickup"
-                  class="mr-2"
-                />
-                <span class="font-semibold">Pickup</span>
-              </label>
+        <% if (session) { %>
+          <div class="max-w-7xl mx-auto px-4 mb-4">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-gray-900">Active Session</h3>
+                  <p class="text-sm text-gray-600">Table: <%= tableCode %>
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-lg font-bold text-gray-900">
+                    $<span id="sessionTotal">
+                      <%= session.totalAmount.toFixed(2) %>
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    <span id="sessionOrderCount">
+                      <%= session.orders.length %>
+                    </span>
+                    order(s)
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <h3 class="font-bold mb-3">Order Summary</h3>
-            <div
-              id="checkoutItems"
-              class="space-y-2 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto"
-            ></div>
-          </div>
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="flex justify-between mb-2">
-              <span>Item(s):</span>
-              <span id="checkoutItemCount">0</span>
+          <% } %>
+
+            <script>
+              // Add session handling to existing JavaScript
+              const sessionToken = "<%= session ? session.sessionToken : '' %>";
+              const tableId = "<%= tableId || '' %>";
+
+              // Check session status periodically
+              if (sessionToken && tableId) {
+                setInterval(async () => {
+                  try {
+                    const response = await fetch(
+                      `/restaurant/<%= branch._id %>/session-status?tableId=${tableId}`
+                    );
+                    const data = await response.json();
+
+                    if (data.hasSession && data.session) {
+                      document.getElementById("sessionTotal").textContent =
+                        data.session.totalAmount.toFixed(2);
+                      document.getElementById("sessionOrderCount").textContent =
+                        data.session.orderCount;
+                    }
+                  } catch (error) {
+                    console.error("Error checking session status:", error);
+                  }
+                }, 30000); // Check every 30 seconds
+              }
+
+              // Update place order function to include tableId
+              const originalPlaceOrder = window.placeOrder;
+              window.placeOrder = async function () {
+                if (cart.length === 0) {
+                  showNotification("Your cart is empty!");
+                  return;
+                }
+
+                const orderType = document.querySelector(
+                  'input[name="orderType"]:checked'
+                ).value;
+                const specialInstructions = document.getElementById(
+                  "specialInstructions"
+                ).value;
+                const totalAmount = cart.reduce(
+                  (sum, item) => sum + item.price * item.quantity,
+                  0
+                );
+
+                const orderData = {
+                  branchId: branchId,
+                  tableId: tableId || null, // Include table ID
+                  orderType: orderType,
+                  items: cart.map((item) => ({
+                    menuItem: item.id,
+                    quantity: item.quantity,
+                    price: item.price,
+                  })),
+                  totalAmount: totalAmount,
+                  specialInstructions: specialInstructions,
+                };
+
+                try {
+                  const response = await fetch(`/restaurant/${branchId}/place-order`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(orderData),
+                  });
+
+                  const result = await response.json();
+
+                  if (result.success) {
+                    closeCheckout();
+                    showSuccessModal(result.order, result.kot);
+
+                    // Update session info if available
+                    if (result.session) {
+                      if (document.getElementById("sessionTotal")) {
+                        document.getElementById("sessionTotal").textContent =
+                          result.session.totalAmount.toFixed(2);
+                      }
+                      if (document.getElementById("sessionOrderCount")) {
+                        const currentCount = parseInt(
+                          document.getElementById("sessionOrderCount").textContent
+                        );
+                        document.getElementById("sessionOrderCount").textContent =
+                          currentCount + 1;
+                      }
+                    }
+
+                    cart = [];
+                    updateCart();
+
+                    document
+                      .querySelectorAll('[class*="item-controls-"]')
+                      .forEach((control) => {
+                        const itemId = control.className.match(
+                          /item-controls-([\w]+)/
+                        )[1];
+                        updateItemControls(itemId);
+                      });
+                  } else {
+                    showNotification("Failed to place order. Please try again.");
+                  }
+                } catch (error) {
+                  console.error("Error placing order:", error);
+                  showNotification("Failed to place order. Please try again.");
+                }
+              };
+            </script>
+
+            <!-- REST OF THE PAGE REMAINS THE SAME -->
+            <div class="max-w-7xl mx-auto px-4 mt-4">
+              <div class="bg-orange-50 py-6 px-4 rounded-lg shadow-sm text-center">
+                <h2 class="text-xl md:text-3xl font-bold text-gray-900 px-4">
+                  Ready to Satisfy Your Cravings? Place Your Order Now!
+                </h2>
+              </div>
             </div>
-            <div class="flex justify-between mb-2">
-              <span>Sub Total:</span>
-              <span id="checkoutSubTotal">$0</span>
+
+            <div class="max-w-7xl mx-auto px-4 py-4">
+              <div class="flex justify-between items-center">
+                <div class="relative flex-1">
+                  <input type="text" id="searchInput" placeholder="Search your menu item here"
+                    class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    onkeyup="searchItems()" />
+                  <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-gray-700 font-medium">Veg</span>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" value="" class="sr-only peer" />
+                    <div
+                      class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 peer-checked:bg-green-600">
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between text-xl font-bold">
-              <span>Total:</span>
-              <span id="checkoutTotal">$0</span>
+
+            <div class="border-b border-gray-200">
+              <div class="max-w-7xl mx-auto px-4">
+                <div class="flex space-x-6 overflow-x-auto category-scroll">
+                  <button onclick="filterByCategory('all')"
+                    class="category-filter-btn text-orange-500 font-bold border-b-2 border-orange-500 pb-2 whitespace-nowrap flex-shrink-0">
+                    Show All
+                  </button>
+                  <% if (menuItems && menuItems.length> 0) { %> <% const categories={}; menuItems.forEach(item=> { const
+                      cat = item.category?.name ||
+                      'Uncategorized'; if (!categories[cat]) categories[cat] = 0;
+                      categories[cat]++; }); %> <% Object.keys(categories).forEach(cat=> {
+                        %>
+                        <button onclick="filterByCategory(this.dataset.category)" data-category="<%= cat %>"
+                          class="category-filter-btn text-gray-500 pb-2 whitespace-nowrap hover:text-orange-500 transition-colors flex-shrink-0">
+                          <%= cat %> (<%= categories[cat] %>)
+                        </button>
+                        <% }) %>
+                          <% } %>
+                </div>
+              </div>
             </div>
-          </div>
-          <div>
-            <label class="block font-semibold mb-2"
-              >Special Instructions (Optional)</label
-            >
-            <textarea
-              id="specialInstructions"
-              rows="3"
-              class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Any special requests..."
-            ></textarea>
-          </div>
-        </div>
-        <div class="p-4 border-t flex space-x-4">
-          <button
-            onclick="closeCheckout()"
-            class="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onclick="placeOrder()"
-            class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
-          >
-            Confirm Order
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <div
-      id="successModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
-    >
-      <div class="bg-white rounded-lg w-full max-w-md p-6 text-center">
-        <div class="mb-4">
-          <svg
-            class="w-16 h-16 text-green-500 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold text-green-600 mb-2">
-          Order placed successfully!
-        </h3>
-        <div
-          id="orderDetails"
-          class="mb-6 text-left bg-gray-50 p-4 rounded-lg"
-        ></div>
-        <button
-          onclick="newOrder()"
-          class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"
-        >
-          <span>New Order</span>
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
+            <div class="max-w-7xl mx-auto px-4 pb-20 md:pb-12 mt-4">
+              <% if (menuItems && menuItems.length> 0) { %>
+                <div id="menuGrid" class="space-y-4">
+                  <% menuItems.forEach(item=> { %>
+                    <div
+                      class="menu-item bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow flex items-center justify-between"
+                      data-category="<%= item.category?.name || 'Uncategorized' %>"
+                      data-name="<%= item.itemName.toLowerCase() %>" data-id="<%= item._id %>"
+                      data-price="<%= item.price %>" data-prep-time="<%= item.preparationTime || 0 %>">
+                      <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                          <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden relative">
+                            <% if (item.menuItemImage?.url) { %>
+                              <img src="<%= item.menuItemImage.url %>" class="w-full h-full object-cover"
+                                alt="<%= item.itemName %>" />
+                              <% } else { %>
+                                <div class="w-full h-full flex items-center justify-center">
+                                  <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                                <% } %>
+                          </div>
+                        </div>
 
-    <div
-      class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 flex justify-around items-center z-40"
-    >
-      <a href="#" class="flex flex-col items-center text-orange-500">
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
-          />
-        </svg>
-        <span class="text-xs mt-1">Home</span>
-      </a>
-      <a href="#" class="flex flex-col items-center text-gray-600">
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-          />
-        </svg>
-        <span class="text-xs mt-1">Book Table</span>
-      </a>
-      <button
-        onclick="openCart()"
-        class="relative flex flex-col items-center text-gray-600"
-      >
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-        <span class="text-xs mt-1">Cart</span>
-        <span
-          id="mobileCartCount"
-          class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-1 -right-2"
-          >0</span
-        >
-      </button>
-      <a href="#" class="flex flex-col items-center text-gray-600">
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-        <span class="text-xs mt-1">Account</span>
-      </a>
-    </div>
-    <!-- FLOATING BUTTONS (Mobile Only) -->
-    <div class="floating-buttons md:hidden">
-      <button
-        onclick="scrollToTop()"
-        class="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-orange-600 transition-all flex items-center space-x-2"
-      >
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75z"
-          />
-        </svg>
-        <span>Menu</span>
-      </button>
-      <button
-        onclick="callWaiter()"
-        class="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-orange-600 transition-all flex items-center space-x-2"
-      >
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-          />
-        </svg>
-        <span>Call Waiter</span>
-      </button>
-    </div>
+                        <div class="min-w-0">
+                          <div class="flex items-center space-x-2">
+                            <div>
+                              <% if (item.type==='Veg' ) { %>
+                                <div
+                                  class="w-5 h-5 bg-white rounded border-2 border-green-600 flex items-center justify-center">
+                                  <div class="w-2 h-2 rounded-full bg-green-600"></div>
+                                </div>
+                                <% } else if (item.type==='Non Veg' ) { %>
+                                  <div
+                                    class="w-5 h-5 bg-white rounded border-2 border-red-600 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-red-600"></div>
+                                  </div>
+                                  <% } else if (item.type==='Egg' ) { %>
+                                    <div
+                                      class="w-5 h-5 bg-white rounded border-2 border-yellow-600 flex items-center justify-center">
+                                      <div class="w-2 h-2 bg-yellow-600"></div>
+                                    </div>
+                                    <% } %>
+                            </div>
 
-    <script>
-      const branchId = "<%= branch._id %>";
-      let cart = [];
-      let currentCategory = "all";
+                            <h3 class="font-bold text-gray-900 text-lg truncate">
+                              <%= item.itemName %>
+                            </h3>
+                          </div>
 
-      // Mobile menu toggle
-      document
-        .getElementById("mobileMenuButton")
-        .addEventListener("click", function () {
-          const menu = document.getElementById("mobileMenu");
-          menu.classList.toggle("hidden");
-        });
+                          <% if (item.description) { %>
+                            <p class="text-gray-600 line-clamp-1 mt-1 text-sm">
+                              <%= item.description %>
+                            </p>
+                            <% } %>
 
-      // Add to cart
-      function addToCart(itemId, itemName, price, prepTime) {
-        const existing = cart.find((i) => i.id === itemId);
-        if (existing) {
-          existing.quantity++;
-        } else {
-          cart.push({
-            id: itemId,
-            name: itemName,
-            price: parseFloat(price),
-            preparationTime: parseInt(prepTime) || 0,
-            quantity: 1,
-          });
-        }
+                              <span class="text-lg font-bold text-gray-900 block mt-1">$<%= item.price %></span>
 
-        updateCart();
-        updateItemControls(itemId);
-        showNotification(`${itemName} added to cart!`);
-      }
+                              <% if (item.preparationTime> 0) { %>
+                                <p class="text-xs text-gray-500 mt-1">
+                                  Preparation Time: <%= item.preparationTime %> Minutes
+                                </p>
+                                <% } %>
+                        </div>
+                      </div>
 
-      // Update item quantity
-      function updateQuantity(itemId, delta) {
-        const item = cart.find((i) => i.id === itemId);
-        if (item) {
-          item.quantity += delta;
-          if (item.quantity <= 0) {
-            cart = cart.filter((i) => i.id !== itemId);
-          }
-          updateCart();
-          updateItemControls(itemId);
-        }
-      }
+                      <div class="item-controls-<%= item._id %> flex items-center space-x-2">
+                        <button
+                          onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)"
+                          data-id="<%= item._id %>" data-name="<%= item.itemName %>" data-price="<%= item.price %>"
+                          data-prep-time="<%= item.preparationTime || 0 %>"
+                          class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-2 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors">
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %>
+                  <div class="text-center py-16">
+                    <p class="text-gray-500 text-lg">No menu items available.</p>
+                  </div>
+                  <% } %>
+            </div>
 
-      // Update cart display
-      function updateCart() {
-        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const total = cart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
-
-        document.getElementById("cartCount").textContent = count;
-        document.getElementById("cartCountDesktop").textContent = count;
-        document.getElementById("mobileCartCount").textContent = count;
-        document.getElementById("cartItemCount").textContent = count;
-        document.getElementById("cartSubTotal").textContent = `${total.toFixed(
-          2
-        )}`;
-        document.getElementById("cartTotal").textContent = `${total.toFixed(
-          2
-        )}`;
-
-        // Update cart items display
-        const cartItemsDiv = document.getElementById("cartItems");
-        if (cart.length === 0) {
-          cartItemsDiv.innerHTML =
-            '<p class="text-center text-gray-500 py-8">Your cart is empty</p>';
-        } else {
-          cartItemsDiv.innerHTML = cart
-            .map(
-              (item) => `
-            <div class="bg-gray-50 p-3 rounded-lg mb-3">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-semibold text-sm">${item.name}</span>
-                <button onclick="updateQuantity('${item.id}', -${
-                item.quantity
-              })" class="text-red-500 hover:text-red-700">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            <!-- Cart Sidebar, Checkout Modal, Success Modal, Bottom Navigation - SAME AS ORIGINAL -->
+            <div id="cartSidebar"
+              class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
+              <div class="flex items-center justify-between p-4 border-b">
+                <h2 class="text-xl font-bold">My Cart</h2>
+                <button onclick="closeCart()" class="text-gray-500 hover:text-gray-700">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <button onclick="updateQuantity('${
-                    item.id
-                  }', -1)" class="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100">-</button>
-                  <span class="w-8 text-center font-semibold">${
-                    item.quantity
-                  }</span>
-                  <button onclick="updateQuantity('${
-                    item.id
-                  }', 1)" class="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100">+</button>
+              <div id="cartItems" class="flex-1 overflow-y-auto p-4"></div>
+              <div class="border-t p-4 space-y-4">
+                <div class="flex justify-between text-sm">
+                  <span>Item(s)</span>
+                  <span id="cartItemCount">0</span>
                 </div>
-                <span class="font-bold">${(item.price * item.quantity).toFixed(
-                  2
-                )}</span>
+                <div class="flex justify-between text-sm">
+                  <span>Sub Total</span>
+                  <span id="cartSubTotal">$0</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span id="cartTotal">$0</span>
+                </div>
+                <button onclick="proceedToCheckout()"
+                  class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                  Place Order
+                </button>
+                <button onclick="closeCart()"
+                  class="w-full border-2 border-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                  Back
+                </button>
               </div>
-              ${
-                item.preparationTime > 0
-                  ? `<p class="text-xs text-gray-500 mt-2">Prep time: ${item.preparationTime} min</p>`
-                  : ""
+            </div>
+
+            <div id="checkoutModal"
+              class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+              <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div class="p-4 border-b sticky top-0 bg-white">
+                  <h2 class="text-xl font-bold">Checkout</h2>
+                </div>
+                <div class="p-4 space-y-6">
+                  <div>
+                    <h3 class="font-bold mb-3">Select Order Type</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <label
+                        class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="radio" name="orderType" value="Dine In" checked class="mr-2" />
+                        <span class="font-semibold">Dine In</span>
+                      </label>
+                      <label
+                        class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="radio" name="orderType" value="Delivery" class="mr-2" />
+                        <span class="font-semibold">Delivery</span>
+                      </label>
+                      <label
+                        class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="radio" name="orderType" value="Pickup" class="mr-2" />
+                        <span class="font-semibold">Pickup</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 class="font-bold mb-3">Order Summary</h3>
+                    <div id="checkoutItems" class="space-y-2 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto"></div>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex justify-between mb-2">
+                      <span>Item(s):</span>
+                      <span id="checkoutItemCount">0</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                      <span>Sub Total:</span>
+                      <span id="checkoutSubTotal">$0</span>
+                    </div>
+                    <div class="flex justify-between text-xl font-bold">
+                      <span>Total:</span>
+                      <span id="checkoutTotal">$0</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-2">Special Instructions (Optional)</label>
+                    <textarea id="specialInstructions" rows="3"
+                      class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Any special requests..."></textarea>
+                  </div>
+                </div>
+                <div class="p-4 border-t flex space-x-4">
+                  <button onclick="closeCheckout()"
+                    class="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                    Cancel
+                  </button>
+                  <button onclick="placeOrder()"
+                    class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                    Confirm Order
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="successModal"
+              class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+              <div class="bg-white rounded-lg w-full max-w-md p-6 text-center">
+                <div class="mb-4">
+                  <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-green-600 mb-2">
+                  Order placed successfully!
+                </h3>
+                <div id="orderDetails" class="mb-6 text-left bg-gray-50 p-4 rounded-lg"></div>
+                <button onclick="newOrder()"
+                  class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2">
+                  <span>New Order</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 flex justify-around items-center z-40">
+              <a href="#" class="flex flex-col items-center text-orange-500">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+              </a>
+              <a href="#" class="flex flex-col items-center text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span class="text-xs mt-1">Book Table</span>
+              </a>
+              <button onclick="openCart()" class="relative flex flex-col items-center text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span class="text-xs mt-1">Cart</span>
+                <span id="mobileCartCount"
+                  class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold absolute -top-1 -right-2">0</span>
+              </button>
+              <a href="#" class="flex flex-col items-center text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="text-xs mt-1">Account</span>
+              </a>
+            </div>
+            <!-- FLOATING BUTTONS (Mobile Only) -->
+            <div class="floating-buttons md:hidden">
+              <button onclick="scrollToTop()"
+                class="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-orange-600 transition-all flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM8.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM11.5 4.5a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM5 8a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 8zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5A.75.75 0 015 11zm0 3a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75z" />
+                </svg>
+                <span>Menu</span>
+              </button>
+              <button onclick="callWaiter(event)"
+                class="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-orange-600 transition-all flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                </svg>
+                <span>Call Waiter</span>
+              </button>
+            </div>
+            <!-- Loading Popup -->
+            <div id="waiterLoadingPopup"
+              class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 popup-overlay">
+              <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 popup-content">
+                <div class="flex flex-col items-center">
+                  <div class="w-20 h-20 border-4 border-orange-500 border-t-transparent rounded-full animate-spin">
+                  </div>
+                  <p class="mt-6 text-lg font-semibold text-gray-800">Notifying waiter...</p>
+                  <p class="mt-2 text-sm text-gray-500">Please wait a moment</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Success Popup -->
+            <div id="waiterSuccessPopup"
+              class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 popup-overlay">
+              <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 popup-content">
+                <div class="flex flex-col items-center">
+                  <!-- Success Icon -->
+                  <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center success-pulse">
+                    <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+
+                  <!-- Success Message -->
+                  <h3 class="mt-6 text-2xl font-bold text-gray-800">Waiter Notified!</h3>
+                  <p class="mt-3 text-center text-gray-600">Our staff will be with you shortly</p>
+
+                  <!-- Table Info -->
+                  <div class="mt-4 bg-orange-50 px-4 py-2 rounded-lg">
+                    <p class="text-sm text-orange-700 font-medium">Table: <span id="waiterTableCode">--</span></p>
+                  </div>
+
+                  <!-- Close Button -->
+                  <button onclick="closeWaiterSuccessPopup()"
+                    class="mt-6 w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all shadow-lg">
+                    Got it!
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error Popup -->
+            <div id="waiterErrorPopup"
+              class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 popup-overlay">
+              <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 popup-content">
+                <div class="flex flex-col items-center">
+                  <!-- Error Icon -->
+                  <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                      </path>
+                    </svg>
+                  </div>
+
+                  <!-- Error Message -->
+                  <h3 class="mt-6 text-2xl font-bold text-gray-800">Oops!</h3>
+                  <p id="waiterErrorMessage" class="mt-3 text-center text-gray-600">Something went wrong</p>
+
+                  <!-- Close Button -->
+                  <button onclick="closeWaiterErrorPopup()"
+                    class="mt-6 w-full bg-gray-500 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 transition-all shadow-lg">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+            <script>
+              // ==================== WAITER REQUEST CONFIGURATION ====================
+              const WAITER_API_BASE_URL = '';
+
+              // ==================== HELPER FUNCTIONS ====================
+
+              // Extract branch ID from URL path
+              function getBranchIdFromURL() {
+                const pathParts = window.location.pathname.split('/');
+                const restaurantIndex = pathParts.indexOf('restaurant');
+                if (restaurantIndex !== -1 && pathParts[restaurantIndex + 1]) {
+                  return pathParts[restaurantIndex + 1];
+                }
+                return null;
               }
-            </div>
-          `
-            )
-            .join("");
-        }
-      }
 
-      // Update item controls (show quantity controls instead of Add button)
-      function updateItemControls(itemId) {
-        const item = cart.find((i) => i.id === itemId);
-        const controlsDiv = document.querySelector(`.item-controls-${itemId}`);
+              // Extract table code from URL
+              function getTableCodeFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('tableCode');
+              }
 
-        if (!controlsDiv) return;
+              // Extract table ID from URL
+              function getTableIdFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('table');
+              }
 
-        if (item && item.quantity > 0) {
-          controlsDiv.innerHTML = `
-            <button onclick="updateQuantity('${itemId}', -1)" class="w-8 h-8 bg-white border-2 border-orange-500 text-orange-500 rounded flex items-center justify-center hover:bg-orange-50">-</button>
-            <span class="w-8 text-center font-bold">${item.quantity}</span>
-            <button onclick="updateQuantity('${itemId}', 1)" class="w-8 h-8 bg-orange-500 text-white rounded flex items-center justify-center hover:bg-orange-600">+</button>
-          `;
-        } else {
-          const menuItemElem = document.querySelector(`[data-id="${itemId}"]`);
-          const itemName = menuItemElem ? menuItemElem.dataset.name : "";
-          const itemPrice = menuItemElem ? menuItemElem.dataset.price : "0";
-          const itemPrepTime = menuItemElem
-            ? menuItemElem.dataset.prepTime
-            : "0";
+              // Show popup
+              function showWaiterPopup(popupId) {
+                const popup = document.getElementById(popupId);
+                if (popup) {
+                  popup.classList.remove('hidden');
+                  popup.classList.add('flex');
+                }
+              }
 
-          controlsDiv.innerHTML = `
-            <button onclick="addToCart(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.prepTime)" data-id="${itemId}" data-name="${itemName}" data-price="${itemPrice}" data-prep-time="${itemPrepTime}" class="add-btn bg-white text-orange-500 border-2 border-orange-500 px-4 py-2 rounded-lg hover:bg-orange-500 hover:text-white font-semibold transition-colors">
-              Add
-            </button>
-          `;
-        }
-      }
+              // Hide popup
+              function hideWaiterPopup(popupId) {
+                const popup = document.getElementById(popupId);
+                if (popup) {
+                  popup.classList.add('hidden');
+                  popup.classList.remove('flex');
+                }
+              }
 
-      // Cart operations
-      function openCart() {
-        if (cart.length === 0) {
-          showNotification("Your cart is empty!");
-          return;
-        }
-        document
-          .getElementById("cartSidebar")
-          .classList.remove("translate-x-full");
-      }
+              // Close success popup
+              function closeWaiterSuccessPopup() {
+                hideWaiterPopup('waiterSuccessPopup');
+              }
 
-      function closeCart() {
-        document
-          .getElementById("cartSidebar")
-          .classList.add("translate-x-full");
-      }
+              // Close error popup
+              function closeWaiterErrorPopup() {
+                hideWaiterPopup('waiterErrorPopup');
+              }
 
-      // Checkout operations
-      function proceedToCheckout() {
-        if (cart.length === 0) {
-          showNotification("Your cart is empty!");
-          return;
-        }
+              // Show error popup
+              function showWaiterError(message) {
+                const errorMessageEl = document.getElementById('waiterErrorMessage');
+                if (errorMessageEl) {
+                  errorMessageEl.textContent = message;
+                }
+                showWaiterPopup('waiterErrorPopup');
+              }
 
-        const total = cart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
-        const maxPrepTime = Math.max(
-          ...cart.map((item) => item.preparationTime)
-        );
+              // ==================== MAIN CALL WAITER FUNCTION ====================
 
-        document.getElementById("checkoutItemCount").textContent = cart.reduce(
-          (sum, item) => sum + item.quantity,
-          0
-        );
-        document.getElementById(
-          "checkoutSubTotal"
-        ).textContent = `${total.toFixed(2)}`;
-        document.getElementById("checkoutTotal").textContent = `${total.toFixed(
-          2
-        )}`;
+              // REPLACE your existing callWaiter() function with this one:
+              async function callWaiter(event) {
+                const tableCode = getTableCodeFromURL();
+                const branchId = getBranchIdFromURL();
+                const tableId = getTableIdFromURL();
 
-        document.getElementById("checkoutItems").innerHTML =
-          cart
-            .map(
-              (item) => `
-          <div class="flex justify-between items-center py-2 border-b last:border-0">
-            <div class="flex items-center space-x-3">
-              <div class="bg-white border border-gray-300 rounded px-2 py-1 text-sm font-semibold">${
-                item.quantity
-              }</div>
-              <span class="text-sm">${item.name}</span>
-            </div>
-            <span class="font-semibold text-sm">${(
-              item.price * item.quantity
-            ).toFixed(2)}</span>
-          </div>
-        `
-            )
-            .join("") +
-          (maxPrepTime > 0
-            ? `<p class="text-sm text-gray-600 mt-3">Preparation Time: ${maxPrepTime} Minutes (Approx)</p>`
-            : "");
+                // Validation
+                if (!tableCode) {
+                  showWaiterError('Table code not found in URL. Please scan the QR code again.');
+                  return;
+                }
 
-        closeCart();
-        document.getElementById("checkoutModal").classList.remove("hidden");
-        document.getElementById("checkoutModal").classList.add("flex");
-      }
+                if (!branchId) {
+                  showWaiterError('Branch information not found. Please scan the QR code again.');
+                  return;
+                }
 
-      function closeCheckout() {
-        document.getElementById("checkoutModal").classList.add("hidden");
-        document.getElementById("checkoutModal").classList.remove("flex");
-      }
+                // Show loading popup
+                showWaiterPopup('waiterLoadingPopup');
 
-      // Place order
-      async function placeOrder() {
-        if (cart.length === 0) {
-          showNotification("Your cart is empty!");
-          return;
-        }
+                try {
+                  const requestBody = { tableCode };
 
-        const orderType = document.querySelector(
-          'input[name="orderType"]:checked'
-        ).value;
-        const specialInstructions = document.getElementById(
-          "specialInstructions"
-        ).value;
-        const totalAmount = cart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
+                  // Include table ID if available
+                  if (tableId) {
+                    requestBody.tableId = tableId;
+                  }
 
-        const orderData = {
-          branchId: branchId,
-          tableId: tableId,
-          orderType: orderType,
-          items: cart.map((item) => ({
-            menuItem: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          totalAmount: totalAmount,
-          specialInstructions: specialInstructions,
-        };
+                  const response = await fetch(`${WAITER_API_BASE_URL}/waiterRequest/${branchId}/create`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                  });
 
-        try {
-          const response = await fetch(`/restaurant/${branchId}/place-order`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(orderData),
-          });
+                  const data = await response.json();
 
-          const result = await response.json();
+                  // Hide loading popup
+                  hideWaiterPopup('waiterLoadingPopup');
 
-          if (result.success) {
-            closeCheckout();
-            showSuccessModal(result.order, result.kot);
-            cart = [];
-            updateCart();
+                  if (response.ok && data.success) {
+                    // Show success popup
+                    const tableCodeEl = document.getElementById('waiterTableCode');
+                    if (tableCodeEl) {
+                      tableCodeEl.textContent = tableCode;
+                    }
+                    showWaiterPopup('waiterSuccessPopup');
 
-            document
-              .querySelectorAll('[class*="item-controls-"]')
-              .forEach((control) => {
-                const itemId = control.className.match(
-                  /item-controls-([\w]+)/
-                )[1];
-                updateItemControls(itemId);
+                    // Add bell ring animation to button
+                    const callWaiterBtn = event.target.closest('button');
+                    if (callWaiterBtn) {
+                      const bellIcon = callWaiterBtn.querySelector('svg');
+                      if (bellIcon) {
+                        bellIcon.classList.add('bell-ring');
+                        setTimeout(() => bellIcon.classList.remove('bell-ring'), 500);
+                      }
+                    }
+
+                    // Auto-close after 5 seconds
+                    setTimeout(() => {
+                      closeWaiterSuccessPopup();
+                    }, 5000);
+
+                    // Call your existing notification if it exists
+                    if (typeof showNotification === 'function') {
+                      showNotification("Waiter has been notified!");
+                    }
+                  } else {
+                    // Show error popup
+                    showWaiterError(data.message || 'Failed to notify waiter. Please try again.');
+                  }
+                } catch (error) {
+                  console.error('Error calling waiter:', error);
+                  hideWaiterPopup('waiterLoadingPopup');
+                  showWaiterError('Network error. Please check your connection and try again.');
+                }
+              }
+
+              // ==================== EVENT LISTENERS ====================
+
+              // Close popups when clicking outside
+              document.addEventListener('click', function (event) {
+                const popups = ['waiterLoadingPopup', 'waiterSuccessPopup', 'waiterErrorPopup'];
+                popups.forEach(popupId => {
+                  const popup = document.getElementById(popupId);
+                  if (popup && event.target === popup) {
+                    hideWaiterPopup(popupId);
+                  }
+                });
               });
-          } else {
-            showNotification("Failed to place order. Please try again.");
-          }
-        } catch (error) {
-          console.error("Error placing order:", error);
-          showNotification("Failed to place order. Please try again.");
-        }
-      }
+            </script>
+            <script src="/js/pages/customer-dashboard.js"></script>
+</body>
 
-      // Show success modal
-      function showSuccessModal(order, kot) {
-        const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const maxPrepTime = Math.max(
-          ...cart.map((item) => item.preparationTime)
-        );
-
-        document.getElementById("orderDetails").innerHTML = `
-          <div class="space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-sm">Order #${
-                order.orderNumber
-              }</span>
-              <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">COOKING NOW</span>
-            </div>
-            <p class="text-xs text-gray-600">${itemCount} Item(s) | ${new Date().toLocaleString()}</p>
-            ${
-              maxPrepTime > 0
-                ? `<p class="text-xs text-gray-600">Preparation Time: ${maxPrepTime} Minutes (Approx)</p>`
-                : ""
-            }
-            <div class="border-t pt-2 mt-2 space-y-1">
-              ${cart
-                .map(
-                  (item) => `
-                <div class="flex justify-between text-xs">
-                  <span>x${item.quantity} ${item.name}</span>
-                  <span class="font-semibold">${(
-                    item.price * item.quantity
-                  ).toFixed(2)}</span>
-                </div>
-              `
-                )
-                .join("")}
-            </div>
-            <div class="border-t pt-2 mt-2">
-              <div class="flex justify-between text-xs">
-                <span>Sub Total</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
-              </div>
-              <div class="flex justify-between text-base font-bold mt-2">
-                <span>Total</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-        `;
-
-        document.getElementById("successModal").classList.remove("hidden");
-        document.getElementById("successModal").classList.add("flex");
-      }
-
-      // New order
-      function newOrder() {
-        document.getElementById("successModal").classList.add("hidden");
-        document.getElementById("successModal").classList.remove("flex");
-        window.location.reload();
-      }
-
-      // Filter by category
-      function filterByCategory(category) {
-        currentCategory = category;
-        applyFilters();
-
-        document.querySelectorAll(".category-filter-btn").forEach((btn) => {
-          btn.classList.remove(
-            "text-orange-500",
-            "font-bold",
-            "border-b-2",
-            "border-orange-500"
-          );
-          btn.classList.add("text-gray-500");
-        });
-
-        let activeBtn;
-        if (category === "all") {
-          activeBtn = document.querySelector(
-            ".category-filter-btn[onclick=\"filterByCategory('all')\"]"
-          );
-        } else {
-          activeBtn = Array.from(
-            document.querySelectorAll(".category-filter-btn")
-          ).find((btn) => btn.dataset.category === category);
-        }
-
-        if (activeBtn) {
-          activeBtn.classList.remove("text-gray-500");
-          activeBtn.classList.add(
-            "text-orange-500",
-            "font-bold",
-            "border-b-2",
-            "border-orange-500"
-          );
-        }
-      }
-
-      // Search items
-      function searchItems() {
-        applyFilters();
-      }
-
-      // Apply filters
-      function applyFilters() {
-        const searchTerm = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
-        const menuItems = document.querySelectorAll(".menu-item");
-
-        menuItems.forEach((item) => {
-          const itemCategory = item.dataset.category;
-          const itemName = item.dataset.name;
-
-          const categoryMatch =
-            currentCategory === "all" || itemCategory === currentCategory;
-          const searchMatch = !searchTerm || itemName.includes(searchTerm);
-
-          if (categoryMatch && searchMatch) {
-            item.style.display = "block";
-          } else {
-            item.style.display = "none";
-          }
-        });
-      }
-
-      // Replace your existing showNotification with this:
-      function showNotification(message) {
-        const notification = document.createElement("div");
-        notification.className =
-          "fixed bottom-24 md:bottom-16 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity text-center";
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-          notification.style.opacity = "0";
-          setTimeout(() => notification.remove(), 300);
-        }, 2000);
-      }
-
-      // Initialize on page load
-      document.addEventListener("DOMContentLoaded", function () {
-        updateCart();
-      });
-
-      const dropdown = document.getElementById("accountDropdown");
-      const menu = document.getElementById("dropdownMenu");
-      const arrow = document.getElementById("dropdownArrow");
-
-      dropdown.addEventListener("click", (e) => {
-        e.stopPropagation();
-        menu.classList.toggle("hidden");
-        arrow.classList.toggle("rotate-180");
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener("click", () => {
-        menu.classList.add("hidden");
-        arrow.classList.remove("rotate-180");
-      });
-      // Scroll to top function
-      function scrollToTop() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      // Call waiter function
-      function callWaiter() {
-        showNotification("Waiter has been notified!");
-      }
-    </script>
-  </body>
 </html>

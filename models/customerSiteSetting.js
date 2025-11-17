@@ -54,9 +54,6 @@ const customerSiteSettingsSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster queries
-customerSiteSettingsSchema.index({ branch: 1 });
-
 // Static method to get or create settings for a branch
 customerSiteSettingsSchema.statics.getOrCreate = async function (branchId) {
   let settings = await this.findOne({ branch: branchId });

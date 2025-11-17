@@ -91,6 +91,26 @@ const orderSchema = new mongoose.Schema(
       default: false, // True if billed but not yet paid
     },
 
+    // Add these fields to your order schema
+    subtotal: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
+
+    taxes: [
+      {
+        name: { type: String, required: true },
+        percentage: { type: Number, required: true, min: 0, max: 100 },
+        amount: { type: Number, required: true, min: 0 },
+      },
+    ],
+
+    totalTax: {
+      type: Number,
+      default: 0,
+    },
+
     totalAmount: {
       type: Number,
       required: true,

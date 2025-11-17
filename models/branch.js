@@ -2,42 +2,44 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const branchSchema = new Schema({
-  branchName: { type: String, required: true }, // Branch name
+  branchName: { type: String, required: true },
   country: { type: String, required: true },
-  address: { type: String, required: true }, // Use lowercase key for consistency
+  address: { type: String, required: true },
   phone: { type: Number },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Hotel-admin
   branchHead: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     default: null,
-  }, // Optional branch head / manager
-  areas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Area" }], // Linked service areas
-  // Add this field to your Branch schema:
+  },
+  currency: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Currency",
+    required: true, // each branch must have a currency
+  },
+  tax: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tax",
+    },
+  ],
+
+  timezone: { type: String, default: "Asia/Kolkata" },
+  areas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Area" }],
   aboutUs: {
     type: String,
     default: "",
+  },
+  // Theme settings
+  theme: {
+    logo: { type: String },
+    primaryColor: { type: String, default: "#EA580C" },
   },
   createdAt: { type: Date, default: Date.now },
   isActive: { type: Boolean, default: true },
 });
 
 module.exports = mongoose.model("Branch", branchSchema);
-
-// const mongoose = require("mongoose");
-// const Schema = mongoose.Schema;
-
-// const currencySchema = new Schema({
-//   name: { type: String, required: true },
-//   symbol: { type: String, required: true },
-//   code: { type: String, required: true },
-//   isDefault: { type: Boolean, default: false },
-// });
-
-// const taxSchema = new Schema({
-//   name: { type: String, required: true },
-//   percentage: { type: Number, required: true, min: 0, max: 100 },
-// });
 
 // const branchSchema = new Schema({
 //   branchName: { type: String, required: true },
@@ -80,12 +82,6 @@ module.exports = mongoose.model("Branch", branchSchema);
 //       publicKey: { type: String },
 //       secretKey: { type: String },
 //     },
-//   },
-
-//   // Theme settings
-//   theme: {
-//     logo: { type: String },
-//     primaryColor: { type: String, default: "#EA580C" },
 //   },
 
 //   createdAt: { type: Date, default: Date.now },

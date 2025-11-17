@@ -77,6 +77,48 @@
       -webkit-user-select: none;
       user-select: none;
     }
+
+    :root {
+      --theme-color: <%=branch.theme.primaryColor %>;
+    }
+
+    .btn-theme {
+      background-color: var(--theme-color);
+      color: #fff;
+
+    }
+
+    .btn-theme:hover {
+      background-color: var(--theme-color);
+      opacity: .9;
+    }
+
+    /* Border that uses theme color */
+    .theme-border {
+      border-color: var(--theme-color) !important;
+    }
+
+    /* Text using theme color */
+    .theme-text {
+      color: var(--theme-color) !important;
+    }
+
+    /* Icons using theme color */
+    .theme-icon {
+      color: var(--theme-color) !important;
+      stroke: var(--theme-color) !important;
+    }
+
+    /* Background hover tint using theme color */
+    .theme-hover:hover {
+      background-color: color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
+    }
+
+    /* Focus ring using theme color */
+    .theme-focus:focus {
+      border-color: var(--theme-color) !important;
+      box-shadow: 0 0 0 2px var(--theme-color) !important;
+    }
   </style>
 </head>
 
@@ -96,58 +138,74 @@
         </svg>
       </button>
 
-      <div class="p-4 sm:p-6 border-b border-gray-700">
-        <div class="flex items-center gap-3">
-          <div class="w-full">
-            <!-- Restaurant Name -->
-            <h1 class="text-lg sm:text-xl font-bold text-white flex items-center gap-1">
-              <span>
-                <%= user.restaurantName %>
-              </span>
-            </h1>
+      <div class="p-4 sm:p-6 border-b border-gray-700 bg-gray-800">
+        <div class="space-y-4">
 
-            <!-- Branch Switcher -->
-            <div class="relative mt-3">
-              <form action="/dashboard" method="GET" id="branchForm">
-                <div class="relative">
-                  <!-- Dropdown -->
-                  <select name="branchId" onchange="window.location.href = '/dashboard/' + this.value"
-                    class="w-full appearance-none border-2 border-orange-400 bg-white text-orange-600 font-semibold rounded-lg px-9 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer transition-all text-sm">
-                    <% branches.forEach(b=> { %> <option value="<%= b._id %>" <%=branch &&
-                        branch._id.toString()===b._id.toString() ? 'selected' : '' %>> <%= b.branchName
-                          || 'Unnamed Branch' %>
-                          <% }) %>
-                  </select>
+          <!-- ROW 1: Logo + Restaurant Name -->
+          <div class="flex items-center gap-3">
 
-                  <!-- Location Icon -->
-                  <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-orange-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z" />
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 22s8-7.58 8-13a8 8 0 10-16 0c0 5.42 8 13 8 13z" />
-                    </svg>
-                  </div>
+            <!-- Logo -->
+            <% if (branch?.theme?.logo) { %>
+              <div
+                class="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-xl border-2 theme-border p-1.5 flex items-center justify-center">
+                <img src="<%= branch.theme.logo %>" alt="Logo" class="w-full h-full object-contain" />
+              </div>
+              <% } %>
 
-                  <!-- Dropdown Arrow -->
-                  <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-orange-500">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </form>
-            </div>
+                <!-- Restaurant Name -->
+                <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wide">
+                  <%= user.restaurantName %>
+                </h1>
+
           </div>
+
+          <!-- ROW 2: Branch Switcher -->
+          <div class="max-w-xs">
+            <form action="/dashboard" method="GET" id="branchForm">
+
+              <div class="relative">
+                <select name="branchId" onchange="window.location.href='/dashboard/' + this.value" class="w-full appearance-none border-2 theme-border bg-white theme-text
+                         font-semibold rounded-lg pl-10 pr-10 py-2.5 text-sm sm:text-base
+                         cursor-pointer transition-all theme-hover theme-focus">
+
+                  <% branches.forEach(b=> { %>
+                    <option value="<%= b._id %>" <%=branch._id.toString()===b._id.toString() ? 'selected' : '' %>>
+                      <%= b.branchName %>
+                    </option>
+                    <% }) %>
+
+                </select>
+
+                <!-- Location Icon -->
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none theme-icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+
+                <!-- Dropdown Arrow -->
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none theme-icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
         </div>
       </div>
+
+
 
       <nav class="p-3 sm:p-4 space-y-1 pb-20">
         <!-- Dashboard -->
         <div class="menu-item">
           <a href="#"
-            class="flex items-center justify-between px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white transition-all shadow-md">
+            class="btn-theme flex items-center justify-between px-4 py-3 rounded-lg text-white transition-all shadow-md">
             <div class="flex items-center space-x-3">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -157,6 +215,7 @@
             </div>
           </a>
         </div>
+
 
         <!-- Menu -->
         <%- include("../includes/menu.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
@@ -170,32 +229,30 @@
               <!-- Orders -->
               <%- include("../includes/orders.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
 
-                <a href="#"
-                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 text-gray-300 hover:text-white transition-all">
-                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                  <span class="font-medium text-sm sm:text-base">Waiter Requests</span>
-                </a>
+                <!-- Waiter Request -->
+                <%- include("../includes/waiter-request.ejs", { branch: branch, branches: branches, branchId: branchId
+                  }) %>
 
-                <%- include("../includes/reservations.ejs", {branch: branch, branches: branches, branchId: branchId}) %>
-                  <!-- Customers-->
-                  <%- include("../includes/customers.ejs", { branch: branch, branches: branches, branchId: branchId })
+
+                  <%- include("../includes/reservations.ejs", {branch: branch, branches: branches, branchId: branchId})
                     %>
-                    <!-- Staff -->
-                    <%- include("../includes/staff.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
-                      <!-- delivery executive -->
-                      <%- include("../includes/delivery-executive.ejs") %>
-                        <!-- Payments -->
-                        <%- include("../includes/payments.ejs",{ branch: branch, branches: branches, branchId: branchId
-                          }) %>
-                          <!-- Reports -->
-                          <%- include("../includes/reports.ejs",{ branch: branch, branches: branches, branchId: branchId
-                            }) %>
-                            <!-- settings -->
-                            <%- include("../includes/settings.ejs", { branch: branch, branches: branches, branchId:
+                    <!-- Customers-->
+                    <%- include("../includes/customers.ejs", { branch: branch, branches: branches, branchId: branchId })
+                      %>
+                      <!-- Staff -->
+                      <%- include("../includes/staff.ejs", { branch: branch, branches: branches, branchId: branchId })
+                        %>
+                        <!-- delivery executive -->
+                        <%- include("../includes/delivery-executive.ejs") %>
+                          <!-- Payments -->
+                          <%- include("../includes/payments.ejs",{ branch: branch, branches: branches, branchId:
+                            branchId }) %>
+                            <!-- Reports -->
+                            <%- include("../includes/reports.ejs",{ branch: branch, branches: branches, branchId:
                               branchId }) %>
+                              <!-- settings -->
+                              <%- include("../includes/settings.ejs", { branch: branch, branches: branches, branchId:
+                                branchId }) %>
       </nav>
       <!-- customer-site -->
       <%- include("../includes/customer-site.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
@@ -231,7 +288,8 @@
               <div class="hidden sm:flex items-center space-x-2">
                 <span
                   class="px-2 sm:px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-medium whitespace-nowrap">Orders:
-                  <%= statistics ? statistics.todayOrdersCount : 0 %></span>
+                  <%= statistics ? statistics.todayOrdersCount : 0 %>
+                </span>
                 <span
                   class="px-2 sm:px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium whitespace-nowrap">
                   Reservations: <%= statistics ? statistics.todayReservationsCount : 0 %>
@@ -308,7 +366,7 @@
         </header>
 
         <!-- Dashboard Content -->
-        <div id="dashboard-content" class="p-4 sm:p-6 lg:p-4">
+        <div id="dashboard-content" class="p-2 sm:p-6 lg:p-2">
           <%- include("../includes/statistics.ejs", { branch: branch, branches: branches, branchId: branchId }) %>
         </div>
     </main>

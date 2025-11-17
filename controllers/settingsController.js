@@ -7,6 +7,8 @@ const Purchase = require("../models/purchase");
 const OfflineRequest = require("../models/offlineRequest");
 const ReservationSlot = require("../models/reservationSlot");
 const CustomerSiteSettings = require("../models/customerSiteSetting");
+const Currency = require("../models/currency");
+const Tax = require("../models/tax");
 
 // ============================================
 // SHOW SETTINGS - Main Settings Page
@@ -14,7 +16,9 @@ const CustomerSiteSettings = require("../models/customerSiteSetting");
 module.exports.showSettings = async (req, res) => {
   try {
     const { branchId } = req.params;
-    const branch = await Branch.findById(branchId).populate("owner");
+    const branch = await Branch.findById(branchId)
+      .populate("owner")
+      .populate("currency");
 
     if (!branch) {
       req.flash("error", "Branch not found");
@@ -85,6 +89,8 @@ module.exports.showSettings = async (req, res) => {
     const customerSiteSettings = await CustomerSiteSettings.getOrCreate(
       branchId
     );
+    const currencies = await Currency.find();
+    const taxes = await Tax.find({ branch: branchId });
 
     res.render("dashboard/settings/showSettings", {
       branch,
@@ -97,12 +103,14 @@ module.exports.showSettings = async (req, res) => {
       purchaseHistory,
       offlineRequests,
       reservationSlots,
-      customerSiteSettings, // ✅ Add this
+      customerSiteSettings,
+      currencies,
+      taxes, // ✅ Add this
     });
   } catch (error) {
     console.error("Error loading settings:", error);
     req.flash("error", "Error loading settings");
-    res.redirect(`/dashboard`);
+    res.redirect(`/dashboard/${branchId}?section=${sectionName}`);
   }
 };
 
@@ -272,7 +280,7 @@ module.exports.updateAppSettings = async (req, res) => {
     await Branch.findByIdAndUpdate(branchId, {
       country,
       timezone,
-      defaultCurrency: currency,
+      currency,
     });
 
     req.flash("success", "App settings updated successfully");
@@ -280,7 +288,7 @@ module.exports.updateAppSettings = async (req, res) => {
   } catch (error) {
     console.error(error);
     req.flash("error", "Error updating app settings");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}/settings`);
   }
 };
 
@@ -342,18 +350,19 @@ module.exports.addCurrency = async (req, res) => {
     const { branchId } = req.params;
     const { name, symbol, code } = req.body;
 
-    await Branch.findByIdAndUpdate(branchId, {
-      $push: {
-        currencies: { name, symbol, code },
-      },
+    // 1️⃣ Create new currency in Currency collection
+    const newCurrency = await Currency.create({
+      name,
+      symbol,
+      code,
     });
 
     req.flash("success", "Currency added successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error(error);
     req.flash("error", "Error adding currency");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard`);
   }
 };
 
@@ -362,23 +371,19 @@ module.exports.updateCurrency = async (req, res) => {
     const { branchId, currencyId } = req.params;
     const { name, symbol, code } = req.body;
 
-    await Branch.updateOne(
-      { _id: branchId, "currencies._id": currencyId },
-      {
-        $set: {
-          "currencies.$.name": name,
-          "currencies.$.symbol": symbol,
-          "currencies.$.code": code,
-        },
-      }
-    );
+    // Update Currency document
+    await Currency.findByIdAndUpdate(currencyId, {
+      name,
+      symbol,
+      code,
+    });
 
     req.flash("success", "Currency updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error(error);
+    console.error("Update Currency Error:", error);
     req.flash("error", "Error updating currency");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -386,16 +391,26 @@ module.exports.deleteCurrency = async (req, res) => {
   try {
     const { branchId, currencyId } = req.params;
 
-    await Branch.findByIdAndUpdate(branchId, {
-      $pull: { currencies: { _id: currencyId } },
-    });
+    // Check if this currency is currently assigned to ANY branch
+    const inUse = await Branch.findOne({ currency: currencyId });
+
+    if (inUse) {
+      req.flash(
+        "error",
+        "Cannot delete: This currency is currently used by a branch."
+      );
+      return res.redirect(`/dashboard/${branchId}/settings`);
+    }
+
+    // Safe to delete
+    await Currency.findByIdAndDelete(currencyId);
 
     req.flash("success", "Currency deleted successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error(error);
+    console.error("Delete Currency Error:", error);
     req.flash("error", "Error deleting currency");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -421,11 +436,11 @@ module.exports.updateEmailSettings = async (req, res) => {
     });
 
     req.flash("success", "Email settings updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error(error);
     req.flash("error", "Error updating email settings");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -434,18 +449,22 @@ module.exports.addTax = async (req, res) => {
     const { branchId } = req.params;
     const { name, percentage } = req.body;
 
+    const newTax = await Tax.create({
+      name,
+      percentage: Number(percentage),
+      branch: branchId,
+    });
+
     await Branch.findByIdAndUpdate(branchId, {
-      $push: {
-        taxes: { name, percentage: parseFloat(percentage) },
-      },
+      $push: { tax: newTax._id },
     });
 
     req.flash("success", "Tax added successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error(error);
+    console.error("Error adding tax:", error);
     req.flash("error", "Error adding tax");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -454,22 +473,17 @@ module.exports.updateTax = async (req, res) => {
     const { branchId, taxId } = req.params;
     const { name, percentage } = req.body;
 
-    await Branch.updateOne(
-      { _id: branchId, "taxes._id": taxId },
-      {
-        $set: {
-          "taxes.$.name": name,
-          "taxes.$.percentage": parseFloat(percentage),
-        },
-      }
-    );
+    await Tax.findByIdAndUpdate(taxId, {
+      name,
+      percentage: Number(percentage),
+    });
 
     req.flash("success", "Tax updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error(error);
+    console.error("Error updating tax:", error);
     req.flash("error", "Error updating tax");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -477,16 +491,18 @@ module.exports.deleteTax = async (req, res) => {
   try {
     const { branchId, taxId } = req.params;
 
+    await Tax.findByIdAndDelete(taxId);
+
     await Branch.findByIdAndUpdate(branchId, {
-      $pull: { taxes: { _id: taxId } },
+      $pull: { tax: taxId },
     });
 
     req.flash("success", "Tax deleted successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
-    console.error(error);
+    console.error("Error deleting tax:", error);
     req.flash("error", "Error deleting tax");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -514,11 +530,11 @@ module.exports.updatePaymentGateway = async (req, res) => {
     await Branch.findByIdAndUpdate(branchId, updateData);
 
     req.flash("success", "Payment gateway settings updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error(error);
     req.flash("error", "Error updating payment gateway settings");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -539,11 +555,11 @@ module.exports.updateTheme = async (req, res) => {
     await Branch.findByIdAndUpdate(branchId, updateData);
 
     req.flash("success", "Theme settings updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error(error);
     req.flash("error", "Error updating theme settings");
-    res.redirect(`/dashboard/${req.params.branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 
@@ -641,10 +657,10 @@ module.exports.updateAboutUs = async (req, res) => {
     });
 
     req.flash("success", "About Us updated successfully");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${branchId}`);
   } catch (error) {
     console.error("Error updating About Us:", error);
     req.flash("error", "Error updating About Us");
-    res.redirect(`/dashboard/${branchId}/settings`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };

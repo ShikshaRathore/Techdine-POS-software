@@ -1,6 +1,8 @@
 <!-- Taxes Tab -->
 <div id="taxes" class="settings-content hidden">
   <div class="bg-white shadow-lg rounded-xl p-4 sm:p-6 lg:p-8">
+
+    <!-- Heading -->
     <div class="mb-6 sm:mb-8">
       <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
         Tax Management
@@ -10,295 +12,123 @@
       </p>
     </div>
 
-    <div
-      class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-3 sm:p-4 mb-6"
-    >
+    <!-- Info Badge -->
+    <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-3 sm:p-4 mb-6">
       <div class="flex items-start gap-2 sm:gap-3">
-        <div class="flex-shrink-0">
-          <svg
-            class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <p class="text-xs sm:text-sm text-blue-800 leading-relaxed">
-          All taxes will be applicable on creating order.
+          All taxes will automatically apply during order billing.
         </p>
       </div>
     </div>
 
-    <button
-      onclick="openAddTaxModal()"
-      class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-semibold px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 mb-6"
-    >
+    <!-- Add Tax Button -->
+    <button onclick="openAddTaxModal()"
+      class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-semibold px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-md hover:shadow-lg transition-all mb-6">
       <span class="flex items-center justify-center gap-2">
-        <svg
-          class="w-4 h-4 sm:w-5 sm:h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
         Add Tax
       </span>
     </button>
 
-    <!-- Mobile Card View -->
+    <!-- MOBILE VIEW -->
     <div class="block sm:hidden space-y-3">
-      <% if (branch.taxes && branch.taxes.length > 0) { %> <%
-      branch.taxes.forEach(tax => { %>
-      <div
-        class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-all"
-      >
-        <div class="flex items-start justify-between mb-3">
-          <div class="flex-1">
-            <h3 class="text-base font-semibold text-gray-900 mb-1">
-              <%= tax.name %>
-            </h3>
-            <div
-              class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-            >
-              <%= tax.percentage %>%
+      <% if (taxes.length> 0) { %>
+        <% taxes.forEach(tax=> { %>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <h3 class="text-base font-semibold text-gray-900">
+                  <%= tax.name %>
+                </h3>
+                <div class="inline-flex px-2.5 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                  <%= tax.percentage %>%
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-2 pt-3 border-t border-gray-200">
+              <!-- Edit -->
+              <button onclick="openEditTaxModal('<%= tax._id %>', '<%= tax.name %>', '<%= tax.percentage %>')"
+                class="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-lg text-sm">
+                Edit
+              </button>
+
+              <!-- Delete -->
+              <form action="/dashboard/<%= branchId %>/settings/tax/<%= tax._id %>?_method=DELETE" method="POST"
+                class="flex-1" onsubmit="return confirm('Delete this tax?')">
+                <button type="submit"
+                  class="w-full bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm">
+                  Delete
+                </button>
+              </form>
             </div>
           </div>
-        </div>
-        <div class="flex gap-2 pt-3 border-t border-gray-200">
-          <button
-            onclick="openEditTaxModal('<%= tax._id %>', '<%= tax.name %>', '<%= tax.percentage %>')"
-            class="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-700 font-medium px-3 py-2 rounded-lg transition-colors text-sm"
-          >
-            <span class="flex items-center justify-center gap-1">
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              Edit
-            </span>
-          </button>
-          <form
-            action="/dashboard/<%= branchId %>/settings/tax/<%= tax._id %>?_method=DELETE"
-            method="POST"
-            class="flex-1"
-            onsubmit="return confirm('Are you sure you want to delete this tax?')"
-          >
-            <button
-              type="submit"
-              class="w-full bg-red-50 hover:bg-red-100 text-red-700 font-medium px-3 py-2 rounded-lg transition-colors text-sm"
-            >
-              <span class="flex items-center justify-center gap-1">
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Delete
-              </span>
-            </button>
-          </form>
-        </div>
-      </div>
-      <% }); %> <% } else { %>
-      <div
-        class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
-      >
-        <svg
-          class="mx-auto h-12 w-12 text-gray-400 mb-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        <p class="text-sm text-gray-500">No taxes found.</p>
-        <p class="text-xs text-gray-400 mt-1">Click "Add Tax" to create one</p>
-      </div>
-      <% } %>
+          <% }) %>
+            <% } else { %>
+              <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <p class="text-sm text-gray-500">No taxes added yet.</p>
+              </div>
+              <% } %>
     </div>
 
-    <!-- Desktop Table View -->
-    <div
-      class="hidden sm:block overflow-x-auto rounded-lg border border-gray-200"
-    >
+    <!-- DESKTOP TABLE -->
+    <div class="hidden sm:block overflow-x-auto rounded-lg border border-gray-200 mt-4">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+        <thead class="bg-gray-50">
           <tr>
-            <th
-              class="px-4 py-3 sm:px-6 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-            >
-              <span class="flex items-center gap-2">
-                <svg
-                  class="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-                Tax Name
-              </span>
-            </th>
-            <th
-              class="px-4 py-3 sm:px-6 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-            >
-              <span class="flex items-center gap-2">
-                <svg
-                  class="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                  />
-                </svg>
-                Tax Percent
-              </span>
-            </th>
-            <th
-              class="px-4 py-3 sm:px-6 sm:py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
-            >
-              Actions
-            </th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Tax Name</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Percentage</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% if (branch.taxes && branch.taxes.length > 0) { %> <%
-          branch.taxes.forEach(tax => { %>
-          <tr class="hover:bg-gray-50 transition-colors">
-            <td
-              class="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-            >
-              <%= tax.name %>
-            </td>
-            <td class="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm">
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-              >
-                <%= tax.percentage %>%
-              </span>
-            </td>
-            <td
-              class="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium"
-            >
-              <div class="flex items-center justify-end gap-2">
-                <button
-                  onclick="openEditTaxModal('<%= tax._id %>', '<%= tax.name %>', '<%= tax.percentage %>')"
-                  class="inline-flex items-center px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-medium rounded-lg transition-colors"
-                >
-                  <svg
-                    class="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  Update
-                </button>
-                <form
-                  action="/dashboard/<%= branchId %>/settings/tax/<%= tax._id %>?_method=DELETE"
-                  method="POST"
-                  class="inline"
-                  onsubmit="return confirm('Are you sure you want to delete this tax?')"
-                >
-                  <button
-                    type="submit"
-                    class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-lg transition-colors"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          <% }); %> <% } else { %>
-          <tr>
-            <td colspan="3" class="px-4 py-8 sm:px-6 sm:py-12 text-center">
-              <svg
-                class="mx-auto h-12 w-12 text-gray-400 mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <p class="text-sm font-medium text-gray-500 mb-1">
-                No taxes found.
-              </p>
-              <p class="text-xs text-gray-400">
-                Click "Add Tax" button above to create your first tax
-              </p>
-            </td>
-          </tr>
-          <% } %>
+        <tbody class="bg-white divide-y divide-gray-100">
+          <% if (taxes.length> 0) { %>
+            <% taxes.forEach(tax=> { %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                  <%= tax.name %>
+                </td>
+
+                <td class="px-6 py-4">
+                  <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <%= tax.percentage %>%
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-right">
+                  <div class="flex justify-end gap-2">
+                    <!-- Edit -->
+                    <button onclick="openEditTaxModal('<%= tax._id %>', '<%= tax.name %>', '<%= tax.percentage %>')"
+                      class="bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-sm">
+                      Update
+                    </button>
+
+                    <!-- Delete -->
+                    <form action="/dashboard/<%= branchId %>/settings/tax/<%= tax._id %>?_method=DELETE" method="POST"
+                      onsubmit="return confirm('Delete this tax?')">
+                      <button type="submit"
+                        class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-sm">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="3" class="py-12 text-center text-gray-500">No taxes added.</td>
+                  </tr>
+                  <% } %>
         </tbody>
       </table>
     </div>
+
   </div>
 </div>

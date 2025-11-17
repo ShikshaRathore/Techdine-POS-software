@@ -67,6 +67,5 @@ const purchaseSchema = new mongoose.Schema(
 
 // Index for faster queries
 purchaseSchema.index({ userId: 1, createdAt: -1 });
-purchaseSchema.index({ transactionId: 1 });
 
 module.exports = mongoose.model("Purchase", purchaseSchema);

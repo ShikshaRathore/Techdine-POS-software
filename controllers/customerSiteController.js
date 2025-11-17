@@ -60,6 +60,7 @@ exports.getCustomerDashboard = async (req, res) => {
 
     res.render("./layouts/customer-dashboard.ejs", {
       branch,
+      branchId,
       allBranches, // Pass all branches for dropdown
       menu,
       menuItems,

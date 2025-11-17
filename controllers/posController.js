@@ -3,8 +3,19 @@ const KOT = require("../models/kot");
 
 exports.createOrderKOT = async (req, res) => {
   try {
-    const { items, branch, serviceType, pax, totalAmount, orderType } =
-      req.body;
+    const {
+      items,
+      branch,
+      serviceType,
+      pax,
+      totalAmount,
+      subtotal,
+      taxes,
+      totalTax,
+      orderType,
+      customer, // ADD THIS
+      table, // ADD THIS
+    } = req.body;
 
     // ✅ Validate required fields
     if (!branch) {
@@ -53,6 +64,8 @@ exports.createOrderKOT = async (req, res) => {
       branch,
       itemCount: items.length,
       totalAmount,
+      table: table || "No table", // ADD THIS DEBUG
+      customer: customer || "Walk-in", // ADD THIS DEBUG
     });
 
     // ✅ Validate and transform items
@@ -68,25 +81,28 @@ exports.createOrderKOT = async (req, res) => {
       };
     });
 
-    // ✅ Create Order
+    // ✅ Create Order with customer and table
     const order = new Order({
       orderNumber,
       branch,
       items: transformedItems,
-      orderType: orderType || "Dine In", // Must match enum: "Dine In", "Delivery", "Pickup"
+      orderType: orderType || "Dine In",
       status: "KOT",
       paymentStatus: "Unpaid",
+      subtotal: parseFloat(subtotal) || 0, // ADD THIS
+      taxes: taxes || [],
+      totalTax: parseFloat(totalTax) || 0,
       totalAmount: parseFloat(totalAmount) || 0,
       kotGenerated: true,
-      // Optional fields can be added later:
-      // customer, table, waiter, specialInstructions
+      pax: pax || 1,
+      customer: customer || null, // ADD THIS - customer object or null
+      table: table || null, // ADD THIS - table ID or null
     });
 
     await order.save();
-    console.log("✅ Order created:", order._id);
+    console.log("✅ Order created:", order._id, "with table:", table);
 
-    // ✅ Get createdBy from session/auth (you need to pass this)
-    // For now, using a placeholder - you should pass actual user ID
+    // ✅ Get createdBy from session/auth
     const createdBy = req.user?._id || req.session?.userId;
     const createdByModel = req.user?.role === "Customer" ? "Customer" : "Staff";
 
@@ -107,8 +123,8 @@ exports.createOrderKOT = async (req, res) => {
         notes: item.notes || "",
       })),
       status: "In Kitchen",
-      createdBy: createdBy || order._id, // Fallback to order ID if no user
-      createdByModel: createdBy ? createdByModel : "Staff", // Default to Staff
+      createdBy: createdBy || order._id,
+      createdByModel: createdBy ? createdByModel : "Staff",
       startedAt: new Date(),
     });
 
@@ -123,6 +139,7 @@ exports.createOrderKOT = async (req, res) => {
         orderNumber: order.orderNumber,
         totalAmount: order.totalAmount,
         status: order.status,
+        table: table, // ADD THIS for debugging
       },
       kot: {
         _id: kot._id,

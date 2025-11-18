@@ -1,5 +1,8 @@
 const pathParts = window.location.pathname.split("/");
 const branchId = pathParts[2]; // index: 0="", 1="restaurant", 2="branchId"
+const params = new URLSearchParams(window.location.search);
+
+const tableCode = params.get("tableCode") || "Unknown Table";
 
 let cart = [];
 let currentCategory = "all";
@@ -228,11 +231,14 @@ async function placeOrder() {
   };
 
   try {
-    const response = await fetch(`/restaurant/${branchId}/place-order`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
-    });
+    const response = await fetch(
+      `/restaurant/${branchId}/place-order?tableCode=${tableCode}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      }
+    );
 
     const result = await response.json();
 

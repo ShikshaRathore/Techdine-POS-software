@@ -6,6 +6,10 @@ const MenuItem = require("../models/menuItem");
 const Order = require("../models/order");
 const KOT = require("../models/kot");
 const Area = require("../models/area");
+const Reservation = require("../models/reservation");
+const Customer = require("../models/customer");
+const Table = require("../models/table");
+const sendNotification = require("../utils/sendNotification");
 
 /**
  * Display customer dashboard with menu
@@ -80,6 +84,12 @@ exports.getCustomerDashboard = async (req, res) => {
 exports.placeOrder = async (req, res) => {
   try {
     const { branchId } = req.params;
+    const tableCode = req.query.tableCode?.trim();
+    if (!tableCode) {
+      console.log("❌ Missing tableCode from QR URL");
+    }
+
+    console.log(tableCode);
 
     // Validate MongoDB ObjectId format
     if (!branchId.match(/^[0-9a-fA-F]{24}$/)) {

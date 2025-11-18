@@ -51,6 +51,7 @@ const Order = require("../models/order");
 const TableSessionService = require("../services/tableSessionService");
 const Branch = require("../models/branch");
 const MenuItem = require("../models/menuItem");
+const sendNotification = require("../utils/sendNotification");
 
 /**
  * Customer site route - Initialize session when QR is scanned
@@ -108,6 +109,11 @@ router.post("/:branchId/place-order", async (req, res) => {
     const { branchId } = req.params;
     const { orderType, items, totalAmount, specialInstructions, tableId } =
       req.body;
+
+    const tableCode = req.query.tableCode;
+
+    console.log(tableCode);
+    console.log(tableId);
 
     // Get session from cookie or create new one
     const sessionToken = req.cookies.tableSession;
@@ -203,6 +209,8 @@ router.post("/:branchId/place-order", async (req, res) => {
           }
         : null,
     });
+
+    sendNotification(`🛎️ New Order from Table ${tableCode}`);
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ success: false, message: "Failed to place order" });

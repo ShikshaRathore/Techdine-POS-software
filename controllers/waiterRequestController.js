@@ -1,8 +1,8 @@
 // controllers/waiterRequestController.js
 
-const mongoose = require("mongoose");
 const WaiterRequest = require("../models/waiterRequest");
 const Table = require("../models/table");
+const sendNotification = require("../utils/sendNotification");
 
 // ================================
 // GET NEW REQUESTS FOR API (JSON Response)
@@ -170,6 +170,8 @@ exports.createRequest = async (req, res) => {
       { path: "table", select: "tableCode" },
       { path: "area", select: "name" },
     ]);
+
+    sendNotification(`🚨 Waiter Call from Table ${trimmedTableCode}`);
 
     res.status(201).json({
       success: true,

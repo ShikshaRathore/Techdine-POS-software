@@ -102,8 +102,7 @@ export function initPage(branchId) {
         // const qrUrl = `${window.location.origin}${customerSiteUrl}?table=${table._id}&tableCode=${table.tableCode}`;
 
         // Try this:
-        const baseUrl = `https://techdine-pos-software.onrender.com/restaurant/${branchId}?`; // Replace with your actual domain
-        const qrUrl = `${baseUrl}${customerSiteUrl}?table=${table._id}&tableCode=${table.tableCode}`;
+        const qrUrl = `https://techdine-pos-software.onrender.com/restaurant/${BRANCH_ID}?table=${table._id}&tableCode=${table.tableCode}`;
 
         try {
           new QRCode(qrElement, {

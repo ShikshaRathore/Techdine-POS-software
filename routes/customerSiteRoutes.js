@@ -112,9 +112,6 @@ router.post("/:branchId/place-order", async (req, res) => {
 
     const tableCode = req.query.tableCode;
 
-    console.log(tableCode);
-    console.log(tableId);
-
     // Get session from cookie or create new one
     const sessionToken = req.cookies.tableSession;
     let session = null;

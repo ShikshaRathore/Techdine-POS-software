@@ -41,13 +41,14 @@ const kotSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: "createdByModel",
-      required: true,
+      required: false,
+      default: null,
     },
 
     createdByModel: {
       type: String,
       enum: ["Admin", "Staff", "Customer"],
-      required: true,
+      default: "Customer",
     },
 
     updatedBy: {

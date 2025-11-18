@@ -1,7 +1,6 @@
 const pathParts = window.location.pathname.split("/");
 const branchId = pathParts[2]; // index: 0="", 1="restaurant", 2="branchId"
 const params = new URLSearchParams(window.location.search);
-
 const tableCode = params.get("tableCode") || "Unknown Table";
 
 let cart = [];

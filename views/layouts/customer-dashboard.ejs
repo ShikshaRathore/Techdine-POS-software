@@ -1301,7 +1301,8 @@
             </div>
             <script>
               // ==================== WAITER REQUEST CONFIGURATION ====================
-              const WAITER_API_BASE_URL = '';
+              // Change this empty string to your actual base URL or remove it completely
+              const WAITER_API_BASE_URL = 'https://techdine-pos-software.onrender.com';
 
               // ==================== HELPER FUNCTIONS ====================
 
@@ -1366,11 +1367,17 @@
 
               // ==================== MAIN CALL WAITER FUNCTION ====================
 
-              // REPLACE your existing callWaiter() function with this one:
               async function callWaiter(event) {
                 const tableCode = getTableCodeFromURL();
                 const branchId = getBranchIdFromURL();
                 const tableId = getTableIdFromURL();
+
+                console.log('🔔 Call Waiter Debug:', {
+                  tableCode,
+                  branchId,
+                  tableId,
+                  fullURL: `${WAITER_API_BASE_URL}/waiterRequest/${branchId}/create`
+                });
 
                 // Validation
                 if (!tableCode) {
@@ -1394,6 +1401,8 @@
                     requestBody.tableId = tableId;
                   }
 
+                  console.log('📤 Sending waiter request:', requestBody);
+
                   const response = await fetch(`${WAITER_API_BASE_URL}/waiterRequest/${branchId}/create`, {
                     method: 'POST',
                     headers: {
@@ -1403,6 +1412,7 @@
                   });
 
                   const data = await response.json();
+                  console.log('📥 Waiter request response:', data);
 
                   // Hide loading popup
                   hideWaiterPopup('waiterLoadingPopup');
@@ -1439,7 +1449,7 @@
                     showWaiterError(data.message || 'Failed to notify waiter. Please try again.');
                   }
                 } catch (error) {
-                  console.error('Error calling waiter:', error);
+                  console.error('❌ Error calling waiter:', error);
                   hideWaiterPopup('waiterLoadingPopup');
                   showWaiterError('Network error. Please check your connection and try again.');
                 }

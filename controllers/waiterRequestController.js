@@ -3,6 +3,7 @@
 const WaiterRequest = require("../models/waiterRequest");
 const Table = require("../models/table");
 const sendNotification = require("../utils/sendNotification");
+const Area = require("../models/area");
 
 // ================================
 // GET NEW REQUESTS FOR API (JSON Response)
@@ -109,44 +110,95 @@ exports.markAttended = async (req, res) => {
 exports.createRequest = async (req, res) => {
   try {
     const { branchId } = req.params;
-    const { tableCode } = req.body;
+    const { tableCode, tableId } = req.body;
 
-    if (!tableCode || !branchId) {
+    if ((!tableId && !tableCode) || !branchId) {
       return res.status(400).json({
         success: false,
-        message: "Table code and branch ID are required",
+        message: "Table ID or table code and branch ID are required",
       });
     }
 
-    const trimmedTableCode = tableCode.trim();
+    let table = null;
 
-    // Find table inside the branch via area
-    let table = await Table.findOne({
-      tableCode: trimmedTableCode,
-    }).populate({
-      path: "area",
-      match: { branch: branchId },
+    console.log("🔍 Incoming waiter request:", {
+      branchId,
+      tableId,
+      tableCode,
     });
 
-    // Case-insensitive fallback
-    if (!table || !table.area) {
-      table = await Table.findOne({
-        tableCode: { $regex: new RegExp(`^${trimmedTableCode}$`, "i") },
-      }).populate({
+    // 1️⃣ PRIORITY: CHECK USING tableId (Best & always correct)
+    if (tableId) {
+      console.log("🔎 Searching using tableId:", tableId);
+
+      table = await Table.findById(tableId).populate({
         path: "area",
-        match: { branch: branchId },
+        populate: { path: "branch" },
       });
+
+      if (!table) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid QR: Table not found",
+        });
+      }
+
+      // Validate the table belongs to this branch
+      if (String(table.area.branch._id) !== String(branchId)) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid QR: This table does not belong to this branch",
+        });
+      }
     }
 
-    // If STILL not found
-    if (!table || !table.area) {
-      return res.status(404).json({
-        success: false,
-        message: `Table '${trimmedTableCode}' not found in this branch`,
-      });
+    // 2️⃣ If NO tableId → fallback to tableCode (only inside same branch)
+    if (!table) {
+      const trimmed = tableCode.trim();
+      console.log("🔎 Searching by tableCode:", trimmed);
+
+      // Get areas that belong to the branch
+      const areas = await Area.find({ branch: branchId }).select("_id");
+      const areaIds = areas.map((a) => a._id);
+
+      if (areaIds.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No areas found in this branch",
+        });
+      }
+
+      // Exact match
+      table = await Table.findOne({
+        tableCode: trimmed,
+        area: { $in: areaIds },
+      }).populate({ path: "area", populate: { path: "branch" } });
+
+      // Case-insensitive fallback
+      if (!table) {
+        table = await Table.findOne({
+          tableCode: { $regex: new RegExp(`^${trimmed}$`, "i") },
+          area: { $in: areaIds },
+        }).populate({ path: "area", populate: { path: "branch" } });
+      }
+
+      if (!table) {
+        return res.status(404).json({
+          success: false,
+          message: `Table '${trimmed}' not found in this branch`,
+        });
+      }
     }
 
-    // Check pending request
+    // 3️⃣ Table is now found and valid
+    console.log("✅ Table resolved:", {
+      tableId: table._id,
+      tableCode: table.tableCode,
+      area: table.area.name,
+      branch: table.area.branch._id,
+    });
+
+    // 4️⃣ Check for pending request
     const existing = await WaiterRequest.findOne({
       table: table._id,
       status: "Pending",
@@ -159,7 +211,7 @@ exports.createRequest = async (req, res) => {
       });
     }
 
-    // Create new request
+    // 5️⃣ Create new waiter request
     const waiterRequest = await WaiterRequest.create({
       table: table._id,
       area: table.area._id,
@@ -171,15 +223,21 @@ exports.createRequest = async (req, res) => {
       { path: "area", select: "name" },
     ]);
 
-    sendNotification(`🚨 Waiter Call from Table ${trimmedTableCode}`);
+    console.log("✅ Waiter request created:", {
+      requestId: waiterRequest._id,
+      table: waiterRequest.table.tableCode,
+      area: waiterRequest.area.name,
+    });
 
-    res.status(201).json({
+    sendNotification(`🚨 Waiter Call from Table ${table.tableCode}`);
+
+    return res.status(201).json({
       success: true,
       message: "Waiter has been notified successfully",
       data: waiterRequest,
     });
   } catch (error) {
-    console.error("Error creating waiter request:", error);
+    console.error("❌ Error creating waiter request:", error);
     res.status(500).json({
       success: false,
       message: "Failed to notify waiter",

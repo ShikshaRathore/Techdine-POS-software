@@ -82,6 +82,7 @@ export function initPage(branchId) {
     }
 
     const BRANCH_ID = branchId || storedBranchId;
+    console.log("🎯 Using BRANCH_ID:", BRANCH_ID);
 
     // Generate QR codes
     if (!Array.isArray(tables) || tables.length === 0) {
@@ -98,11 +99,10 @@ export function initPage(branchId) {
         // Clear any existing QR code
         qrElement.innerHTML = "";
 
-        // // Create URL with table information
-        // const qrUrl = `${window.location.origin}${customerSiteUrl}?table=${table._id}&tableCode=${table.tableCode}`;
-
-        // Try this:
+        // Create URL with the correct branch ID
         const qrUrl = `https://techdine-pos-software.onrender.com/restaurant/${BRANCH_ID}?table=${table._id}&tableCode=${table.tableCode}`;
+
+        console.log(`🔗 QR URL for ${table.tableCode}:`, qrUrl);
 
         try {
           new QRCode(qrElement, {
@@ -114,10 +114,13 @@ export function initPage(branchId) {
             correctLevel: QRCode.CorrectLevel.H,
           });
           successCount++;
-          console.log(`Generated QR for table ${table.tableCode}`);
+          console.log(`✅ Generated QR for table ${table.tableCode}`);
         } catch (error) {
           failCount++;
-          console.error(`Error generating QR for ${table.tableCode}:`, error);
+          console.error(
+            `❌ Error generating QR for ${table.tableCode}:`,
+            error
+          );
         }
       } else {
         failCount++;
@@ -129,12 +132,12 @@ export function initPage(branchId) {
       `QR generation complete: ${successCount} success, ${failCount} failed`
     );
 
-    // Setup window functions
-    setupWindowFunctions(customerSiteUrl);
+    // Setup window functions with BRANCH_ID
+    setupWindowFunctions(BRANCH_ID);
   }
 
   // Setup global functions
-  function setupWindowFunctions(customerSiteUrl) {
+  function setupWindowFunctions(BRANCH_ID) {
     // Filter by area
     window.filterArea = function (areaId) {
       console.log("🔍 Filtering by area:", areaId);
@@ -164,7 +167,7 @@ export function initPage(branchId) {
 
     // Download QR code
     window.downloadQR = function (tableId, tableCode) {
-      console.log("Downloading QR for table:", tableCode);
+      console.log("📥 Downloading QR for table:", tableCode);
       const qrElement = document.getElementById(`qr-${tableId}`);
 
       if (!qrElement) {
@@ -182,9 +185,9 @@ export function initPage(branchId) {
           link.download = `QR-${tableCode}.png`;
           link.href = url;
           link.click();
-          console.log("QR downloaded:", tableCode);
+          console.log("✅ QR downloaded:", tableCode);
         } catch (error) {
-          console.error("Error downloading QR:", error);
+          console.error("❌ Error downloading QR:", error);
           alert("Failed to download QR code. Please try again.");
         }
       } else {
@@ -193,9 +196,9 @@ export function initPage(branchId) {
       }
     };
 
-    // Open customer site
+    // Open customer site - NOW USES BRANCH_ID
     window.openCustomerSite = function (tableId, tableCode) {
-      const url = `${window.location.origin}${customerSiteUrl}?table=${tableId}&tableCode=${tableCode}`;
+      const url = `https://techdine-pos-software.onrender.com/restaurant/${BRANCH_ID}?table=${tableId}&tableCode=${tableCode}`;
       console.log("🔗 Opening customer site:", url);
       window.open(url, "_blank");
     };

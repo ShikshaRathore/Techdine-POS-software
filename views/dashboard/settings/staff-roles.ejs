@@ -6,59 +6,56 @@
       <thead class="bg-gray-100 text-gray-700">
         <tr>
           <th class="text-left px-6 py-3">Permission</th>
-          <th class="text-center px-6 py-3">Branch Head</th>
+          <th class="text-center px-6 py-3">Branch-Head</th>
           <th class="text-center px-6 py-3">Chef</th>
           <th class="text-center px-6 py-3">Waiter</th>
         </tr>
       </thead>
 
       <tbody class="divide-y divide-gray-200 text-gray-700">
-        <% const sections = [ { key: 'menu', label: 'Menu' }, { key: 'menuItem',
-        label: 'Menu Item' }, { key: 'category', label: 'Item Category' }, {
-        key: 'area', label: 'Area' }, { key: 'table', label: 'Table' }, { key:
-        'reservation', label: 'Reservation' }, { key: 'kot', label: 'KOT' }, {
-        key: 'order', label: 'Order' }, { key: 'customer', label: 'Customer' },
-        { key: 'staff', label: 'Staff' }, { key: 'payment', label: 'Payment' },
-        { key: 'report', label: 'Report' }, { key: 'settings', label: 'Settings'
-        }, { key: 'deliveryExecutive', label: 'Delivery Executive' }, { key:
-        'waiterRequest', label: 'Waiter Request' }, ]; const roles =
-        ['Branch-Head', 'Chef', 'Waiter']; const actions = ['create', 'read',
-        'update', 'delete']; %> <% sections.forEach((section) => { %>
-        <tr class="bg-gray-50 font-semibold">
-          <td colspan="4" class="px-6 py-3 text-gray-800">
-            <%= section.label %>
-          </td>
-        </tr>
+        <% const sections=[ { key: 'menu' , label: 'Menu' }, { key: 'menuItem' , label: 'Menu Item' }, { key: 'category'
+          , label: 'Item Category' }, { key: 'area' , label: 'Area' }, { key: 'table' , label: 'Table' }, {
+          key: 'reservation' , label: 'Reservation' }, { key: 'kot' , label: 'KOT' }, { key: 'order' , label: 'Order' },
+          { key: 'customer' , label: 'Customer' }, { key: 'staff' , label: 'Staff' }, { key: 'payment' ,
+          label: 'Payment' }, { key: 'report' , label: 'Report' }, { key: 'settings' , label: 'Settings' }, {
+          key: 'deliveryExecutive' , label: 'Delivery Executive' }, { key: 'waiterRequest' , label: 'Waiter Request' },
+          ]; const roles=['Branch-Head', 'Chef' , 'Waiter' ]; const actions=['create', 'read' , 'update' , 'delete' ];
+          %>
+          <% sections.forEach((section)=> { %>
+            <tr class="bg-gray-50 font-semibold">
+              <td colspan="4" class="px-6 py-3 text-gray-800">
+                <%= section.label %>
+              </td>
+            </tr>
 
-        <% actions.forEach((action) => { %>
-        <tr>
-          <td class="px-6 py-2 capitalize text-sm text-gray-700 pl-10">
-            <%= action.charAt(0).toUpperCase() + action.slice(1) %> <%=
-            section.label %>
-          </td>
+            <% actions.forEach((action)=> { %>
+              <tr>
+                <td class="px-6 py-2 capitalize text-sm text-gray-700 pl-10">
+                  <%= action.charAt(0).toUpperCase() + action.slice(1) %>
+                    <%= section.label %>
+                </td>
 
-          <% roles.forEach((role) => { const isChecked = permissions &&
-          permissions[role] && permissions[role][section.key] &&
-          permissions[role][section.key][action]; const toggleClass = isChecked
-          ? 'bg-green-500' : 'bg-gray-300'; const dotClass = isChecked ?
-          'translate-x-5' : ''; %>
-          <td class="text-center py-2">
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only permission-toggle"
-              data-role="<%= role %>" data-section="<%= section.key %>"
-              data-action="<%= action %>" <%= isChecked ? 'checked' : '' %> />
-              <div
-                class="w-10 h-5 rounded-full transition-colors duration-300 ease-in-out <%= toggleClass %>"
-              >
-                <div
-                  class="absolute left-1 top-1 bg-white w-3.5 h-3.5 rounded-full shadow transition-transform duration-300 ease-in-out <%= dotClass %>"
-                ></div>
-              </div>
-            </label>
-          </td>
-          <% }); %>
-        </tr>
-        <% }); %> <% }); %>
+                <% roles.forEach((role)=> { const isChecked = permissions &&
+                  permissions[role] && permissions[role][section.key] &&
+                  permissions[role][section.key][action]; const toggleClass = isChecked
+                  ? 'bg-green-500' : 'bg-gray-300'; const dotClass = isChecked ?
+                  'translate-x-5' : ''; %>
+                  <td class="text-center py-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" class="sr-only permission-toggle" data-role="<%= role %>"
+                        data-section="<%= section.key %>" data-action="<%= action %>" <%=isChecked ? 'checked' : '' %>
+                      />
+                      <div class="w-10 h-5 rounded-full transition-colors duration-300 ease-in-out <%= toggleClass %>">
+                        <div
+                          class="absolute left-1 top-1 bg-white w-3.5 h-3.5 rounded-full shadow transition-transform duration-300 ease-in-out <%= dotClass %>">
+                        </div>
+                      </div>
+                    </label>
+                  </td>
+                  <% }); %>
+              </tr>
+              <% }); %>
+                <% }); %>
       </tbody>
     </table>
   </div>

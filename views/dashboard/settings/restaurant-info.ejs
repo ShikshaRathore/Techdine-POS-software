@@ -1,287 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Restaurant Information</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      @media (max-width: 640px) {
-        .form-label {
-          font-size: 13px;
-        }
-        .form-input {
-          font-size: 14px;
-          padding: 10px 12px;
-        }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant Information</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media (max-width: 640px) {
+      .form-label {
+        font-size: 13px;
       }
-    </style>
-  </head>
-  <body class="bg-gray-50">
-    <!-- Restaurant Information Tab -->
-    <div id="restaurant-info" class="settings-content">
-      <div
-        class="bg-white shadow-sm sm:shadow rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8"
-      >
-        <!-- Header -->
-        <div class="mb-6 sm:mb-8">
-          <div class="flex items-start space-x-3 mb-2">
-            <div
-              class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                ></path>
-              </svg>
+
+      .form-input {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Restaurant Information Tab -->
+  <div id="restaurant-info" class="settings-content">
+    <div class="bg-white shadow-sm sm:shadow rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
+      <!-- Header -->
+      <div class="mb-6 sm:mb-8">
+        <div class="flex items-start space-x-3 mb-2">
+          <div
+            class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
+              Restaurant Information
+            </h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">
+              Manage your restaurant's basic details
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <form action="/dashboard/<%= branchId %>/settings/restaurant-info" method="POST">
+        <div class="space-y-4 sm:space-y-5">
+          <!-- Restaurant Name -->
+          <div>
+            <label for="restaurantName" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+              Restaurant Name <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                  </path>
+                </svg>
+              </div>
+              <input type="text" id="restaurantName" name="restaurantName" value="<%= hotelAdmin.restaurantName %>"
+                class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                placeholder="Enter restaurant name" required />
             </div>
-            <div>
-              <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
-                Restaurant Information
-              </h2>
-              <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                Manage your restaurant's basic details
-              </p>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label for="phone" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+              Phone Number
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                  </path>
+                </svg>
+              </div>
+              <input type="tel" id="phone" name="phone" value="<%= branch.phone || '' %>"
+                class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                placeholder="+91 XXXXX XXXXX" />
             </div>
+          </div>
+
+          <!-- Email Address -->
+          <div>
+            <label for="email" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+              Email Address <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                  </path>
+                </svg>
+              </div>
+              <input type="email" id="email" name="email" value="<%= branch.email || hotelAdmin.email %>"
+                class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                placeholder="restaurant@example.com" required />
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div>
+            <label for="address" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+              Restaurant Address <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute top-3 left-3 pointer-events-none">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <textarea id="address" name="address" rows="3"
+                class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
+                placeholder="Enter complete address with city and pincode" required>
+<%= branch.address %></textarea>
+            </div>
+            <p class="mt-1.5 text-xs text-gray-500">
+              Include street, area, city, state, and postal code
+            </p>
           </div>
         </div>
 
-        <form
-          action="/dashboard/<%= branchId %>/settings/restaurant-info"
-          method="POST"
-        >
-          <div class="space-y-4 sm:space-y-5">
-            <!-- Restaurant Name -->
-            <div>
-              <label
-                for="restaurantName"
-                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5"
-              >
-                Restaurant Name <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <div
-                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                >
-                  <svg
-                    class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                    ></path>
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  id="restaurantName"
-                  name="restaurantName"
-                  value="<%= user.restaurantName %>"
-                  class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
-                  placeholder="Enter restaurant name"
-                  required
-                />
-              </div>
-            </div>
+        <!-- Action Buttons -->
+        <div class="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
+          <button type="submit"
+            class="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm sm:text-base font-semibold rounded-lg shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all flex items-center justify-center space-x-2">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
 
-            <!-- Phone Number -->
-            <div>
-              <label
-                for="phone"
-                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5"
-              >
-                Phone Number
-              </label>
-              <div class="relative">
-                <div
-                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                >
-                  <svg
-                    class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    ></path>
-                  </svg>
-                </div>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value="<%= branch.phone || '' %>"
-                  class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
-                  placeholder="+91 XXXXX XXXXX"
-                />
-              </div>
-            </div>
-
-            <!-- Email Address -->
-            <div>
-              <label
-                for="email"
-                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5"
-              >
-                Email Address <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <div
-                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                >
-                  <svg
-                    class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    ></path>
-                  </svg>
-                </div>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value="<%= branch.email || user.email %>"
-                  class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
-                  placeholder="restaurant@example.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Address -->
-            <div>
-              <label
-                for="address"
-                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5"
-              >
-                Restaurant Address <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute top-3 left-3 pointer-events-none">
-                  <svg
-                    class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    ></path>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
-                  </svg>
-                </div>
-                <textarea
-                  id="address"
-                  name="address"
-                  rows="3"
-                  class="w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
-                  placeholder="Enter complete address with city and pincode"
-                  required
-                >
-<%= branch.address %></textarea
-                >
-              </div>
-              <p class="mt-1.5 text-xs text-gray-500">
-                Include street, area, city, state, and postal code
-              </p>
-            </div>
+      <!-- Info Box -->
+      <div class="mt-6 sm:mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clip-rule="evenodd"></path>
+            </svg>
           </div>
-
-          <!-- Action Buttons -->
-          <div
-            class="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:gap-4"
-          >
-            <button
-              type="submit"
-              class="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm sm:text-base font-semibold rounded-lg shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all flex items-center justify-center space-x-2"
-            >
-              <svg
-                class="w-4 h-4 sm:w-5 sm:h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                ></path>
-              </svg>
-              <span>Save Changes</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- Info Box -->
-        <div
-          class="mt-6 sm:mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4"
-        >
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg
-                class="h-4 w-4 sm:h-5 sm:w-5 text-blue-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-xs sm:text-sm text-blue-700">
-                <strong>Note:</strong> This information will be displayed on
-                your customer-facing menu and website. Make sure all details are
-                accurate.
-              </p>
-            </div>
+          <div class="ml-3">
+            <p class="text-xs sm:text-sm text-blue-700">
+              <strong>Note:</strong> This information will be displayed on
+              your customer-facing menu and website. Make sure all details are
+              accurate.
+            </p>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <style>
-      @media (max-width: 640px) {
-        #restaurant-info input,
-        #restaurant-info textarea {
-          font-size: 14px;
-        }
+  <style>
+    @media (max-width: 640px) {
+
+      #restaurant-info input,
+      #restaurant-info textarea {
+        font-size: 14px;
       }
-    </style>
-  </body>
+    }
+  </style>
+</body>
+
 </html>

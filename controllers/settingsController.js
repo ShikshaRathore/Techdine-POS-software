@@ -25,8 +25,15 @@ module.exports.showSettings = async (req, res) => {
       return res.redirect("/dashboard");
     }
 
-    const allBranches = await Branch.find({ owner: req.user._id });
+    if (req.user.constructor.modelName === "Staff") {
+      // staff → only their assigned branch
+      allBranches = [await Branch.findById(req.user.branch)];
+    } else {
+      // admin → all branches they own
+      allBranches = await Branch.find({ owner: req.user._id });
+    }
     const user = await User.findById(req.user._id);
+    const hotelAdmin = branch.owner;
 
     // Fetch permissions
     const allPermissions = await Permission.find({ branch: branchId });
@@ -95,6 +102,7 @@ module.exports.showSettings = async (req, res) => {
     res.render("dashboard/settings/showSettings", {
       branch,
       allBranches,
+      hotelAdmin,
       user,
       branchId,
       permissions: permissionsByRole,
@@ -110,7 +118,7 @@ module.exports.showSettings = async (req, res) => {
   } catch (error) {
     console.error("Error loading settings:", error);
     req.flash("error", "Error loading settings");
-    res.redirect(`/dashboard/${branchId}?section=${sectionName}`);
+    res.redirect(`/dashboard/${req.params.branchId}?section=${sectionName}`);
   }
 };
 

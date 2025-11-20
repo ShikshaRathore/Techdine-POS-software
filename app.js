@@ -47,6 +47,7 @@ const Customer = require("./models/customer.js");
 const Staff = require("./models/staff.js");
 const Tax = require("./models/tax.js");
 const Reservation = require("./models/reservation.js");
+const Permission = require("./models/permission.js");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -119,6 +120,11 @@ passport.use(
   new LocalStrategy({ usernameField: "email" }, SuperAdmin.authenticate())
 );
 
+passport.use(
+  "staff-local",
+  new LocalStrategy({ usernameField: "email" }, Staff.authenticate())
+);
+
 //Serialize and deserialize both user types
 passport.serializeUser((user, done) => {
   done(null, { id: user.id, type: user.constructor.modelName });
@@ -132,6 +138,9 @@ passport.deserializeUser(async (obj, done) => {
     } else if (obj.type === "User") {
       const user = await User.findById(obj.id);
       return done(null, user);
+    } else if (obj.type === "Staff") {
+      const staff = await Staff.findById(obj.id);
+      return done(null, staff);
     }
   } catch (err) {
     done(err);
@@ -201,13 +210,14 @@ app.get("/login", (req, res) => {
   res.render("users/login");
 });
 
-app.post("/login", (req, res, next) => {
-  const { email } = req.body;
+app.post("/login", async (req, res, next) => {
+  try {
+    const { email } = req.body;
 
-  // Check if this email belongs to a SuperAdmin
-  SuperAdmin.findOne({ email }).then((admin) => {
+    // Check SuperAdmin first
+    const admin = await SuperAdmin.findOne({ email });
     if (admin) {
-      passport.authenticate("admin-local", (err, user, info) => {
+      return passport.authenticate("admin-local", (err, user, info) => {
         if (err) return next(err);
         if (!user) {
           req.flash("error", "Invalid credentials for Super Admin");
@@ -219,40 +229,63 @@ app.post("/login", (req, res, next) => {
           return res.redirect("/admin-dashboard");
         });
       })(req, res, next);
-    } else {
-      // Otherwise, try normal user login
-      passport.authenticate("user-local", async (err, user, info) => {
+    }
+
+    // Check Staff
+    const staff = await Staff.findOne({ email });
+    if (staff) {
+      return passport.authenticate("staff-local", (err, user, info) => {
         if (err) return next(err);
         if (!user) {
-          req.flash("success", "Invalid credentials for User");
+          req.flash("error", "Invalid credentials for Staff");
           return res.redirect("/login");
         }
-        req.logIn(user, async (err) => {
+        req.logIn(user, (err) => {
           if (err) return next(err);
-
-          // ✅ Find user's first branch after login
-          const firstBranch = await Branch.findOne({ owner: user._id });
-
-          if (firstBranch) {
-            req.flash("success", `Welcome back, ${user.username}`);
-            return res.redirect(`/dashboard/${firstBranch._id}`);
-          } else {
-            // If no branch exists, redirect to add branch
-            req.flash("error", "Please create a branch first");
-            return res.redirect("/add-branch");
-          }
+          req.flash("success", `Welcome, ${user.name}`);
+          return res.redirect(`/dashboard/${user.branch}`);
         });
       })(req, res, next);
     }
-  });
+
+    // Try regular User login
+    return passport.authenticate("user-local", async (err, user, info) => {
+      if (err) return next(err);
+      if (!user) {
+        req.flash("error", "Invalid email or password");
+        return res.redirect("/login");
+      }
+
+      req.logIn(user, async (err) => {
+        if (err) return next(err);
+        const firstBranch = await Branch.findOne({ owner: user._id });
+
+        if (firstBranch) {
+          req.flash("success", `Welcome back, ${user.username}`);
+          return res.redirect(`/dashboard/${firstBranch._id}`);
+        }
+
+        req.flash("error", "Please create a branch first");
+        return res.redirect("/add-branch");
+      });
+    })(req, res, next);
+  } catch (err) {
+    console.error("Login error:", err);
+    next(err);
+  }
 });
 
 // ========== DASHBOARD ROUTE ==========
-// Old route - redirect to first branch
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   try {
     if (req.user.role === "superadmin") return res.redirect("/admin-dashboard");
 
+    // Check if user is Staff (by checking if they have a branch field assigned)
+    if (req.user.branch && req.user.constructor.modelName === "Staff") {
+      return res.redirect(`/dashboard/${req.user.branch}`);
+    }
+
+    // For regular Users (restaurant owners)
     const ownerId = req.user._id;
     const firstBranch = await Branch.findOne({ owner: ownerId });
 
@@ -268,7 +301,6 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
   }
 });
 
-// New route with branchId
 app.get(
   "/dashboard/:branchId",
   isLoggedIn,
@@ -278,8 +310,53 @@ app.get(
       if (req.user.role === "superadmin")
         return res.redirect("/admin-dashboard");
 
-      const ownerId = req.user._id;
       const { branchId } = req.params;
+      let userPermissions = null;
+      let hotelAdmin = null;
+
+      // Check if user is Staff
+      if (req.user.constructor.modelName === "Staff") {
+        // Verify staff member is assigned to this branch
+        if (req.user.branch.toString() !== branchId) {
+          req.flash("error", "Access denied to this branch");
+          return res.redirect(`/dashboard/${req.user.branch}`);
+        }
+
+        // Get the branch details with owner populated
+        const branch = await Branch.findById(branchId).populate(
+          "owner",
+          "username restaurantName email"
+        );
+
+        if (!branch) {
+          req.flash("error", "Branch not found");
+          return res.redirect("/login");
+        }
+
+        // Fetch permissions for this staff member's role
+        const permissionDoc = await Permission.findOne({
+          branch: branchId,
+          role: req.user.role,
+        });
+
+        userPermissions = permissionDoc ? permissionDoc.permissions : {};
+        hotelAdmin = branch.owner;
+
+        // Staff only see their assigned branch (no dropdown needed)
+        return res.render("layouts/dashboard.ejs", {
+          user: req.user,
+          branches: [branch], // Single branch in array for consistency
+          branch,
+          branchId: branch._id.toString(),
+          isStaff: true,
+          userPermissions,
+          userRole: req.user.role,
+          hotelAdmin,
+        });
+      }
+
+      // For regular Users (restaurant owners)
+      const ownerId = req.user._id;
 
       // Get all branches for the dropdown
       const branches = await Branch.find({ owner: ownerId }).populate(
@@ -288,7 +365,10 @@ app.get(
       );
 
       // Verify the requested branch belongs to this user
-      const branch = await Branch.findOne({ _id: branchId, owner: ownerId });
+      const branch = await Branch.findOne({
+        _id: branchId,
+        owner: ownerId,
+      }).populate("owner", "username restaurantName email");
 
       if (!branch) {
         req.flash("error", "Branch not found or access denied");
@@ -299,14 +379,22 @@ app.get(
         return res.redirect("/add-branch");
       }
 
+      // Hotel Admin (owner) has all permissions
+      hotelAdmin = branch.owner;
+
       res.render("layouts/dashboard.ejs", {
         user: req.user,
         branches,
         branch,
         branchId: branch._id.toString(),
+        isStaff: false,
+        userPermissions: null, // Hotel Admin doesn't need permission object
+        userRole: req.user.role,
+        hotelAdmin,
       });
     } catch (err) {
       console.error("Error loading dashboard:", err);
+      req.flash("error", "Error loading dashboard");
       res.redirect("/");
     }
   }
@@ -341,42 +429,42 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
   }
 });
 
-// app.get("/admin-dashboard", isLoggedIn, async (req, res) => {
-//   try {
-//     if (req.user.role !== "superadmin") {
-//       req.flash("error", "Access denied!");
-//       return res.redirect("/login");
-//     }
+app.get("/admin-dashboard", isLoggedIn, async (req, res) => {
+  try {
+    if (req.user.role !== "superadmin") {
+      req.flash("error", "Access denied!");
+      return res.redirect("/login");
+    }
 
-//     const allUsers = await User.find({})
-//       .select("restaurantName username email")
-//       .lean();
+    const allUsers = await User.find({})
+      .select("restaurantName username email")
+      .lean();
 
-//     const allBranches = await Branch.find({})
-//       .populate("owner", "restaurantName username email")
-//       .lean();
+    const allBranches = await Branch.find({})
+      .populate("owner", "restaurantName username email")
+      .lean();
 
-//     const usersWithBranchCount = allUsers.map((user) => {
-//       const count = allBranches.filter(
-//         (branch) =>
-//           branch.owner && branch.owner._id.toString() === user._id.toString()
-//       ).length;
+    const usersWithBranchCount = allUsers.map((user) => {
+      const count = allBranches.filter(
+        (branch) =>
+          branch.owner && branch.owner._id.toString() === user._id.toString()
+      ).length;
 
-//       return { ...user, branchCount: count };
-//     });
+      return { ...user, branchCount: count };
+    });
 
-//     // Render to EJS
-//     res.render("./layouts/super-admin-dashboard.ejs", {
-//       admin: req.user,
-//       users: usersWithBranchCount,
-//       branches: allBranches,
-//     });
-//   } catch (err) {
-//     console.error("Error loading admin dashboard:", err);
-//     req.flash("success", "Something went wrong while loading dashboard!");
-//     res.redirect("/login");
-//   }
-// });
+    // Render to EJS
+    res.render("./layouts/super-admin-dashboard.ejs", {
+      admin: req.user,
+      users: usersWithBranchCount,
+      branches: allBranches,
+    });
+  } catch (err) {
+    console.error("Error loading admin dashboard:", err);
+    req.flash("success", "Something went wrong while loading dashboard!");
+    res.redirect("/login");
+  }
+});
 
 //-----------------Menu--------------------------
 
@@ -2010,9 +2098,6 @@ app.get("/showStaff/:branchId", isLoggedIn, async (req, res) => {
   try {
     const branchId = req.params.branchId;
 
-    // Verify user has access to this branch (optional - add your own logic)
-    // For example, check if user is admin or belongs to this branch
-
     // Fetch staff for the specific branch
     const staff = await Staff.find({ branch: branchId })
       .select("-password")
@@ -2020,6 +2105,7 @@ app.get("/showStaff/:branchId", isLoggedIn, async (req, res) => {
 
     // Fetch branch details
     const branch = await Branch.findById(branchId);
+    const hotelAdmin = await User.findById(branch.owner);
 
     // Fetch all branches for dropdown (if needed)
     const branches = await Branch.find({});
@@ -2028,6 +2114,7 @@ app.get("/showStaff/:branchId", isLoggedIn, async (req, res) => {
       staff: staff,
       currentUserId: req.user._id.toString(),
       currentUser: req.user,
+      hotelAdmin,
       branchId: branchId,
       branch: branch,
       branches: branches,

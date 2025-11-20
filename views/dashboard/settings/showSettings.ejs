@@ -1,729 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rajbhog - Restaurant Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        safelist: [
-          "bg-green-500",
-          "bg-gray-300",
-          "translate-x-5",
-          "translate-x-0",
-        ],
-      };
-    </script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rajbhog - Restaurant Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      safelist: [
+        "bg-green-500",
+        "bg-gray-300",
+        "translate-x-5",
+        "translate-x-0",
+      ],
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <style>
-      body {
-        font-family: "Inter", sans-serif;
-      }
-      .sidebar-backdrop {
-        transition: opacity 0.3s ease;
-      }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .sidebar-backdrop {
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar {
+      transition: transform 0.3s ease;
+    }
+
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .submenu.open {
+      max-height: 500px;
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
       .sidebar {
-        transition: transform 0.3s ease;
-      }
-      .submenu {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out;
-      }
-      .submenu.open {
-        max-height: 500px;
-      }
-      .loading {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 50;
-        align-items: center;
-        justify-content: center;
-      }
-      .loading.active {
-        display: flex;
+        width: 280px;
+        max-width: 85vw;
       }
 
-      /* Mobile optimizations */
-      @media (max-width: 640px) {
-        .sidebar {
-          width: 280px;
-          max-width: 85vw;
-        }
-
-        html {
-          scroll-behavior: smooth;
-        }
-
-        button,
-        a {
-          min-height: 44px;
-        }
+      html {
+        scroll-behavior: smooth;
       }
 
-      @media (max-width: 640px) {
-        select {
-          font-size: 14px;
-        }
+      button,
+      a {
+        min-height: 44px;
       }
+    }
 
-      .sidebar nav {
-        -webkit-user-select: none;
-        user-select: none;
+    @media (max-width: 640px) {
+      select {
+        font-size: 14px;
       }
-    </style>
-  </head>
-  <body class="bg-gray-50">
-    <!-- Settings Section - To be loaded in dashboard-content -->
-    <div class="settings-wrapper">
-      <!-- Settings Navigation Tabs -->
-      <div class="bg-white border-b border-gray-200 mb-6">
-        <nav
-          class="flex flex-wrap gap-x-4 gap-y-2 px-6"
-          aria-label="Settings tabs"
-        >
-          <button
-            onclick="showTab('restaurant-info')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-orange-500 text-orange-600"
-            data-tab="restaurant-info"
-          >
-            Restaurant Information
-          </button>
-          <button
-            onclick="showTab('app-settings')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="app-settings"
-          >
-            App Settings
-          </button>
-          <button
-            onclick="showTab('branch-settings')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="branch-settings"
-          >
-            Branch Settings
-          </button>
-          <button
-            onclick="showTab('currencies')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="currencies"
-          >
-            Currencies
-          </button>
-          <button
-            onclick="showTab('email-settings')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="email-settings"
-          >
-            Email Settings
-          </button>
-          <button
-            onclick="showTab('taxes')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="taxes"
-          >
-            Taxes
-          </button>
-          <button
-            onclick="showTab('payment-gateways')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="payment-gateways"
-          >
-            Payment Gateways
-          </button>
-          <button
-            onclick="showTab('theme-settings')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="theme-settings"
-          >
-            Theme Settings
-          </button>
-          <button
-            onclick="showTab('staff-roles')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="staff-roles"
-          >
-            Staff Roles
-          </button>
-          <button
-            onclick="showTab('billing')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="billing"
-          >
-            Billing
-          </button>
-          <button
-            onclick="showTab('reservation-settings')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="reservation-settings"
-          >
-            Reservation Settings
-          </button>
-          <button
-            onclick="showTab('About-Us')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="About-Us"
-          >
-            About Us
-          </button>
-          <button
-            onclick="showTab('Customer-Site')"
-            class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
-            data-tab="Customer-Site"
-          >
-            Customer Site
-          </button>
-        </nav>
-      </div>
+    }
 
-      <!-- Settings Content Container -->
-      <div class="px-6 pb-8">
-        <!-- Restaurant Information Tab -->
-        <%- include("../settings/restaurant-info") %>
+    .sidebar nav {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Settings Section - To be loaded in dashboard-content -->
+  <div class="settings-wrapper">
+    <!-- Settings Navigation Tabs -->
+    <div class="bg-white border-b border-gray-200 mb-6">
+      <nav class="flex flex-wrap gap-x-4 gap-y-2 px-6" aria-label="Settings tabs">
+        <button onclick="showTab('restaurant-info')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-orange-500 text-orange-600"
+          data-tab="restaurant-info">
+          Restaurant Information
+        </button>
+        <button onclick="showTab('app-settings')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="app-settings">
+          App Settings
+        </button>
+        <button onclick="showTab('branch-settings')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="branch-settings">
+          Branch Settings
+        </button>
+        <button onclick="showTab('currencies')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="currencies">
+          Currencies
+        </button>
+        <button onclick="showTab('email-settings')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="email-settings">
+          Email Settings
+        </button>
+        <button onclick="showTab('taxes')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="taxes">
+          Taxes
+        </button>
+        <button onclick="showTab('payment-gateways')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="payment-gateways">
+          Payment Gateways
+        </button>
+        <button onclick="showTab('theme-settings')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="theme-settings">
+          Theme Settings
+        </button>
+        <button onclick="showTab('staff-roles')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="staff-roles">
+          Staff Roles
+        </button>
+        <button onclick="showTab('billing')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="billing">
+          Billing
+        </button>
+        <button onclick="showTab('reservation-settings')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="reservation-settings">
+          Reservation Settings
+        </button>
+        <button onclick="showTab('About-Us')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="About-Us">
+          About Us
+        </button>
+        <button onclick="showTab('Customer-Site')"
+          class="settings-tab whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 border-transparent text-gray-500"
+          data-tab="Customer-Site">
+          Customer Site
+        </button>
+      </nav>
+    </div>
+
+    <!-- Settings Content Container -->
+    <div class="px-6 pb-8">
+      <!-- Restaurant Information Tab -->
+      <%- include("../settings/restaurant-info", { hotelAdmin}) %>
 
         <!-- App Settings Tab -->
         <%- include("../settings/app-settings") %>
 
-        <!-- Branch Settings Tab -->
-        <%- include("../settings/branch-settings") %>
+          <!-- Branch Settings Tab -->
+          <%- include("../settings/branch-settings") %>
 
-        <!-- Currencies Tab -->
-        <%- include("../settings/currencies") %>
+            <!-- Currencies Tab -->
+            <%- include("../settings/currencies") %>
 
-        <!-- Email Settings Tab -->
-        <%- include("../settings/email-settings") %>
-        <!-- Taxes Tab -->
-        <%- include("../settings/taxes") %>
-        <!-- Payment Gateway -->
-        <%- include("../settings/payment-gateway") %>
+              <!-- Email Settings Tab -->
+              <%- include("../settings/email-settings") %>
+                <!-- Taxes Tab -->
+                <%- include("../settings/taxes") %>
+                  <!-- Payment Gateway -->
+                  <%- include("../settings/payment-gateway") %>
 
-        <!-- Theme Settings -->
-        <%- include("../settings/theme-settings") %>
+                    <!-- Theme Settings -->
+                    <%- include("../settings/theme-settings") %>
 
-        <!-- Staff Role Permissions Tab -->
-        <%- include("../settings/staff-roles") %>
+                      <!-- Staff Role Permissions Tab -->
+                      <%- include("../settings/staff-roles") %>
 
-        <!-- Billing Tab -->
-        <%- include("../settings/billing") %>
+                        <!-- Billing Tab -->
+                        <%- include("../settings/billing") %>
 
-        <!-- Billing Tab -->
-        <%- include("../settings/reservation-settings") %>
+                          <!-- Billing Tab -->
+                          <%- include("../settings/reservation-settings") %>
 
-        <!-- About Us -->
-        <%- include("../settings/aboutUs") %>
-        <!-- About Us -->
-        <%- include("../settings/customer-site-settings") %>
-      </div>
+                            <!-- About Us -->
+                            <%- include("../settings/aboutUs") %>
+                              <!-- About Us -->
+                              <%- include("../settings/customer-site-settings") %>
     </div>
+  </div>
 
-    <!-- Modals -->
+  <!-- Modals -->
 
-    <!-- Add Branch Modal -->
-    <div
-      id="addBranchModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Add Branch</h3>
-          <button
-            onclick="closeAddBranchModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <form
-          action="/dashboard/<%= branchId %>/settings/branch/add"
-          method="POST"
-        >
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Branch Name</label
-              >
-              <input
-                type="text"
-                name="branchName"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Branch Address</label
-              >
-              <textarea
-                name="address"
-                rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              ></textarea>
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeAddBranchModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Add Branch
-              </button>
-            </div>
+  <!-- Add Branch Modal -->
+  <div id="addBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Add Branch</h3>
+        <button onclick="closeAddBranchModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form action="/dashboard/<%= branchId %>/settings/branch/add" method="POST">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+            <input type="text" name="branchName"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Edit Branch Modal -->
-    <div
-      id="editBranchModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Edit Branch</h3>
-          <button
-            onclick="closeEditBranchModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <form id="editBranchForm" method="POST">
-          <input type="hidden" name="_method" value="PUT" />
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Branch Name</label
-              >
-              <input
-                type="text"
-                id="editBranchName"
-                name="branchName"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Branch Address</label
-              >
-              <textarea
-                id="editBranchAddress"
-                name="address"
-                rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              ></textarea>
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeEditBranchModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Update Branch
-              </button>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Branch Address</label>
+            <textarea name="address" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required></textarea>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Add Currency Modal -->
-    <div
-      id="addCurrencyModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Add Currency</h3>
-          <button
-            onclick="closeAddCurrencyModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <form
-          action="/dashboard/<%= branchId %>/settings/currency/add"
-          method="POST"
-        >
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Name</label
-              >
-              <input
-                type="text"
-                name="name"
-                placeholder="e.g., Rupee"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Symbol</label
-              >
-              <input
-                type="text"
-                name="symbol"
-                placeholder="e.g., ₹"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Code</label
-              >
-              <input
-                type="text"
-                name="code"
-                placeholder="e.g., INR"
-                maxlength="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeAddCurrencyModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Add Currency
-              </button>
-            </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeAddBranchModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Add Branch
+            </button>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Edit Currency Modal -->
-    <div
-      id="editCurrencyModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Edit Currency</h3>
-          <button
-            onclick="closeEditCurrencyModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
         </div>
-        <form id="editCurrencyForm" method="POST">
-          <input type="hidden" name="_method" value="PUT" />
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Name</label
-              >
-              <input
-                type="text"
-                id="editCurrencyName"
-                name="name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Symbol</label
-              >
-              <input
-                type="text"
-                id="editCurrencySymbol"
-                name="symbol"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Currency Code</label
-              >
-              <input
-                type="text"
-                id="editCurrencyCode"
-                name="code"
-                maxlength="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeEditCurrencyModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Update Currency
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Add Tax Modal -->
-    <div
-      id="addTaxModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Add Tax</h3>
-          <button
-            onclick="closeAddTaxModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <form
-          action="/dashboard/<%= branchId %>/settings/tax/add"
-          method="POST"
-        >
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Tax Name</label
-              >
-              <input
-                type="text"
-                name="name"
-                placeholder="e.g., GST"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Tax Percentage</label
-              >
-              <input
-                type="number"
-                name="percentage"
-                placeholder="e.g., 18"
-                min="0"
-                max="100"
-                step="0.01"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeAddTaxModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Add Tax
-              </button>
-            </div>
-          </div>
-        </form>
+  <!-- Edit Branch Modal -->
+  <div id="editBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Edit Branch</h3>
+        <button onclick="closeEditBranchModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+      <form id="editBranchForm" method="POST">
+        <input type="hidden" name="_method" value="PUT" />
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+            <input type="text" id="editBranchName" name="branchName"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Branch Address</label>
+            <textarea id="editBranchAddress" name="address" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required></textarea>
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeEditBranchModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Update Branch
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Edit Tax Modal -->
-    <div
-      id="editTaxModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white"
-      >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Edit Tax</h3>
-          <button
-            onclick="closeEditTaxModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <form id="editTaxForm" method="POST">
-          <input type="hidden" name="_method" value="PUT" />
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Tax Name</label
-              >
-              <input
-                type="text"
-                id="editTaxName"
-                name="name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Tax Percentage</label
-              >
-              <input
-                type="number"
-                id="editTaxPercentage"
-                name="percentage"
-                min="0"
-                max="100"
-                step="0.01"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                type="button"
-                onclick="closeEditTaxModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-              >
-                Update Tax
-              </button>
-            </div>
-          </div>
-        </form>
+  <!-- Add Currency Modal -->
+  <div id="addCurrencyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Add Currency</h3>
+        <button onclick="closeAddCurrencyModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+      <form action="/dashboard/<%= branchId %>/settings/currency/add" method="POST">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Name</label>
+            <input type="text" name="name" placeholder="e.g., Rupee"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Symbol</label>
+            <input type="text" name="symbol" placeholder="e.g., ₹"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
+            <input type="text" name="code" placeholder="e.g., INR" maxlength="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeAddCurrencyModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Add Currency
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
-  </body>
+  </div>
+
+  <!-- Edit Currency Modal -->
+  <div id="editCurrencyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Edit Currency</h3>
+        <button onclick="closeEditCurrencyModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="editCurrencyForm" method="POST">
+        <input type="hidden" name="_method" value="PUT" />
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Name</label>
+            <input type="text" id="editCurrencyName" name="name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Symbol</label>
+            <input type="text" id="editCurrencySymbol" name="symbol"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
+            <input type="text" id="editCurrencyCode" name="code" maxlength="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeEditCurrencyModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Update Currency
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Tax Modal -->
+  <div id="addTaxModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Add Tax</h3>
+        <button onclick="closeAddTaxModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form action="/dashboard/<%= branchId %>/settings/tax/add" method="POST">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Name</label>
+            <input type="text" name="name" placeholder="e.g., GST"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Percentage</label>
+            <input type="number" name="percentage" placeholder="e.g., 18" min="0" max="100" step="0.01"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeAddTaxModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Add Tax
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Tax Modal -->
+  <div id="editTaxModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Edit Tax</h3>
+        <button onclick="closeEditTaxModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="editTaxForm" method="POST">
+        <input type="hidden" name="_method" value="PUT" />
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Name</label>
+            <input type="text" id="editTaxName" name="name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Percentage</label>
+            <input type="number" id="editTaxPercentage" name="percentage" min="0" max="100" step="0.01"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              required />
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeEditTaxModal()"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+              Update Tax
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
 </html>

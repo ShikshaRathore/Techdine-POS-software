@@ -29,7 +29,7 @@ router.post("/settings/permissions", isLoggedIn, async (req, res) => {
     const { branchId } = req.params;
     const { role, permissions } = req.body;
 
-    const validRoles = ["Branch Head", "Chef", "Waiter"];
+    const validRoles = ["Branch-Head", "Chef", "Waiter"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role" });
     }
@@ -70,13 +70,13 @@ router.get("/settings/permissions", isLoggedIn, async (req, res) => {
   }
 });
 
-// ✅ NEW: Toggle single permission dynamically (used by frontend "+"/"-" button)
+// ✅ NEW: Toggle single permission dynamically
 router.post("/settings/permissions/update", isLoggedIn, async (req, res) => {
   try {
     const { branchId } = req.params;
     const { role, section, action, value } = req.body;
 
-    const validRoles = ["Branch Head", "Chef", "Waiter"];
+    const validRoles = ["Branch-Head", "Chef", "Waiter"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role" });
     }

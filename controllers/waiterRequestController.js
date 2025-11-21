@@ -12,7 +12,7 @@ exports.getNewRequest = async (req, res) => {
   try {
     const branchId = req.params.branchId;
 
-    console.log("🔵 API: Fetching pending requests for branch:", branchId);
+    console.log("API: Fetching pending requests for branch:", branchId);
 
     const requests = await WaiterRequest.find({
       branch: branchId,
@@ -24,7 +24,7 @@ exports.getNewRequest = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log(`✅ Found ${requests.length} pending requests`);
+    console.log(`Found ${requests.length} pending requests`);
 
     // Map to correct field names for frontend
     const mappedRequests = requests.map((req) => ({
@@ -40,7 +40,7 @@ exports.getNewRequest = async (req, res) => {
       requests: mappedRequests,
     });
   } catch (error) {
-    console.error("❌ Error fetching requests:", error);
+    console.error("Error fetching requests:", error);
     res.status(500).json({
       success: false,
       error: error.message,

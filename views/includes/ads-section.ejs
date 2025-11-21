@@ -1,0 +1,536 @@
+<!-- Hero Section / Ads Carousel -->
+<div class="relative w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+        <!-- Carousel Container -->
+        <div id="heroCarousel" class="relative h-48 sm:h-64 md:h-80 lg:h-96">
+            <!-- Loading skeleton -->
+            <div id="heroLoadingSkeleton"
+                class="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse">
+                <div class="absolute inset-0 flex items-end">
+                    <div class="w-full px-4 sm:px-6 md:px-8 lg:px-12 pb-6 sm:pb-8 md:pb-12">
+                        <div class="max-w-7xl mx-auto">
+                            <div class="h-8 bg-gray-400 rounded w-3/4 mb-3"></div>
+                            <div class="h-4 bg-gray-400 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slides will be dynamically inserted here -->
+        </div>
+
+        <!-- Navigation Dots -->
+        <div id="carouselDots" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+            <!-- Dots will be dynamically inserted here -->
+        </div>
+
+        <!-- Navigation Arrows (Desktop only) -->
+        <button id="prevSlide"
+            class="hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 items-center justify-center opacity-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+
+        <button id="nextSlide"
+            class="hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 items-center justify-center opacity-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Carousel Animations */
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOutLeft {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        to {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    #heroLoadingSkeleton {
+        animation: shimmer 2s infinite linear;
+        background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+        background-size: 1000px 100%;
+    }
+
+    .hero-slide {
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    .hero-slide.slide-out {
+        animation: slideOutLeft 0.6s ease-out;
+    }
+
+    /* Smooth video loading */
+    .hero-video {
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+    }
+
+    .hero-video.loaded {
+        opacity: 1;
+    }
+
+    /* Responsive text sizing */
+    .hero-heading {
+        font-size: clamp(1.25rem, 4vw, 2.5rem);
+        line-height: 1.2;
+    }
+
+    .hero-subheading {
+        font-size: clamp(0.875rem, 2vw, 1.125rem);
+    }
+
+    /* Dot animation */
+    .carousel-dot {
+        transition: all 0.3s ease;
+    }
+
+    .carousel-dot.active {
+        width: 2rem;
+    }
+
+    /* Overlay gradient for better text visibility */
+    .hero-overlay {
+        background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.7) 0%,
+                rgba(0, 0, 0, 0.3) 50%,
+                rgba(0, 0, 0, 0.1) 100%);
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .hero-overlay {
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 0.8) 0%,
+                    rgba(0, 0, 0, 0.4) 60%,
+                    rgba(0, 0, 0, 0.2) 100%);
+        }
+    }
+
+    /* Prevent layout shift */
+    #heroCarousel {
+        min-height: 6rem;
+    }
+
+    @media (min-width: 640px) {
+        #heroCarousel {
+            min-height: 8rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        #heroCarousel {
+            min-height: 20rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        #heroCarousel {
+            min-height: 16rem;
+        }
+    }
+</style>
+
+<script>
+    // ==================== HERO CAROUSEL CONFIGURATION ====================
+    const HERO_CONFIG = {
+        autoPlayInterval: 5000, // 5 seconds per slide
+        transitionDuration: 600, // Animation duration in ms
+        pauseOnHover: true,
+        enableSwipe: true, // Enable touch swipe on mobile
+    };
+
+    // ==================== HERO CAROUSEL STATE ====================
+    let heroSlides = [];
+    let currentSlideIndex = 0;
+    let autoPlayTimer = null;
+    let isTransitioning = false;
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let isInitialized = false;
+
+    // ==================== GET BRANCH ID FROM URL ====================
+    function getBranchIdFromURL() {
+        const pathParts = window.location.pathname.split("/");
+        const restaurantIndex = pathParts.indexOf("restaurant");
+
+        if (restaurantIndex !== -1 && pathParts[restaurantIndex + 1]) {
+            return pathParts[restaurantIndex + 1];
+        }
+
+        return null;
+    }
+
+
+    // ==================== FETCH HERO SLIDES (IMMEDIATE) ====================
+    (async function fetchHeroSlidesImmediately() {
+        const branchId = getBranchIdFromURL();
+
+        if (!branchId) {
+            console.warn('No branch ID found for hero section');
+            hideCarousel();
+            return;
+        }
+
+        try {
+            const response = await fetch(`/frontend-setting/hero-section/${branchId}/showAds`);
+            const data = await response.json();
+
+            if (data.success && data.heroSections && data.heroSections.length > 0) {
+                heroSlides = data.heroSections.sort((a, b) => a.order - b.order);
+                initializeHeroCarousel();
+            } else {
+                hideCarousel();
+            }
+        } catch (error) {
+            console.error('Error fetching hero sections:', error);
+            hideCarousel();
+        }
+    })();
+
+    // ==================== HIDE CAROUSEL ====================
+    function hideCarousel() {
+        const carouselContainer = document.getElementById('heroCarousel')?.parentElement;
+        if (carouselContainer) {
+            carouselContainer.style.display = 'none';
+        }
+    }
+
+    // ==================== INITIALIZE CAROUSEL ====================
+    function initializeHeroCarousel() {
+        if (heroSlides.length === 0 || isInitialized) return;
+
+        isInitialized = true;
+
+        // Remove loading skeleton
+        const skeleton = document.getElementById('heroLoadingSkeleton');
+        if (skeleton) {
+            skeleton.remove();
+        }
+
+        renderSlides();
+        renderDots();
+
+        // Show navigation arrows
+        const prevBtn = document.getElementById('prevSlide');
+        const nextBtn = document.getElementById('nextSlide');
+        if (prevBtn) prevBtn.style.opacity = '1';
+        if (nextBtn) nextBtn.style.opacity = '1';
+
+        setupEventListeners();
+
+        // Show first slide immediately
+        showSlide(0, true);
+
+        // Start autoplay
+        startAutoPlay();
+    }
+
+    // ==================== RENDER SLIDES ====================
+    function renderSlides() {
+        const carousel = document.getElementById('heroCarousel');
+        if (!carousel) return;
+
+        // Clear any existing content except skeleton (already removed)
+        const existingSlides = carousel.querySelectorAll('[data-slide-index]');
+        existingSlides.forEach(slide => slide.remove());
+
+        heroSlides.forEach((slide, index) => {
+            const slideEl = createSlideElement(slide, index);
+            carousel.appendChild(slideEl);
+        });
+    }
+
+    // ==================== CREATE SLIDE ELEMENT ====================
+    function createSlideElement(slide, index) {
+        const slideDiv = document.createElement('div');
+        slideDiv.className = 'absolute inset-0 w-full h-full opacity-0 transition-opacity duration-600';
+        slideDiv.dataset.slideIndex = index;
+
+        // Create clickable link wrapper
+        const link = document.createElement('a');
+        link.href = slide.link || '#';
+        link.className = 'block relative w-full h-full';
+        if (slide.link && slide.link !== '#') {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+        }
+
+        // Media element (video or image)
+        let mediaEl;
+        if (slide.type === 'video') {
+            mediaEl = document.createElement('video');
+            mediaEl.className = 'hero-video w-full h-full';
+            mediaEl.src = slide.mediaUrl;
+            mediaEl.autoplay = false;
+            mediaEl.loop = true;
+            mediaEl.muted = true;
+            mediaEl.playsInline = true;
+            mediaEl.preload = index === 0 ? 'auto' : 'metadata'; // Preload first video
+
+            // Handle video loading
+            mediaEl.addEventListener('loadeddata', () => {
+                mediaEl.classList.add('loaded');
+            });
+        } else {
+            mediaEl = document.createElement('img');
+            mediaEl.className = 'w-full h-full object-cover';
+            mediaEl.src = slide.mediaUrl;
+            mediaEl.alt = slide.heading;
+            mediaEl.loading = index === 0 ? 'eager' : 'lazy'; // Load first image immediately
+        }
+
+        // Overlay with text content
+        const overlay = document.createElement('div');
+        overlay.className = 'hero-overlay absolute inset-0 flex items-end';
+
+        const content = document.createElement('div');
+        content.className = 'w-full px-4 sm:px-6 md:px-8 lg:px-12 pb-6 sm:pb-8 md:pb-12';
+
+        content.innerHTML = `
+      <div class="max-w-7xl mx-auto">
+        <h2 class="hero-heading font-bold text-white mb-2 sm:mb-3 drop-shadow-lg">
+          ${escapeHtml(slide.heading)}
+        </h2>
+        ${slide.subHeading ? `
+          <p class="hero-subheading text-white/90 mb-3 sm:mb-4 drop-shadow-md max-w-2xl">
+            ${escapeHtml(slide.subHeading)}
+          </p>
+        ` : ''}
+        ${slide.link && slide.link !== '#' ? `
+          <span class="inline-flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+            <span class="text-sm sm:text-base">Learn More</span>
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </span>
+        ` : ''}
+      </div>
+    `;
+
+        overlay.appendChild(content);
+        link.appendChild(mediaEl);
+        link.appendChild(overlay);
+        slideDiv.appendChild(link);
+
+        return slideDiv;
+    }
+
+    // ==================== RENDER NAVIGATION DOTS ====================
+    function renderDots() {
+        if (heroSlides.length <= 1) return;
+
+        const dotsContainer = document.getElementById('carouselDots');
+        if (!dotsContainer) return;
+
+        dotsContainer.innerHTML = '';
+
+        heroSlides.forEach((_, index) => {
+            const dot = document.createElement('button');
+            dot.className = 'carousel-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white/80 transition-all duration-300';
+            dot.dataset.slideIndex = index;
+            dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+            dot.onclick = () => goToSlide(index);
+            dotsContainer.appendChild(dot);
+        });
+
+        updateDots();
+    }
+
+    // ==================== SHOW SLIDE ====================
+    function showSlide(index, immediate = false) {
+        if (!immediate && (isTransitioning || index === currentSlideIndex)) return;
+
+        isTransitioning = true;
+        const slides = document.querySelectorAll('#heroCarousel > div[data-slide-index]');
+        const currentSlide = slides[currentSlideIndex];
+        const nextSlide = slides[index];
+
+        // Fade out current slide
+        if (currentSlide && !immediate) {
+            currentSlide.style.opacity = '0';
+
+            // Handle video pause
+            const currentVideo = currentSlide.querySelector('video');
+            if (currentVideo) {
+                currentVideo.pause();
+            }
+        }
+
+        // Fade in next slide
+        const delay = immediate ? 0 : 100;
+        setTimeout(() => {
+            if (nextSlide) {
+                nextSlide.style.opacity = '1';
+
+                // Handle video play
+                const nextVideo = nextSlide.querySelector('video');
+                if (nextVideo) {
+                    nextVideo.play().catch(e => console.log('Video autoplay prevented:', e));
+                }
+            }
+
+            currentSlideIndex = index;
+            updateDots();
+
+            setTimeout(() => {
+                isTransitioning = false;
+            }, immediate ? 0 : HERO_CONFIG.transitionDuration);
+        }, delay);
+    }
+
+    // ==================== UPDATE DOTS ====================
+    function updateDots() {
+        const dots = document.querySelectorAll('.carousel-dot');
+        dots.forEach((dot, index) => {
+            if (index === currentSlideIndex) {
+                dot.classList.add('active', 'bg-white', 'w-8');
+                dot.classList.remove('bg-white/50');
+            } else {
+                dot.classList.remove('active', 'bg-white', 'w-8');
+                dot.classList.add('bg-white/50');
+            }
+        });
+    }
+
+    // ==================== NAVIGATION FUNCTIONS ====================
+    function nextSlide() {
+        const next = (currentSlideIndex + 1) % heroSlides.length;
+        goToSlide(next);
+    }
+
+    function prevSlide() {
+        const prev = (currentSlideIndex - 1 + heroSlides.length) % heroSlides.length;
+        goToSlide(prev);
+    }
+
+    function goToSlide(index) {
+        stopAutoPlay();
+        showSlide(index);
+        startAutoPlay();
+    }
+
+    // ==================== AUTO PLAY ====================
+    function startAutoPlay() {
+        if (heroSlides.length <= 1) return;
+
+        stopAutoPlay();
+        autoPlayTimer = setInterval(nextSlide, HERO_CONFIG.autoPlayInterval);
+    }
+
+    function stopAutoPlay() {
+        if (autoPlayTimer) {
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = null;
+        }
+    }
+
+    // ==================== TOUCH SWIPE SUPPORT ====================
+    function handleTouchStart(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }
+
+    function handleTouchEnd(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }
+
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                nextSlide(); // Swipe left
+            } else {
+                prevSlide(); // Swipe right
+            }
+        }
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    function setupEventListeners() {
+        const carousel = document.getElementById('heroCarousel');
+        const prevBtn = document.getElementById('prevSlide');
+        const nextBtn = document.getElementById('nextSlide');
+
+        // Navigation buttons
+        if (prevBtn) prevBtn.onclick = prevSlide;
+        if (nextBtn) nextBtn.onclick = nextSlide;
+
+        // Pause on hover (desktop)
+        if (HERO_CONFIG.pauseOnHover) {
+            carousel.addEventListener('mouseenter', stopAutoPlay);
+            carousel.addEventListener('mouseleave', startAutoPlay);
+        }
+
+        // Touch swipe (mobile)
+        if (HERO_CONFIG.enableSwipe) {
+            carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
+            carousel.addEventListener('touchend', handleTouchEnd, { passive: true });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+
+        // Pause when page is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        });
+    }
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>

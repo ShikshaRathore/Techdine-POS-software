@@ -31,6 +31,7 @@ const settingsRoutes = require("./routes/settingsRoutes");
 const paymentsRoutes = require("./routes/paymentsRoutes");
 const reportRoutes = require("./routes/reportRoutes.js");
 const waiterRequestRoutes = require("./routes/waiterRequestRoutes.js");
+const heroSectionRoutes = require("./routes/heroSectionRoutes");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -48,6 +49,7 @@ const Staff = require("./models/staff.js");
 const Tax = require("./models/tax.js");
 const Reservation = require("./models/reservation.js");
 const Permission = require("./models/permission.js");
+const menuItem = require("./models/menuItem.js");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -66,7 +68,6 @@ app.use(cookieParser());
 
 const multer = require("multer");
 const { storage } = require("./cloudConfig.js");
-const menuItem = require("./models/menuItem.js");
 const upload = multer({ storage });
 
 // ---------- Database ----------
@@ -172,6 +173,7 @@ app.use("/payments", paymentsRoutes);
 app.use("/dashboard/:branchId/settings", settingsRoutes);
 app.use("/reports", reportRoutes);
 app.use("/waiterRequest/:branchId", waiterRequestRoutes);
+app.use("/frontend-setting", heroSectionRoutes);
 //--------------API---------------------
 
 app.get("/", (req, res) => {

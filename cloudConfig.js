@@ -12,7 +12,8 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "Techdine_DEV",
-    allowedFormats: ["png", "jpg", "jpeg"], // supports promises as well
+    allowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "mp4", "webm", "ogg"], // supports promises as well
+    resource_type: "auto",
   },
 });
 

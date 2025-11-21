@@ -1,0 +1,25 @@
+<!-- Frontend-Setting -->
+<div class="menu-item content-form">
+    <a href="#"
+        class="menu-toggle flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all"
+        data-menu="frontend-setting">
+        <div class="flex items-center space-x-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            <span class="font-medium text-sm sm:text-base">Frontend-Setting</span>
+        </div>
+        <svg class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </a>
+    <div class="submenu pl-8" id="submenu-frontend-setting">
+        <form action="/frontend-setting/hero-section/<%= branchId %>" method="GET" class="content-form">
+            <button type="submit"
+                class="submenu-item flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-30 text-gray-300 hover:text-white transition-all w-full text-left">
+                <span class="font-medium text-sm">hero-section</span>
+            </button>
+        </form>
+    </div>
+</div>

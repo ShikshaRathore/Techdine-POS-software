@@ -52,6 +52,7 @@ const TableSessionService = require("../services/tableSessionService");
 const Branch = require("../models/branch");
 const MenuItem = require("../models/menuItem");
 const sendNotification = require("../utils/sendNotification");
+const Table = require("../models/table");
 
 /**
  * Customer site route - Initialize session when QR is scanned
@@ -318,6 +319,38 @@ router.get("/:branchId/session-status", async (req, res) => {
   } catch (error) {
     console.error("Error getting session status:", error);
     res.status(500).json({ success: false });
+  }
+});
+
+// routes/restaurant.js
+router.get("/:branchId/tables", async (req, res) => {
+  try {
+    const { branchId } = req.params;
+
+    const tables = await Table.find({ status: "Active" })
+      .populate({
+        path: "area",
+        match: { branch: branchId },
+        select: "name branch",
+      })
+      .select(
+        "tableCode seatingCapacity availabilityStatus status activeSession area"
+      )
+      .lean();
+
+    const filteredTables = tables.filter((table) => table.area !== null);
+
+    res.json({
+      success: true,
+      tables: filteredTables,
+      count: filteredTables.length,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch tables",
+      error: error.message,
+    });
   }
 });
 

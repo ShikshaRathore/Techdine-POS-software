@@ -524,10 +524,55 @@
         font-size: 0.938rem !important;
       }
     }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .popup-overlay {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .popup-content {
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 
 <body class="bg-white">
+  <!-- Table Selection Popup - Only shows when no table in URL -->
+  <div id="tableSelectionPopup"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 popup-overlay"
+    style="display: none;">
+    <%- include("../includes/selectTable") %>
+  </div>
   <!-- MOBILE NAVBAR -->
   <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm md:hidden">
     <div class="px-4 py-3">
@@ -1384,9 +1429,16 @@
                     fullURL: `${WAITER_API_BASE_URL}/waiterRequest/${branchId}/create`
                   });
 
-                  // Validation
-                  if (!tableCode) {
-                    showWaiterError('Table code not found in URL. Please scan the QR code again.');
+                  // Validation - Show table selection popup if no table info
+                  if (!tableCode || !tableId) {
+                    const tableSelectionPopup = document.getElementById('tableSelectionPopup');
+                    if (tableSelectionPopup) {
+                      tableSelectionPopup.style.display = 'flex';
+                      // Load tables if not already loaded
+                      if (typeof fetchTables === 'function') {
+                        fetchTables();
+                      }
+                    }
                     return;
                   }
 
@@ -1471,6 +1523,17 @@
                       hideWaiterPopup(popupId);
                     }
                   });
+                });
+              </script>
+              <script>
+                // Handle table selection popup visibility
+                document.addEventListener('DOMContentLoaded', function () {
+                  const tableSelectionPopup = document.getElementById('tableSelectionPopup');
+
+                  // Always hide popup on page load - let it be triggered only by user actions
+                  if (tableSelectionPopup) {
+                    tableSelectionPopup.style.display = 'none';
+                  }
                 });
               </script>
               <script src="/js/pages/customer-dashboard.js"></script>

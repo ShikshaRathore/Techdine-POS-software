@@ -32,6 +32,7 @@ const paymentsRoutes = require("./routes/paymentsRoutes");
 const reportRoutes = require("./routes/reportRoutes.js");
 const waiterRequestRoutes = require("./routes/waiterRequestRoutes.js");
 const heroSectionRoutes = require("./routes/heroSectionRoutes");
+const appSettingRoutes = require("./routes/appSettingRoutes.js");
 
 //-------------- Model -------------------
 const SuperAdmin = require("./models/superAdmin.js");
@@ -50,6 +51,7 @@ const Tax = require("./models/tax.js");
 const Reservation = require("./models/reservation.js");
 const Permission = require("./models/permission.js");
 const menuItem = require("./models/menuItem.js");
+const Purchase = require("./models/purchase");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -174,6 +176,7 @@ app.use("/dashboard/:branchId/settings", settingsRoutes);
 app.use("/reports", reportRoutes);
 app.use("/waiterRequest/:branchId", waiterRequestRoutes);
 app.use("/frontend-setting", heroSectionRoutes);
+app.use("/appSettings", appSettingRoutes);
 //--------------API---------------------
 
 app.get("/", (req, res) => {
@@ -407,10 +410,52 @@ app.get("/add-branch", isLoggedIn, (req, res) => {
 });
 
 // ========== ADD BRANCH ROUTE ==========
+// app.post("/add-branch", isLoggedIn, async (req, res) => {
+//   try {
+//     const { branchName, country, address, branchHead } = req.body;
+//     const ownerId = req.user._id;
+
+//     const newBranch = new Branch({
+//       branchName,
+//       country,
+//       address: address,
+//       owner: ownerId,
+//       branchHead: branchHead || null,
+//     });
+
+//     await newBranch.save();
+//     req.flash("success", "New Branch Created Successfully!");
+//     // ✅ Redirect to the new branch dashboard
+//     res.redirect(`/dashboard/${newBranch._id}`);
+//   } catch (err) {
+//     console.error(err);
+//     req.flash("error", "Failed to create branch!");
+//     res.redirect("/add-branch");
+//   }
+// });
+
 app.post("/add-branch", isLoggedIn, async (req, res) => {
   try {
     const { branchName, country, address, branchHead } = req.body;
     const ownerId = req.user._id;
+
+    // Find the default trial package
+    const trialPackage = await Package.findOne({
+      isTrial: true,
+      active: true,
+    });
+
+    if (!trialPackage) {
+      req.flash("error", "No trial package available. Please contact support.");
+      return res.redirect("/add-branch");
+    }
+
+    // Calculate package expiry date based on trial days
+    const packageStartDate = new Date();
+    const packageExpiryDate = new Date();
+    packageExpiryDate.setDate(
+      packageStartDate.getDate() + trialPackage.trialDays
+    );
 
     const newBranch = new Branch({
       branchName,
@@ -418,11 +463,38 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
       address: address,
       owner: ownerId,
       branchHead: branchHead || null,
+      package: trialPackage._id,
+      packageStartDate,
+      packageExpiryDate,
     });
 
     await newBranch.save();
-    req.flash("success", "New Branch Created Successfully!");
-    // ✅ Redirect to the new branch dashboard
+
+    // Generate unique transaction ID for trial
+    const transactionId = `TRIAL-${newBranch._id}-${Date.now()}`;
+
+    // Create purchase record for the trial package
+    const purchaseRecord = new Purchase({
+      userId: ownerId,
+      branchId: newBranch._id,
+      packageId: trialPackage._id,
+      packageName: trialPackage.name,
+      billingCycle: "trial",
+      paymentDate: packageStartDate,
+      nextPaymentDate: packageExpiryDate,
+      transactionId: transactionId,
+      paymentGateway: "offline", // or "free" for trial
+      amount: 0, // Trial is free
+      currency: "INR",
+      status: "completed",
+    });
+
+    await purchaseRecord.save();
+
+    req.flash(
+      "success",
+      `New Branch Created Successfully with ${trialPackage.trialDays}-day trial!`
+    );
     res.redirect(`/dashboard/${newBranch._id}`);
   } catch (err) {
     console.error(err);

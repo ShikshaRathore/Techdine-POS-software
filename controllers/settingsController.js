@@ -18,20 +18,30 @@ module.exports.showSettings = async (req, res) => {
     const { branchId } = req.params;
     const branch = await Branch.findById(branchId)
       .populate("owner")
-      .populate("currency");
+      .populate("currency")
+      .populate("package"); // ✅ Populate package
 
     if (!branch) {
       req.flash("error", "Branch not found");
       return res.redirect("/dashboard");
     }
 
+    // Verify user has access to this branch
     if (req.user.constructor.modelName === "Staff") {
-      // staff → only their assigned branch
-      allBranches = [await Branch.findById(req.user.branch)];
+      if (req.user.branch.toString() !== branchId) {
+        req.flash("error", "Access denied");
+        return res.redirect("/dashboard");
+      }
+      allBranches = [branch];
     } else {
-      // admin → all branches they own
+      // Verify admin owns this branch
+      if (branch.owner._id.toString() !== req.user._id.toString()) {
+        req.flash("error", "Access denied");
+        return res.redirect("/dashboard");
+      }
       allBranches = await Branch.find({ owner: req.user._id });
     }
+
     const user = await User.findById(req.user._id);
     const hotelAdmin = branch.owner;
 
@@ -42,7 +52,7 @@ module.exports.showSettings = async (req, res) => {
       permissionsByRole[p.role] = p.permissions;
     });
 
-    const roles = ["Branch Head", "Chef", "Waiter"];
+    const roles = ["Branch-Head", "Chef", "Waiter"];
     roles.forEach((r) => {
       if (!permissionsByRole[r]) permissionsByRole[r] = {};
     });
@@ -66,26 +76,49 @@ module.exports.showSettings = async (req, res) => {
       };
     }
 
-    // ✅ BILLING DATA
+    // ✅ BILLING DATA - Branch-based
     const userId = req.user._id;
-    const currentSubscription = await UserSubscription.findOne({
-      userId,
-      status: { $in: ["active", "trial"] },
-    })
-      .populate("packageId")
-      .sort({ createdAt: -1 })
-      .limit(1);
 
-    const currentPackage = currentSubscription
-      ? currentSubscription.packageId
+    // Get current package from branch
+    const currentPackage = branch.package;
+
+    // Calculate subscription status
+    const now = new Date();
+    const isExpired =
+      branch.packageExpiryDate && now > branch.packageExpiryDate;
+    const daysRemaining = branch.packageExpiryDate
+      ? Math.ceil((branch.packageExpiryDate - now) / (1000 * 60 * 60 * 24))
       : null;
 
-    const purchaseHistory = await Purchase.find({ userId })
+    const currentSubscription = {
+      packageId: branch.package,
+      packageStartDate: branch.packageStartDate,
+      packageExpiryDate: branch.packageExpiryDate,
+      status: isExpired
+        ? "expired"
+        : currentPackage?.isTrial
+        ? "trial"
+        : "active",
+      daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
+      isExpired,
+      branchId: branch._id,
+      branchName: branch.branchName,
+    };
+
+    // Get purchase history for this branch
+    const purchaseHistory = await Purchase.find({
+      branchId,
+      userId,
+    })
       .populate("packageId")
       .sort({ createdAt: -1 })
       .limit(50);
 
-    const offlineRequests = await OfflineRequest.find({ userId })
+    // Get offline requests for this branch
+    const offlineRequests = await OfflineRequest.find({
+      branchId,
+      userId,
+    })
       .populate("packageId")
       .sort({ createdAt: -1 });
 
@@ -113,12 +146,12 @@ module.exports.showSettings = async (req, res) => {
       reservationSlots,
       customerSiteSettings,
       currencies,
-      taxes, // ✅ Add this
+      taxes,
     });
   } catch (error) {
     console.error("Error loading settings:", error);
     req.flash("error", "Error loading settings");
-    res.redirect(`/dashboard/${req.params.branchId}?section=${sectionName}`);
+    res.redirect(`/dashboard/${req.params.branchId}`);
   }
 };
 

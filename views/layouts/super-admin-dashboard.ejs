@@ -1,48 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %> - Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-  </head>
-  <body class="bg-gray-50">
-    <div class="flex h-screen overflow-hidden">
-      <!-- Sidebar -->
-      <%- include('../superAdmin/sidebar', { currentPage: page }) %>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= title %> - Admin Dashboard
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <%- include('../superAdmin/sidebar', { currentPage: page, appSettings: typeof appSettings !=='undefined' ?
+      appSettings : {} }) %>
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Header -->
         <%- include('../superAdmin/header') %>
+          <%- include("../includes/flash.ejs") %>
 
-        <!-- Content Area -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-          <% if (page === 'dashboard') { %> <%-
-          include('../superAdmin/dashboard-content', { stats: stats }) %> <% }
-          else if (page === 'restaurants') { %> <%-
-          include('../superAdmin/restaurants-content', { restaurants:
-          restaurants}) %> <% } else if (page === 'payments') { %> <%-
-          include('../superAdmin/payments-content',{ payments: payments }) %> <%
-          } else if (page === 'packages') { %> <%-
-          include('../superAdmin/packages-content', { packages: packages }) %>
-          <% } else if (page === 'billing') { %> <%-
-          include('../superAdmin/billing-content', { payments: payments }) %> <%
-          } else if (page === 'offline-request') { %> <%-
-          include('../superAdmin/offline-request-content') %> <% } else if (page
-          === 'landing-site') { %> <%-
-          include('../superAdmin/landing-site-content') %> <% } else if (page
-          === 'settings') { %> <%- include('../superAdmin/settings-content', {
-          currentTab: currentTab, appSettings: appSettings, emailSettings:
-          emailSettings, languages: languages, paymentGateways: paymentGateways,
-          pushNotifications: pushNotifications, currencies: currencies }) %> <%
-          } %>
-        </main>
+            <!-- Content Area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+              <% if (page==='dashboard' ) { %> <%- include('../superAdmin/dashboard-content', { stats: stats }) %>
+                  <% } else if (page==='restaurants' ) { %> <%- include('../superAdmin/restaurants-content', {
+                      restaurants: restaurants}) %>
+                      <% } else if (page==='payments' ) { %> <%- include('../superAdmin/payments-content',{ payments:
+                          payments }) %>
+                          <% } else if (page==='packages' ) { %> <%- include('../superAdmin/packages-content', {
+                              packages: packages }) %>
+                              <% } else if (page==='billing' ) { %>
+                                <%- include('../superAdmin/billing-content', { payments: payments,
+                                  showRestaurantDetails: showRestaurantDetails || false, restaurant: restaurant || null,
+                                  branches: branches || [], purchases: purchases || [], currentPackage: currentPackage
+                                  || null, currentPurchase: currentPurchase || null, trialExpiresOn: trialExpiresOn ||
+                                  null, totalOrders: totalOrders || 0 }) %>
+
+                                  <% } else if (page==='offline-request' ) { %> <%-
+                                      include('../superAdmin/offline-request-content') %>
+                                      <% } else if (page==='landing-site' ) { %> <%-
+                                          include('../superAdmin/landing-site-content') %>
+                                          <% } else if (page==='settings' ) { %> <%-
+                                              include('../superAdmin/settings-content', { currentTab: currentTab,
+                                              appSettings: appSettings, emailSettings: emailSettings, languages:
+                                              languages, paymentGateways: paymentGateways, pushNotifications:
+                                              pushNotifications, currencies: currencies }) %>
+                                              <% } %>
+            </main>
       </div>
-    </div>
-  </body>
+  </div>
+</body>
+
 </html>

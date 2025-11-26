@@ -1,75 +1,72 @@
 <aside class="w-64 bg-gray-800 text-white flex-shrink-0 overflow-y-auto">
   <div class="p-4">
     <div class="flex items-center gap-2 mb-8">
-      <div
-        class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center"
-      >
-        <i class="fas fa-utensils text-white"></i>
-      </div>
-      <span class="text-xl font-semibold">Techdine</span>
+
+      <% if (appSettings && appSettings.appLogo && appSettings.appLogo.url) { %>
+        <!-- If logo exists in AppSettings -->
+        <div class="w-10 h-10 rounded-lg overflow-hidden bg-white border">
+          <img src="<%= appSettings.appLogo.url %>" alt="<%= appSettings.appName || 'App Logo' %>"
+            class="w-full h-full object-cover" />
+        </div>
+        <% } else { %>
+          <!-- Default icon -->
+          <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-utensils text-white"></i>
+          </div>
+          <% } %>
+
+            <span class="text-xl font-semibold">
+              <%= appSettings?.appName || "Techdine" %>
+            </span>
     </div>
 
+
+
     <nav class="space-y-1">
-      <a
-        href="/admin-dashboard"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'dashboard' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'dashboard' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-home w-5"></i>
         <span>Dashboard</span>
       </a>
 
-      <a
-        href="/admin-dashboard/restaurants"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'restaurants' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/restaurants"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'restaurants' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-store w-5"></i>
         <span>Restaurants</span>
       </a>
 
-      <a
-        href="/admin-dashboard/payments"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'payments' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/payments"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'payments' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-credit-card w-5"></i>
         <span>Payments</span>
       </a>
 
-      <a
-        href="/admin-dashboard/packages"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'packages' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/packages"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'packages' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-box w-5"></i>
         <span>Packages</span>
       </a>
 
-      <a
-        href="/admin-dashboard/billing"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'billing' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/billing"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'billing' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-file-invoice-dollar w-5"></i>
         <span>Billing</span>
       </a>
 
-      <a
-        href="/admin-dashboard/offline-request"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'offline-request' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/offline-request"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'offline-request' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-clipboard-list w-5"></i>
         <span>Offline Request</span>
       </a>
 
-      <a
-        href="/admin-dashboard/landing-site"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'landing-site' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/landing-site"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'landing-site' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-globe w-5"></i>
         <span>Landing Site</span>
       </a>
 
-      <a
-        href="/admin-dashboard/settings"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'settings' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>"
-      >
+      <a href="/admin-dashboard/settings"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors <%= currentPage === 'settings' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %>">
         <i class="fas fa-cog w-5"></i>
         <span>Settings</span>
       </a>

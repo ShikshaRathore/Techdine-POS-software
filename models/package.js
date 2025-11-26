@@ -21,6 +21,9 @@ const packageSchema = new mongoose.Schema(
       },
     ],
 
+    additionalFeatures: [{ type: String }],
+    description: { type: String },
+
     active: { type: Boolean, default: true },
   },
   { timestamps: true }

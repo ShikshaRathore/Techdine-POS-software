@@ -17,6 +17,7 @@ const userSchema = new Schema(
       trim: true,
     },
     role: { type: String, default: "Hotel-Admin" },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

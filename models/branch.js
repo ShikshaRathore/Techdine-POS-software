@@ -17,6 +17,13 @@ const branchSchema = new Schema({
     ref: "Currency",
     required: true, // each branch must have a currency
   },
+  package: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+    required: true, // each branch must have a package
+  },
+  packageStartDate: { type: Date, default: Date.now },
+  packageExpiryDate: { type: Date },
   tax: [
     {
       type: mongoose.Schema.Types.ObjectId,

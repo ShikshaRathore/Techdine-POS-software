@@ -8,6 +8,11 @@ const purchaseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true, // Each purchase is associated with a branch
+    },
     packageId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Package",

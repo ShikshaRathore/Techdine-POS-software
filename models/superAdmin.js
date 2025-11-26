@@ -12,11 +12,12 @@ const superAdminSchema = new Schema({
     trim: true,
   },
   role: { type: String, default: "superadmin", immutable: true },
-  permissions: {
-    manageUsers: { type: Boolean, default: true },
-    manageBranches: { type: Boolean, default: true },
-    extendTrial: { type: Boolean, default: true },
-  },
+  adminActions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AppSettings",
+    },
+  ],
 });
 
 superAdminSchema.plugin(passportLocalMongoose, { usernameField: "email" });

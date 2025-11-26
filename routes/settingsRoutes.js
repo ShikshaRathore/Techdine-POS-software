@@ -95,8 +95,6 @@ router.post("/permissions/update", isLoggedIn, async (req, res) => {
   }
 });
 
-// In your settings routes file, add this line:
-
 // Reservation Slots Settings
 router.post(
   "/reservation-slots",

@@ -1,46 +1,94 @@
 const Branch = require("../models/branch");
 const User = require("../models/user");
+const Purchase = require("../models/purchase");
 const Package = require("../models/package");
+const Order = require("../models/order");
+const AppSettings = require("../models/appSettings");
 
-exports.getDashboard = (req, res) => {
-  res.render("layouts/super-admin-dashboard", {
-    page: "dashboard",
-    title: "Dashboard",
-    stats: {
-      todayCount: 0,
-      totalCount: 4,
-      freeCount: 4,
-      paidCount: 0,
-    },
-  });
+exports.getDashboard = async (req, res) => {
+  try {
+    const appSettings = await AppSettings.getSettings();
+
+    res.render("layouts/super-admin-dashboard", {
+      page: "dashboard",
+      title: "Dashboard",
+      appSettings,
+      stats: {
+        todayCount: 0,
+        totalCount: 4,
+        freeCount: 4,
+        paidCount: 0,
+      },
+    });
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+    res.status(500).send("Server Error");
+  }
 };
 
 exports.getRestaurants = async (req, res) => {
   try {
-    // find all branches
-    const branches = await Branch.find().populate("owner").lean();
+    // Find all users with role "Hotel-Admin" (restaurants)
+    const restaurants = await User.find({ role: "Hotel-Admin" })
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.render("layouts/super-admin-dashboard", {
       page: "restaurants",
       title: "Restaurants",
-      restaurants: branches, // sending branches to view
+      restaurants: restaurants, // sending users to view
     });
   } catch (err) {
-    console.log("Error fetching branches:", err);
+    console.log("Error fetching restaurants:", err);
     res.status(500).send("Internal Server Error");
   }
 };
 
-// exports.getRestaurants = (req, res) => {
-//   res.render("layouts/super-admin-dashboard", {
-//     page: "restaurants",
-//     title: "Restaurants",
-//     restaurants: [
-//       { id: 1, name: "Restaurant A", status: "Active" },
-//       { id: 2, name: "Restaurant B", status: "Inactive" },
-//     ],
-//   });
-// };
+// POST - Add new restaurant
+exports.addRestaurant = async (req, res) => {
+  try {
+    const { restaurantName, username, email, password, isActive } = req.body;
+
+    // Validation
+    if (!restaurantName || !username || !email || !password) {
+      req.flash("error", "All fields are required");
+      return res.redirect("/admin-dashboard/restaurants");
+    }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      req.flash("error", "Email already exists");
+      return res.redirect("/admin-dashboard/restaurants");
+    }
+
+    // Create new user with restaurant details
+    const newUser = new User({
+      restaurantName: restaurantName.trim(),
+      username: username.trim(),
+      email: email.toLowerCase().trim(),
+      role: "Hotel-Admin",
+      isActive: isActive === true || isActive === "true",
+    });
+
+    // Register user with password (passport-local-mongoose handles hashing)
+    await User.register(newUser, password);
+
+    req.flash("success", "Restaurant added successfully!");
+    res.redirect("/admin-dashboard/restaurants");
+  } catch (error) {
+    console.error("Error adding restaurant:", error);
+
+    // Handle specific mongoose errors
+    if (error.name === "ValidationError") {
+      req.flash("error", "Validation error: " + error.message);
+      return res.redirect("/admin-dashboard/restaurants");
+    }
+
+    req.flash("error", "Error adding restaurant. Please try again.");
+    res.redirect("/admin-dashboard/restaurants");
+  }
+};
 
 exports.getPayments = (req, res) => {
   res.render("layouts/super-admin-dashboard", {
@@ -126,29 +174,79 @@ exports.deletePackage = async (req, res) => {
   }
 };
 
+// Billing page with restaurant details - shows specific restaurant
 exports.getBilling = async (req, res) => {
   try {
-    // Get all Hotel-Admin users
+    // Get all Hotel-Admin users with their purchases
     const users = await User.find({ role: "Hotel-Admin" }).sort({
       createdAt: -1,
     });
 
-    const payments = users.map((user, index) => ({
-      id: index + 1,
-      restaurant: user.restaurantName || "-",
-      package: "Default",
-      cycle: "-",
-      paymentDate: "-",
-      nextPayment: "-",
-      transactionId: "-",
-      gateway: "offline",
-      amount: "-",
-    }));
+    // Fetch all purchases and populate package details
+    const allPurchases = await Purchase.find()
+      .populate("userId", "restaurantName email")
+      .populate("packageId")
+      .sort({ createdAt: -1 });
+
+    // Create a map of userId to their latest purchase
+    const userPurchaseMap = {};
+    allPurchases.forEach((purchase) => {
+      const userId = purchase.userId?._id.toString();
+      if (userId && !userPurchaseMap[userId]) {
+        userPurchaseMap[userId] = purchase;
+      }
+    });
+
+    // Map users to payment data
+    const payments = users.map((user, index) => {
+      const purchase = userPurchaseMap[user._id.toString()];
+
+      return {
+        id: index + 1,
+        userId: user._id,
+        restaurant: user.restaurantName || "-",
+        package: purchase?.packageName || "Default",
+        packageId: purchase?.packageId?._id,
+        isTrial: purchase?.packageId?.isTrial || false,
+        isLifetime: purchase?.billingCycle === "lifetime",
+        cycle: purchase?.billingCycle
+          ? purchase.billingCycle.charAt(0).toUpperCase() +
+            purchase.billingCycle.slice(1)
+          : "-",
+        paymentDate: purchase?.paymentDate
+          ? new Date(purchase.paymentDate).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+          : "-",
+        nextPayment: purchase?.nextPaymentDate
+          ? new Date(purchase.nextPaymentDate).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+          : "-",
+        transactionId: purchase?.transactionId || "-",
+        gateway: purchase?.paymentGateway || "offline",
+        amount: purchase?.amount ? `$${purchase.amount.toFixed(2)}` : "-",
+        currency: purchase?.currency || "USD",
+        status: purchase?.status || "pending",
+      };
+    });
 
     res.render("layouts/super-admin-dashboard", {
       page: "billing",
       title: "Billing",
       payments: payments,
+      showRestaurantDetails: false,
+      restaurant: null,
+      branches: [],
+      purchases: [],
+      currentPackage: null,
+      currentPurchase: null,
+      trialExpiresOn: null,
+      totalOrders: 0,
     });
   } catch (error) {
     console.error("Error fetching billing:", error);
@@ -156,9 +254,190 @@ exports.getBilling = async (req, res) => {
       page: "billing",
       title: "Billing",
       payments: [],
+      showRestaurantDetails: false,
+      restaurant: null,
+      branches: [],
+      purchases: [],
+      currentPackage: null,
+      currentPurchase: null,
+      trialExpiresOn: null,
+      totalOrders: 0,
     });
   }
 };
+
+// Billing page with restaurant details - shows specific restaurant
+exports.getRestaurantDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    console.log("=== Restaurant Details Route ===");
+    console.log("userId:", userId);
+
+    // 1. Fetch restaurant owner (Hotel-Admin)
+    const restaurant = await User.findById(userId).lean(); // Use .lean() for easier manipulation later
+
+    if (!restaurant) {
+      req.flash("error", "Restaurant not found");
+      return res.redirect("/admin-dashboard/billing");
+    }
+
+    // 2. Fetch all branches for this restaurant
+    const branches = await Branch.find({ owner: userId }).lean();
+    const branchIds = branches.map((b) => b._id); // Get IDs for aggregation
+
+    // 3. Count total orders for each branch using the Order model
+    const orderCounts = await Order.aggregate([
+      {
+        // Match orders belonging to any branch ID under this restaurant
+        $match: {
+          branch: { $in: branchIds },
+        },
+      },
+      {
+        // Group by branch ID and count the documents
+        $group: {
+          _id: "$branch",
+          totalOrders: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // 4. Create a map for quick lookup: { branchId: totalOrders }
+    const orderMap = orderCounts.reduce((acc, item) => {
+      acc[item._id.toString()] = item.totalOrders;
+      return acc;
+    }, {});
+
+    // 5. Merge order counts back into the branches array
+    const branchesWithOrders = branches.map((branch) => {
+      const branchIdString = branch._id.toString();
+
+      return {
+        ...branch,
+        // Attach the actual calculated total, defaulting to 0
+        totalOrders: orderMap[branchIdString] || 0,
+      };
+    });
+
+    // Fetch all purchases/payments
+    const purchases = await Purchase.find({ userId: userId })
+      .populate("packageId")
+      .sort({ createdAt: -1 });
+
+    // Get current active package (logic remains the same)
+    const currentPurchase = purchases.find(
+      (p) =>
+        p.status === "completed" &&
+        (!p.nextPaymentDate || p.nextPaymentDate > new Date())
+    );
+
+    let currentPackage = null;
+    let trialExpiresOn = null;
+
+    if (currentPurchase) {
+      currentPackage = await Package.findById(currentPurchase.packageId);
+
+      if (currentPackage && currentPackage.isTrial) {
+        trialExpiresOn = new Date(currentPurchase.paymentDate);
+        trialExpiresOn.setDate(
+          trialExpiresOn.getDate() + currentPackage.trialDays
+        );
+      }
+    }
+
+    // Count total orders across all branches (no longer needed, but kept for legacy)
+    const totalOrders = branchesWithOrders.reduce(
+      (sum, branch) => sum + (branch.totalOrders || 0),
+      0
+    );
+
+    // Render using the layout system with billing page
+    res.render("layouts/super-admin-dashboard", {
+      page: "billing",
+      title: `Billing - ${restaurant.restaurantName}`,
+      payments: [],
+      showRestaurantDetails: true,
+      restaurant: restaurant,
+      branches: branchesWithOrders, // <--- Use the array with actual order counts
+      purchases: purchases,
+      currentPackage: currentPackage,
+      currentPurchase: currentPurchase,
+      trialExpiresOn: trialExpiresOn,
+      totalOrders: totalOrders, // This now reflects the sum of actual orders
+      success: req.flash("success"),
+      error: req.flash("error"),
+    });
+  } catch (error) {
+    console.error("Error fetching restaurant details:", error);
+    req.flash("error", "Error loading restaurant details");
+    res.redirect("/admin-dashboard/billing");
+  }
+};
+
+// Extend trial functionality
+exports.extendTrial = async (req, res) => {
+  try {
+    const { userId } = req.params; // Changed from restaurantId to userId
+    const { days } = req.body;
+
+    const currentPurchase = await Purchase.findOne({
+      userId: userId, // Changed from restaurantId
+      status: "completed",
+    })
+      .populate("packageId")
+      .sort({ createdAt: -1 });
+
+    if (!currentPurchase || !currentPurchase.packageId.isTrial) {
+      req.flash("error", "No active trial found");
+      return res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
+    }
+
+    const newExpirationDate = new Date(
+      currentPurchase.nextPaymentDate || currentPurchase.paymentDate
+    );
+    newExpirationDate.setDate(newExpirationDate.getDate() + parseInt(days));
+
+    currentPurchase.nextPaymentDate = newExpirationDate;
+    await currentPurchase.save();
+
+    req.flash("success", `Trial extended by ${days} days`);
+    res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
+  } catch (error) {
+    console.error("Error extending trial:", error);
+    req.flash("error", "Error extending trial");
+    res.redirect(`/admin-dashboard/billing`);
+  }
+};
+
+// Toggle restaurant status
+exports.toggleRestaurantStatus = async (req, res) => {
+  try {
+    const { userId } = req.params; // Changed from restaurantId to userId
+
+    const restaurant = await User.findById(userId); // Changed from restaurantId
+    if (!restaurant) {
+      req.flash("error", "Restaurant not found");
+      return res.redirect("/admin-dashboard/billing");
+    }
+
+    restaurant.isActive = !restaurant.isActive;
+    await restaurant.save();
+
+    req.flash(
+      "success",
+      `Restaurant ${
+        restaurant.isActive ? "activated" : "deactivated"
+      } successfully`
+    );
+    res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
+  } catch (error) {
+    console.error("Error toggling restaurant status:", error);
+    req.flash("error", "Error updating restaurant status");
+    res.redirect(`/admin-dashboard/billing`);
+  }
+};
+
 exports.getOfflineRequest = (req, res) => {
   res.render("layouts/super-admin-dashboard", {
     page: "offline-request",
@@ -173,110 +452,96 @@ exports.getLandingSite = (req, res) => {
   });
 };
 
-exports.getSettings = (req, res) => {
-  res.render("layouts/super-admin-dashboard", {
-    page: "settings",
-    title: "Settings",
-    currentTab: req.query.tab || "app",
-    appSettings: {
-      /* same */
-    },
-    emailSettings: {
-      /* same */
-    },
-    languages: [
-      /* same */
-    ],
-    paymentGateways: {
-      /* same */
-    },
-    pushNotifications: {
-      /* same */
-    },
-    currencies: [
-      /* same */
-    ],
-  });
+exports.getSettings = async (req, res) => {
+  try {
+    // Ensure admin is logged in
+    if (!req.user) {
+      return res.redirect("/superadmin/login");
+    }
+
+    // Get the logged-in super admin details
+    const superAdmin = req.user;
+
+    // Get actual DB AppSettings document
+    const settings = await AppSettings.getSettings();
+
+    res.render("layouts/super-admin-dashboard", {
+      page: "settings",
+      title: "Settings",
+      currentTab: req.query.tab || "app",
+
+      // NEW: Passing super admin info to EJS
+      superAdmin,
+
+      // OLD: AppSettings data
+      appSettings: settings,
+      emailSettings: settings.emailSettings,
+      languages: settings.languages,
+      paymentGateways: settings.paymentGateways,
+      pushNotifications: settings.pushNotifications,
+      currencies: settings.currencies,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading settings");
+  }
 };
 
-// Update Restaurant
+// PUT - Update restaurant
 exports.updateRestaurant = async (req, res) => {
   try {
-    // Debug logs
-    console.log("Session exists:", !!req.session);
-    console.log("Session user:", req.user);
-    console.log("User role:", req.user?.role);
-    const { id } = req.params;
-    const { branchName, ownerEmail, isActive } = req.body;
+    const { userId } = req.params; // Changed from 'id' to 'userId'
+    const { restaurantName, username, email, isActive } = req.body;
 
-    // Check if user is authenticated
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. Please login.",
-      });
+    // Validation
+    if (!restaurantName || !username || !email) {
+      req.flash("error", "All fields are required");
+      return res.redirect("/admin-dashboard/restaurants");
     }
 
-    const currentUser = req.user;
+    // Get the current user to check if email is actually changing
+    const currentUser = await User.findById(userId); // Changed to userId
 
-    // Check if user is superAdmin
-    if (currentUser.role !== "superadmin") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Only Super Admin can edit restaurants.",
-      });
+    if (!currentUser) {
+      req.flash("error", "Restaurant not found");
+      return res.redirect("/admin-dashboard/restaurants");
     }
 
-    const branch = await Branch.findById(id).populate("owner");
-
-    if (!branch) {
-      return res.status(404).json({
-        success: false,
-        message: "Restaurant not found",
+    // Only check for duplicate email if the email is being changed
+    if (currentUser.email !== email.toLowerCase()) {
+      const existingUser = await User.findOne({
+        email: email.toLowerCase(),
       });
-    }
 
-    // If email is being changed, check if the new email exists and update owner
-    if (ownerEmail && ownerEmail !== branch.owner?.email) {
-      const newOwner = await User.findOne({ email: ownerEmail });
-      if (!newOwner) {
-        return res.status(404).json({
-          success: false,
-          message: "User with this email not found",
-        });
+      if (existingUser) {
+        req.flash("error", "Email already exists");
+        return res.redirect("/admin-dashboard/restaurants");
       }
-
-      branch.owner = newOwner._id;
     }
 
-    // Update branch details
-    if (branchName) branch.branchName = branchName;
-    if (typeof isActive !== "undefined") branch.isActive = isActive;
-
-    await branch.save();
-
-    // Populate owner details for response
-    await branch.populate("owner");
-
-    res.json({
-      success: true,
-      message: "Restaurant updated successfully",
-      branch: {
-        _id: branch._id,
-        branchName: branch.branchName,
-        isActive: branch.isActive,
-        owner: {
-          _id: branch.owner._id,
-          email: branch.owner.email,
-        },
+    // Update restaurant
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, // Changed to userId
+      {
+        restaurantName: restaurantName.trim(),
+        username: username.trim(),
+        email: email.toLowerCase().trim(),
+        isActive: isActive === true || isActive === "true",
       },
-    });
+      { new: true, runValidators: true }
+    );
+
+    req.flash("success", "Restaurant updated successfully!");
+    res.redirect("/admin-dashboard/restaurants");
   } catch (error) {
     console.error("Error updating restaurant:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error. Please try again later.",
-      error: error.message,
-    });
+
+    if (error.name === "ValidationError") {
+      req.flash("error", "Validation error: " + error.message);
+      return res.redirect("/admin-dashboard/restaurants");
+    }
+
+    req.flash("error", "Error updating restaurant. Please try again.");
+    res.redirect("/admin-dashboard/restaurants");
   }
 };

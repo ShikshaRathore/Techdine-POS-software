@@ -1,10 +1,19 @@
 let currentStatus = true;
 
-function openEditModal(id, name, email, isActive) {
-  document.getElementById("restaurantId").value = id;
-  document.getElementById("branchName").value = name;
-  document.getElementById("ownerEmail").value = email;
-  setStatus(isActive);
+function openEditModal(userId, restaurantName, username, email, isActive) {
+  // Set form action dynamically with the user ID
+  const form = document.getElementById("editRestaurantForm");
+  form.action = `/admin-dashboard/restaurants/edit/${userId}`;
+
+  document.getElementById("userId").value = userId;
+  document.getElementById("restaurantName").value = restaurantName;
+  document.getElementById("restaurantUsername").value = username;
+  document.getElementById("restaurantEmail").value = email;
+
+  // Convert string to boolean if needed
+  const isActiveBoolean = isActive === true || isActive === "true";
+  setStatus(isActiveBoolean);
+
   document.getElementById("editModal").classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
@@ -12,8 +21,6 @@ function openEditModal(id, name, email, isActive) {
 function closeEditModal() {
   document.getElementById("editModal").classList.add("hidden");
   document.body.style.overflow = "auto";
-  document.getElementById("errorMessage").classList.add("hidden");
-  document.getElementById("successMessage").classList.add("hidden");
 }
 
 function setStatus(isActive) {
@@ -36,63 +43,82 @@ function setStatus(isActive) {
   }
 }
 
-// Handle form submission
-document
-  .getElementById("editRestaurantForm")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const formData = {
-      branchName: document.getElementById("branchName").value,
-      ownerEmail: document.getElementById("ownerEmail").value,
-      isActive: document.getElementById("isActive").value === "true",
-    };
-
-    const restaurantId = document.getElementById("restaurantId").value;
-
-    try {
-      const response = await fetch(
-        `/admin-dashboard/edit-branch/${restaurantId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // Show success message
-        document.getElementById("successText").textContent =
-          result.message || "Restaurant updated successfully!";
-        document.getElementById("successMessage").classList.remove("hidden");
-        document.getElementById("errorMessage").classList.add("hidden");
-
-        // Reload page after 1.5 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        // Show error message
-        document.getElementById("errorText").textContent =
-          result.message || "Failed to update restaurant";
-        document.getElementById("errorMessage").classList.remove("hidden");
-        document.getElementById("successMessage").classList.add("hidden");
-      }
-    } catch (error) {
-      document.getElementById("errorText").textContent =
-        "An error occurred. Please try again.";
-      document.getElementById("errorMessage").classList.remove("hidden");
-      document.getElementById("successMessage").classList.add("hidden");
-    }
-  });
-
 // Close modal when clicking outside
 document.getElementById("editModal").addEventListener("click", function (e) {
   if (e.target === this) {
     closeEditModal();
   }
 });
+
+// Open Add Modal
+function openAddModal() {
+  document.getElementById("addModal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  // Set default status to active
+  setAddStatus(true);
+}
+
+// Close Add Modal
+function closeAddModal() {
+  document.getElementById("addModal").classList.add("hidden");
+  document.body.style.overflow = "auto";
+  document.getElementById("addRestaurantForm").reset();
+  setAddStatus(true); // Reset to active
+}
+
+// Set Status for Add Form
+function setAddStatus(isActive) {
+  const activeBtn = document.getElementById("addActiveBtn");
+  const inactiveBtn = document.getElementById("addInactiveBtn");
+  const statusInput = document.getElementById("addIsActive");
+
+  if (isActive) {
+    activeBtn.classList.add("border-orange-500", "bg-orange-50");
+    activeBtn.classList.remove("border-gray-300");
+    activeBtn.querySelector("span:last-child").classList.add("text-gray-900");
+    activeBtn
+      .querySelector("span:last-child")
+      .classList.remove("text-gray-600");
+
+    inactiveBtn.classList.remove("border-orange-500", "bg-orange-50");
+    inactiveBtn.classList.add("border-gray-300");
+    inactiveBtn
+      .querySelector("span:last-child")
+      .classList.remove("text-gray-900");
+    inactiveBtn.querySelector("span:last-child").classList.add("text-gray-600");
+
+    statusInput.value = "true";
+  } else {
+    inactiveBtn.classList.add("border-orange-500", "bg-orange-50");
+    inactiveBtn.classList.remove("border-gray-300");
+    inactiveBtn.querySelector("span:last-child").classList.add("text-gray-900");
+    inactiveBtn
+      .querySelector("span:last-child")
+      .classList.remove("text-gray-600");
+
+    activeBtn.classList.remove("border-orange-500", "bg-orange-50");
+    activeBtn.classList.add("border-gray-300");
+    activeBtn
+      .querySelector("span:last-child")
+      .classList.remove("text-gray-900");
+    activeBtn.querySelector("span:last-child").classList.add("text-gray-600");
+
+    statusInput.value = "false";
+  }
+}
+
+// Toggle Password Visibility
+function togglePassword() {
+  const passwordInput = document.getElementById("addPassword");
+  const icon = document.getElementById("togglePasswordIcon");
+
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye");
+  }
+}

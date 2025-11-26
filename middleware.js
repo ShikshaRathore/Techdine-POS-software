@@ -5,7 +5,7 @@ const Reservation = require("./models/reservation.js");
 // 🔹 Middleware 1: Auth check
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
-    req.flash("success", "You must be logged in!");
+    req.flash("error", "You must be logged in!");
     return res.redirect("/login");
   }
   next();
@@ -13,12 +13,23 @@ const isLoggedIn = (req, res, next) => {
 
 // Middleware to check if user is superAdmin
 const isSuperAdmin = (req, res, next) => {
-  if (req.user && req.user.role === "superadmin") {
-    return next();
-  }
+  try {
+    if (!req.user) {
+      req.flash("error", "Please login to continue");
+      return res.redirect("/login");
+    }
 
-  req.flash("success", "Login as Super Admin to continue to dashboard");
-  return res.redirect("/login");
+    if (req.user.role !== "superadmin") {
+      req.flash("error", "Access denied. Super Admin privileges required.");
+      return res.redirect("/admin-dashboard");
+    }
+
+    next();
+  } catch (error) {
+    console.error("Super Admin Middleware Error:", error);
+    req.flash("error", "Authorization error occurred");
+    res.redirect("/admin-dashboard");
+  }
 };
 
 // 🔹 Middleware 2: Attach statistics

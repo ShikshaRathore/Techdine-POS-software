@@ -1,119 +1,134 @@
 <!-- UPDATE MODAL -->
-<div
-  id="updatePackageModal"
-  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
->
-  <div
-    class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-  >
+<div id="updatePackageModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
     <div
-      class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl"
-    >
+      class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
       <h3 class="text-2xl font-bold text-gray-900">Update Package</h3>
-      <button
-        onclick="closeUpdateModal()"
-        class="text-gray-400 hover:text-gray-600 transition"
-      >
+      <button onclick="closeUpdateModal()" class="text-gray-400 hover:text-gray-600 transition">
         ✕
       </button>
     </div>
 
-    <form
-      action="/admin-dashboard/packages/update"
-      method="POST"
-      class="p-6 space-y-6"
-    >
+    <form action="/admin-dashboard/packages/update" method="POST" class="p-6 space-y-6">
       <input type="hidden" id="update_packageId" name="packageId" />
 
       <div>
         <label class="block font-medium text-gray-700 mb-1">Package Name</label>
-        <input
-          type="text"
-          id="update_packageName"
-          name="name"
-          required
-          class="border w-full px-4 py-2 rounded-lg"
-        />
+        <input type="text" id="update_packageName" name="name" required class="border w-full px-4 py-2 rounded-lg" />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-700 mb-1">Sort Order</label>
+        <input type="number" id="update_sortOrder" name="sortOrder" placeholder="Sort order number"
+          class="border w-full px-4 py-2 rounded-lg" />
       </div>
 
       <div class="grid grid-cols-3 gap-4">
-        <input
-          type="number"
-          id="update_monthlyPrice"
-          name="monthlyPrice"
-          placeholder="Monthly"
-          class="border w-full px-3 py-2 rounded"
-        />
-        <input
-          type="number"
-          id="update_annualPrice"
-          name="annualPrice"
-          placeholder="Annual"
-          class="border w-full px-3 py-2 rounded"
-        />
-        <input
-          type="number"
-          id="update_lifetimePrice"
-          name="lifetimePrice"
-          placeholder="Lifetime"
-          class="border w-full px-3 py-2 rounded"
-        />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Price</label>
+          <input type="number" id="update_monthlyPrice" name="monthlyPrice" placeholder="Monthly"
+            class="border w-full px-3 py-2 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Annual Price</label>
+          <input type="number" id="update_annualPrice" name="annualPrice" placeholder="Annual"
+            class="border w-full px-3 py-2 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lifetime Price</label>
+          <input type="number" id="update_lifetimePrice" name="lifetimePrice" placeholder="Lifetime"
+            class="border w-full px-3 py-2 rounded-lg" />
+        </div>
       </div>
 
-      <label class="flex items-center gap-2"
-        ><input
-          type="checkbox"
-          id="update_isRecommended"
-          name="isRecommended"
-        />
-        Recommended</label
-      >
-      <label class="flex items-center gap-2"
-        ><input type="checkbox" id="update_isTrial" name="isTrial" />
-        Trial</label
-      >
-      <input
-        type="number"
-        id="update_trialDays"
-        name="trialDays"
-        placeholder="Trial Days"
-        class="border w-full px-3 py-2 rounded"
-      />
-      <label class="flex items-center gap-2"
-        ><input type="checkbox" id="update_isPrivate" name="isPrivate" />
-        Private</label
-      >
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        <%
-        ["menu","staff","orders","table","kot","customer","payment","settings","waiter","menu-items","area","reservation","order","staff-mgmt","report","delivery"].forEach(function(m){
-        %>
-
-        <label class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="modules"
-            value="<%= m %>"
-            class="update-module-checkbox"
-          />
-          <span><%= m %></span>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+          <input type="checkbox" id="update_isRecommended" name="isRecommended" class="w-4 h-4" />
+          <span>Recommended</span>
         </label>
-        <% }) %>
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+          <input type="checkbox" id="update_isTrial" name="isTrial" class="w-4 h-4" />
+          <span>Trial</span>
+        </label>
+        <div id="update_trialDaysContainer" class="hidden ml-6">
+          <input type="number" id="update_trialDays" name="trialDays" placeholder="Trial Days"
+            class="border w-full px-4 py-2 rounded-lg" />
+        </div>
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+          <input type="checkbox" id="update_isPrivate" name="isPrivate" class="w-4 h-4" />
+          <span>Private</span>
+        </label>
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-700 mb-2">Select Modules for this package</label>
+        <label class="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded">
+          <input type="checkbox" id="update_selectAllModules" class="w-4 h-4" />
+          <span class="font-semibold">Select All</span>
+        </label>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <% [ {value: "menu" , label: "Menu" }, {value: "menu-items" , label: "Menu Item" }, {value: "customer" ,
+            label: "Item Category" }, {value: "area" , label: "Area" }, {value: "table" , label: "Table" },
+            {value: "reservation" , label: "Reservation" }, {value: "kot" , label: "KOT" }, {value: "orders" ,
+            label: "Order" }, {value: "customer" , label: "Customer" }, {value: "staff" , label: "Staff" },
+            {value: "payment" , label: "Payment" }, {value: "report" , label: "Report" }, {value: "settings" ,
+            label: "Settings" }, {value: "delivery" , label: "Delivery Executive" }, {value: "waiter" ,
+            label: "Waiter Request" } ].forEach(function(m){ %>
+            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+              <input type="checkbox" name="modules" value="<%= m.value %>" class="update-module-checkbox w-4 h-4" />
+              <span class="text-sm">
+                <%= m.label %>
+              </span>
+            </label>
+            <% }) %>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-700 mb-2">Select Additional Feature</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+            <input type="checkbox" name="additionalFeatures" value="changeBranch" id="update_changeBranch"
+              class="w-4 h-4" />
+            <span class="text-sm">Change Branch</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+            <input type="checkbox" name="additionalFeatures" value="exportReport" id="update_exportReport"
+              class="w-4 h-4" />
+            <span class="text-sm">Export Report</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+            <input type="checkbox" name="additionalFeatures" value="tableReservation" id="update_tableReservation"
+              class="w-4 h-4" />
+            <span class="text-sm">Table Reservation</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+            <input type="checkbox" name="additionalFeatures" value="paymentGateway" id="update_paymentGateway"
+              class="w-4 h-4" />
+            <span class="text-sm">Payment Gateway Integration</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+            <input type="checkbox" name="additionalFeatures" value="themeSetting" id="update_themeSetting"
+              class="w-4 h-4" />
+            <span class="text-sm">Theme Setting</span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-700 mb-1">Description</label>
+        <textarea id="update_description" name="description" rows="3" placeholder="Enter package description..."
+          class="border w-full px-4 py-2 rounded-lg resize-none"></textarea>
       </div>
 
       <div class="flex justify-end gap-3 pt-4 border-t">
-        <button
-          type="button"
-          onclick="closeUpdateModal()"
-          class="px-4 py-2 bg-gray-200 rounded"
-        >
+        <button type="button" onclick="closeUpdateModal()"
+          class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition">
           Cancel
         </button>
-        <button
-          type="submit"
-          class="px-6 py-2 bg-orange-500 text-white rounded"
-        >
-          Update
+        <button type="submit" class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition">
+          Save
         </button>
       </div>
     </form>
@@ -126,6 +141,7 @@
 
     document.getElementById("update_packageId").value = pkg._id;
     document.getElementById("update_packageName").value = pkg.name;
+    document.getElementById("update_sortOrder").value = pkg.sortOrder || "";
     document.getElementById("update_monthlyPrice").value =
       pkg.monthlyPrice || "";
     document.getElementById("update_annualPrice").value = pkg.annualPrice || "";
@@ -136,13 +152,74 @@
     document.getElementById("update_isTrial").checked = pkg.isTrial;
     document.getElementById("update_trialDays").value = pkg.trialDays || "";
     document.getElementById("update_isPrivate").checked = pkg.isPrivate;
+    document.getElementById("update_description").value = pkg.description || "";
 
-    document.querySelectorAll(".update-module-checkbox").forEach((cb) => {
-      cb.checked = pkg.modules.includes(cb.value);
+    // Show/hide trial days based on isTrial checkbox
+    const trialDaysContainer = document.getElementById("update_trialDaysContainer");
+    if (pkg.isTrial) {
+      trialDaysContainer.classList.remove("hidden");
+    } else {
+      trialDaysContainer.classList.add("hidden");
+    }
+
+    // Handle modules
+    const moduleCheckboxes = document.querySelectorAll(".update-module-checkbox");
+    moduleCheckboxes.forEach((cb) => {
+      cb.checked = pkg.modules && pkg.modules.includes(cb.value);
     });
+
+    // Check "Select All" if all modules are selected
+    const allChecked = Array.from(moduleCheckboxes).every(cb => cb.checked);
+    document.getElementById("update_selectAllModules").checked = allChecked;
+
+    // Handle additional features
+    if (pkg.additionalFeatures) {
+      document.getElementById("update_changeBranch").checked = pkg.additionalFeatures.includes("changeBranch");
+      document.getElementById("update_exportReport").checked = pkg.additionalFeatures.includes("exportReport");
+      document.getElementById("update_tableReservation").checked = pkg.additionalFeatures.includes("tableReservation");
+      document.getElementById("update_paymentGateway").checked = pkg.additionalFeatures.includes("paymentGateway");
+      document.getElementById("update_themeSetting").checked = pkg.additionalFeatures.includes("themeSetting");
+    }
   }
 
   function closeUpdateModal() {
     document.getElementById("updatePackageModal").classList.add("hidden");
   }
+
+  // Toggle trial days visibility
+  document.addEventListener('DOMContentLoaded', function () {
+    const updateTrialCheckbox = document.getElementById("update_isTrial");
+    const updateTrialDaysContainer = document.getElementById("update_trialDaysContainer");
+
+    if (updateTrialCheckbox) {
+      updateTrialCheckbox.addEventListener("change", function () {
+        if (this.checked) {
+          updateTrialDaysContainer.classList.remove("hidden");
+        } else {
+          updateTrialDaysContainer.classList.add("hidden");
+          document.getElementById("update_trialDays").value = "";
+        }
+      });
+    }
+
+    // Select All modules functionality
+    const updateSelectAll = document.getElementById("update_selectAllModules");
+    const updateModuleCheckboxes = document.querySelectorAll(".update-module-checkbox");
+
+    if (updateSelectAll) {
+      updateSelectAll.addEventListener("change", function () {
+        updateModuleCheckboxes.forEach(cb => {
+          cb.checked = this.checked;
+        });
+      });
+
+      // Update Select All when individual checkboxes change
+      updateModuleCheckboxes.forEach(cb => {
+        cb.addEventListener("change", function () {
+          const allChecked = Array.from(updateModuleCheckboxes).every(checkbox => checkbox.checked);
+          updateSelectAll.checked = allChecked;
+        });
+      });
+    }
+  });
 </script>

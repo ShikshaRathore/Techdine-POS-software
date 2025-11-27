@@ -108,7 +108,6 @@ module.exports.showSettings = async (req, res) => {
     // Get purchase history for this branch
     const purchaseHistory = await Purchase.find({
       branchId,
-      userId,
     })
       .populate("packageId")
       .sort({ createdAt: -1 })
@@ -117,7 +116,6 @@ module.exports.showSettings = async (req, res) => {
     // Get offline requests for this branch
     const offlineRequests = await OfflineRequest.find({
       branchId,
-      userId,
     })
       .populate("packageId")
       .sort({ createdAt: -1 });

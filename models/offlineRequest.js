@@ -8,6 +8,11 @@ const offlineRequestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
     packageId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Package",
@@ -19,7 +24,7 @@ const offlineRequestSchema = new mongoose.Schema(
     },
     billingCycle: {
       type: String,
-      enum: ["monthly", "annual", "lifetime"],
+      enum: ["trial", "monthly", "annual", "lifetime"],
       required: true,
     },
     amount: {

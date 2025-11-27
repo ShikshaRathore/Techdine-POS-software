@@ -16,6 +16,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+    phone: { type: Number },
     role: { type: String, default: "Hotel-Admin" },
     isActive: { type: Boolean, default: true },
   },

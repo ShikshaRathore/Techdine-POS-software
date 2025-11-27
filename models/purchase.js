@@ -24,7 +24,7 @@ const purchaseSchema = new mongoose.Schema(
     },
     billingCycle: {
       type: String,
-      enum: ["monthly", "annual", "lifetime"],
+      enum: ["trial", "monthly", "annual", "lifetime"],
       required: true,
     },
     paymentDate: {

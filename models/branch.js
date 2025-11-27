@@ -12,10 +12,11 @@ const branchSchema = new Schema({
     ref: "User",
     default: null,
   },
+  // ✔ Auto-default to "Indian Rupee"
   currency: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Currency",
-    required: true, // each branch must have a currency
+    required: true,
   },
   package: {
     type: mongoose.Schema.Types.ObjectId,

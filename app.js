@@ -51,7 +51,9 @@ const Tax = require("./models/tax.js");
 const Reservation = require("./models/reservation.js");
 const Permission = require("./models/permission.js");
 const menuItem = require("./models/menuItem.js");
-const Purchase = require("./models/purchase");
+const Purchase = require("./models/purchase.js");
+const Package = require("./models/package.js");
+const Currency = require("./models/currency.js");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -327,11 +329,10 @@ app.get(
           return res.redirect(`/dashboard/${req.user.branch}`);
         }
 
-        // Get the branch details with owner populated
-        const branch = await Branch.findById(branchId).populate(
-          "owner",
-          "username restaurantName email"
-        );
+        // Get the branch details with owner and package populated
+        const branch = await Branch.findById(branchId)
+          .populate("owner", "username restaurantName email")
+          .populate("package");
 
         if (!branch) {
           req.flash("error", "Branch not found");
@@ -347,6 +348,16 @@ app.get(
         userPermissions = permissionDoc ? permissionDoc.permissions : {};
         hotelAdmin = branch.owner;
 
+        // Calculate trial days remaining if on trial
+        let trialDaysRemaining = null;
+        if (branch.package?.isTrial && branch.packageExpiryDate) {
+          const today = new Date();
+          const expiryDate = new Date(branch.packageExpiryDate);
+          const diffTime = expiryDate - today;
+          trialDaysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (trialDaysRemaining < 0) trialDaysRemaining = 0;
+        }
+
         // Staff only see their assigned branch (no dropdown needed)
         return res.render("layouts/dashboard.ejs", {
           user: req.user,
@@ -357,6 +368,7 @@ app.get(
           userPermissions,
           userRole: req.user.role,
           hotelAdmin,
+          trialDaysRemaining,
         });
       }
 
@@ -364,16 +376,17 @@ app.get(
       const ownerId = req.user._id;
 
       // Get all branches for the dropdown
-      const branches = await Branch.find({ owner: ownerId }).populate(
-        "owner",
-        "username restaurantName email"
-      );
+      const branches = await Branch.find({ owner: ownerId })
+        .populate("owner", "username restaurantName email")
+        .populate("package");
 
       // Verify the requested branch belongs to this user
       const branch = await Branch.findOne({
         _id: branchId,
         owner: ownerId,
-      }).populate("owner", "username restaurantName email");
+      })
+        .populate("owner", "username restaurantName email")
+        .populate("package");
 
       if (!branch) {
         req.flash("error", "Branch not found or access denied");
@@ -382,6 +395,16 @@ app.get(
           return res.redirect(`/dashboard/${firstBranch._id}`);
         }
         return res.redirect("/add-branch");
+      }
+
+      // Calculate trial days remaining if on trial
+      let trialDaysRemaining = null;
+      if (branch.package?.isTrial && branch.packageExpiryDate) {
+        const today = new Date();
+        const expiryDate = new Date(branch.packageExpiryDate);
+        const diffTime = expiryDate - today;
+        trialDaysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (trialDaysRemaining < 0) trialDaysRemaining = 0;
       }
 
       // Hotel Admin (owner) has all permissions
@@ -396,6 +419,7 @@ app.get(
         userPermissions: null, // Hotel Admin doesn't need permission object
         userRole: req.user.role,
         hotelAdmin,
+        trialDaysRemaining,
       });
     } catch (err) {
       console.error("Error loading dashboard:", err);
@@ -439,7 +463,17 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
     const { branchName, country, address, branchHead } = req.body;
     const ownerId = req.user._id;
 
-    // Find the default trial package
+    // 1️⃣ Get default currency
+    const defaultCurrency = await Currency.findOne({ isDefault: true });
+    if (!defaultCurrency) {
+      req.flash(
+        "error",
+        "Default currency not set. Please add one in Currency Settings."
+      );
+      return res.redirect("/add-branch");
+    }
+
+    // 2️⃣ Find the default trial package
     const trialPackage = await Package.findOne({
       isTrial: true,
       active: true,
@@ -450,30 +484,31 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
       return res.redirect("/add-branch");
     }
 
-    // Calculate package expiry date based on trial days
+    // 3️⃣ Calculate trial expiry
     const packageStartDate = new Date();
     const packageExpiryDate = new Date();
     packageExpiryDate.setDate(
       packageStartDate.getDate() + trialPackage.trialDays
     );
 
+    // 4️⃣ Create Branch (⚡ currency auto-assigned here)
     const newBranch = new Branch({
       branchName,
       country,
-      address: address,
+      address,
       owner: ownerId,
       branchHead: branchHead || null,
       package: trialPackage._id,
       packageStartDate,
       packageExpiryDate,
+      currency: defaultCurrency._id, // <-- AUTO DEFAULT CURRENCY
     });
 
     await newBranch.save();
 
-    // Generate unique transaction ID for trial
+    // 5️⃣ Generate purchase entry
     const transactionId = `TRIAL-${newBranch._id}-${Date.now()}`;
 
-    // Create purchase record for the trial package
     const purchaseRecord = new Purchase({
       userId: ownerId,
       branchId: newBranch._id,
@@ -483,9 +518,9 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
       paymentDate: packageStartDate,
       nextPaymentDate: packageExpiryDate,
       transactionId: transactionId,
-      paymentGateway: "offline", // or "free" for trial
-      amount: 0, // Trial is free
-      currency: "INR",
+      paymentGateway: "offline",
+      amount: 0,
+      currency: defaultCurrency.code, // Use "INR"
       status: "completed",
     });
 
@@ -497,7 +532,7 @@ app.post("/add-branch", isLoggedIn, async (req, res) => {
     );
     res.redirect(`/dashboard/${newBranch._id}`);
   } catch (err) {
-    console.error(err);
+    console.error("Add Branch Error:", err);
     req.flash("error", "Failed to create branch!");
     res.redirect("/add-branch");
   }

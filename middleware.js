@@ -93,6 +93,12 @@ const attachStatistics = async (req, res, next) => {
       status: { $in: ["Confirmed", "Completed"] },
     });
 
+    // Count pending waiter requests
+    const waiterRequestsCount = await WaiterRequest.countDocuments({
+      branch: branchId,
+      status: "Pending",
+    });
+
     const yesterdayOrders =
       (await Order.find({
         branch: branchObjectId, // ✅ Changed
@@ -214,6 +220,7 @@ const attachStatistics = async (req, res, next) => {
       paymentMethods,
       todayReservationsCount: todayReservations, // ✅ ADD THIS
       paymentMethods,
+      waiterRequestsCount,
 
       currentMonth: today.toLocaleString("en-US", { month: "long" }),
       currentDate: today.toLocaleString("en-US", {

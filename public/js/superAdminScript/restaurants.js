@@ -1,6 +1,13 @@
 let currentStatus = true;
 
-function openEditModal(userId, restaurantName, username, email, isActive) {
+function openEditModal(
+  userId,
+  restaurantName,
+  username,
+  email,
+  phone,
+  isActive
+) {
   // Set form action dynamically with the user ID
   const form = document.getElementById("editRestaurantForm");
   form.action = `/admin-dashboard/restaurants/edit/${userId}`;
@@ -9,6 +16,7 @@ function openEditModal(userId, restaurantName, username, email, isActive) {
   document.getElementById("restaurantName").value = restaurantName;
   document.getElementById("restaurantUsername").value = username;
   document.getElementById("restaurantEmail").value = email;
+  document.getElementById("restaurantPhone").value = phone || "";
 
   // Convert string to boolean if needed
   const isActiveBoolean = isActive === true || isActive === "true";

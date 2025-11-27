@@ -490,17 +490,26 @@ exports.getSettings = async (req, res) => {
 // PUT - Update restaurant
 exports.updateRestaurant = async (req, res) => {
   try {
-    const { userId } = req.params; // Changed from 'id' to 'userId'
-    const { restaurantName, username, email, isActive } = req.body;
+    const { userId } = req.params;
+    const { restaurantName, username, email, phone, isActive } = req.body;
 
     // Validation
     if (!restaurantName || !username || !email) {
-      req.flash("error", "All fields are required");
+      req.flash("error", "All required fields must be filled");
       return res.redirect("/admin-dashboard/restaurants");
     }
 
+    // Validate phone number if provided
+    if (phone && phone.trim() !== "") {
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(phone.trim())) {
+        req.flash("error", "Phone number must be exactly 10 digits");
+        return res.redirect("/admin-dashboard/restaurants");
+      }
+    }
+
     // Get the current user to check if email is actually changing
-    const currentUser = await User.findById(userId); // Changed to userId
+    const currentUser = await User.findById(userId);
 
     if (!currentUser) {
       req.flash("error", "Restaurant not found");
@@ -519,17 +528,24 @@ exports.updateRestaurant = async (req, res) => {
       }
     }
 
+    // Prepare update data
+    const updateData = {
+      restaurantName: restaurantName.trim(),
+      username: username.trim(),
+      email: email.toLowerCase().trim(),
+      isActive: isActive === true || isActive === "true",
+    };
+
+    // Only include phone if it's provided and not empty
+    if (phone && phone.trim() !== "") {
+      updateData.phone = phone.trim();
+    }
+
     // Update restaurant
-    const updatedUser = await User.findByIdAndUpdate(
-      userId, // Changed to userId
-      {
-        restaurantName: restaurantName.trim(),
-        username: username.trim(),
-        email: email.toLowerCase().trim(),
-        isActive: isActive === true || isActive === "true",
-      },
-      { new: true, runValidators: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     req.flash("success", "Restaurant updated successfully!");
     res.redirect("/admin-dashboard/restaurants");

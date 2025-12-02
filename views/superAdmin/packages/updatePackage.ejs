@@ -1,69 +1,85 @@
 <!-- UPDATE MODAL -->
 <div id="updatePackageModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
+
+    <!-- Header -->
     <div
       class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-      <h3 class="text-2xl font-bold text-gray-900">Update Package</h3>
+      <h3 class="text-2xl font-bold text-[var(--theme-color)]">Update Package</h3>
+
       <button onclick="closeUpdateModal()" class="text-gray-400 hover:text-gray-600 transition">
         ✕
       </button>
     </div>
 
+    <!-- FORM -->
     <form action="/admin-dashboard/packages/update" method="POST" class="p-6 space-y-6">
       <input type="hidden" id="update_packageId" name="packageId" />
 
+      <!-- Package Name -->
       <div>
         <label class="block font-medium text-gray-700 mb-1">Package Name</label>
-        <input type="text" id="update_packageName" name="name" required class="border w-full px-4 py-2 rounded-lg" />
+        <input type="text" id="update_packageName" name="name" required
+          class="border border-gray-300 w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none" />
       </div>
 
+      <!-- Sort Order -->
       <div>
         <label class="block font-medium text-gray-700 mb-1">Sort Order</label>
-        <input type="number" id="update_sortOrder" name="sortOrder" placeholder="Sort order number"
-          class="border w-full px-4 py-2 rounded-lg" />
+        <input type="number" id="update_sortOrder" name="sortOrder"
+          class="border border-gray-300 w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none" />
       </div>
 
+      <!-- Prices -->
       <div class="grid grid-cols-3 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Price</label>
-          <input type="number" id="update_monthlyPrice" name="monthlyPrice" placeholder="Monthly"
-            class="border w-full px-3 py-2 rounded-lg" />
+          <input type="number" id="update_monthlyPrice" name="monthlyPrice"
+            class="border border-gray-300 w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)]" />
         </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Annual Price</label>
-          <input type="number" id="update_annualPrice" name="annualPrice" placeholder="Annual"
-            class="border w-full px-3 py-2 rounded-lg" />
+          <input type="number" id="update_annualPrice" name="annualPrice"
+            class="border border-gray-300 w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)]" />
         </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Lifetime Price</label>
-          <input type="number" id="update_lifetimePrice" name="lifetimePrice" placeholder="Lifetime"
-            class="border w-full px-3 py-2 rounded-lg" />
+          <input type="number" id="update_lifetimePrice" name="lifetimePrice"
+            class="border border-gray-300 w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)]" />
         </div>
       </div>
 
+      <!-- Checkboxes -->
       <div class="space-y-2">
-        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-          <input type="checkbox" id="update_isRecommended" name="isRecommended" class="w-4 h-4" />
-          <span>Recommended</span>
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+          <input type="checkbox" id="update_isRecommended" name="isRecommended" class="w-4 h-4 checkbox-theme" />
+          <span class="text-sm">Recommended</span>
         </label>
-        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-          <input type="checkbox" id="update_isTrial" name="isTrial" class="w-4 h-4" />
-          <span>Trial</span>
+
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+          <input type="checkbox" id="update_isTrial" name="isTrial" class="w-4 h-4 checkbox-theme" />
+          <span class="text-sm">Trial</span>
         </label>
+
         <div id="update_trialDaysContainer" class="hidden ml-6">
           <input type="number" id="update_trialDays" name="trialDays" placeholder="Trial Days"
-            class="border w-full px-4 py-2 rounded-lg" />
+            class="border border-gray-300 w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)]" />
         </div>
-        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-          <input type="checkbox" id="update_isPrivate" name="isPrivate" class="w-4 h-4" />
-          <span>Private</span>
+
+        <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+          <input type="checkbox" id="update_isPrivate" name="isPrivate" class="w-4 h-4 checkbox-theme" />
+          <span class="text-sm">Private</span>
         </label>
       </div>
 
+      <!-- Modules -->
       <div>
-        <label class="block font-medium text-gray-700 mb-2">Select Modules for this package</label>
-        <label class="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded">
-          <input type="checkbox" id="update_selectAllModules" class="w-4 h-4" />
+        <label class="block font-medium text-gray-700 mb-2">Select Modules</label>
+
+        <label class="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded cursor-pointer">
+          <input type="checkbox" id="update_selectAllModules" class="w-4 h-4 checkbox-theme" />
           <span class="font-semibold">Select All</span>
         </label>
 
@@ -74,66 +90,77 @@
             label: "Order" }, {value: "customer" , label: "Customer" }, {value: "staff" , label: "Staff" },
             {value: "payment" , label: "Payment" }, {value: "report" , label: "Report" }, {value: "settings" ,
             label: "Settings" }, {value: "delivery" , label: "Delivery Executive" }, {value: "waiter" ,
-            label: "Waiter Request" } ].forEach(function(m){ %>
-            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-              <input type="checkbox" name="modules" value="<%= m.value %>" class="update-module-checkbox w-4 h-4" />
+            label: "Waiter Request" } ].forEach((m)=> { %>
+
+            <label class="flex items-center gap-2 p-2 rounded hover:bg-gray-50 cursor-pointer">
+              <input type="checkbox" name="modules" value="<%= m.value %>"
+                class="update-module-checkbox w-4 h-4 checkbox-theme" />
               <span class="text-sm">
                 <%= m.label %>
               </span>
             </label>
+
             <% }) %>
         </div>
       </div>
 
+      <!-- Additional Features -->
       <div>
-        <label class="block font-medium text-gray-700 mb-2">Select Additional Feature</label>
+        <label class="block font-medium text-gray-700 mb-2">Additional Features</label>
+
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-            <input type="checkbox" name="additionalFeatures" value="changeBranch" id="update_changeBranch"
-              class="w-4 h-4" />
-            <span class="text-sm">Change Branch</span>
-          </label>
-          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-            <input type="checkbox" name="additionalFeatures" value="exportReport" id="update_exportReport"
-              class="w-4 h-4" />
-            <span class="text-sm">Export Report</span>
-          </label>
-          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-            <input type="checkbox" name="additionalFeatures" value="tableReservation" id="update_tableReservation"
-              class="w-4 h-4" />
-            <span class="text-sm">Table Reservation</span>
-          </label>
-          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-            <input type="checkbox" name="additionalFeatures" value="paymentGateway" id="update_paymentGateway"
-              class="w-4 h-4" />
-            <span class="text-sm">Payment Gateway Integration</span>
-          </label>
-          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-            <input type="checkbox" name="additionalFeatures" value="themeSetting" id="update_themeSetting"
-              class="w-4 h-4" />
-            <span class="text-sm">Theme Setting</span>
-          </label>
+          <% [ {id: "update_changeBranch" , label: "Change Branch" , value:"changeBranch"}, {id: "update_exportReport" ,
+            label: "Export Report" , value:"exportReport"}, {id: "update_tableReservation" , label: "Table Reservation"
+            , value:"tableReservation"}, {id: "update_paymentGateway" , label: "Payment Gateway Integration" ,
+            value:"paymentGateway"}, {id: "update_themeSetting" , label: "Theme Setting" , value:"themeSetting"}
+            ].forEach(f=> { %>
+
+            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+              <input type="checkbox" name="additionalFeatures" id="<%= f.id %>" value="<%= f.value %>"
+                class="w-4 h-4 checkbox-theme" />
+              <span class="text-sm">
+                <%= f.label %>
+              </span>
+            </label>
+
+            <% }) %>
         </div>
       </div>
 
+      <!-- Description -->
       <div>
         <label class="block font-medium text-gray-700 mb-1">Description</label>
         <textarea id="update_description" name="description" rows="3" placeholder="Enter package description..."
-          class="border w-full px-4 py-2 rounded-lg resize-none"></textarea>
+          class="border border-gray-300 w-full px-4 py-2 rounded-lg resize-none focus:ring-2 focus:ring-[var(--theme-color)]"></textarea>
       </div>
 
+      <!-- Footer Buttons -->
       <div class="flex justify-end gap-3 pt-4 border-t">
         <button type="button" onclick="closeUpdateModal()"
           class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition">
           Cancel
         </button>
-        <button type="submit" class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition">
+
+        <button type="submit"
+          class="px-6 py-2 text-white rounded-lg shadow-lg transition-all transform hover:scale-[1.02]" style="
+            background: linear-gradient(to right, var(--theme-color), var(--theme-color));
+            box-shadow: 0 4px 12px var(--theme-color)50%;
+          ">
           Save
         </button>
       </div>
     </form>
+
+    <!-- THEME CHECKBOX STYLE -->
+    <style>
+      .checkbox-theme:checked {
+        accent-color: var(--theme-color) !important;
+      }
+    </style>
   </div>
 </div>
+
+
 
 <script>
   function openUpdateModal(pkg) {

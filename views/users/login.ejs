@@ -1,126 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Techdine Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Ensures the background image covers the entire screen for a cleaner look */
-      body {
-        background-image: url(https://plus.unsplash.com/premium_photo-1661883237884-263e8de8869b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600);
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-      }
-    </style>
-  </head>
-  <body
-    class="bg-gray-50 flex items-center justify-center min-h-screen p-4"
-    style="
-      background-image: url(https://plus.unsplash.com/premium_photo-1661883237884-263e8de8869b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600);
 
-      background-size: contain;
-    "
-  >
-    <%- include("../includes/flash.ejs") %>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= appName %> - Login
+  </title>
 
-    <div
-      class="w-full max-w-md bg-white p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-200"
-    >
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background-image: url('https://plus.unsplash.com/premium_photo-1661883237884-263e8de8869b?ixlib=rb-4.1.0&auto=format&fit=crop&w=1600&q=60');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen p-4">
+
+  <%- include("../includes/flash.ejs") %>
+
+    <div class="w-full max-w-md bg-white p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-200">
+
+      <!-- LOGO + APP NAME -->
       <div class="flex flex-col items-center mb-6">
-        <div class="text-4xl text-orange-600 mb-2">🍽️</div>
+        <% if (appLogo && appLogo !=='/images/default-logo.png' ) { %>
+          <img src="<%= appLogo %>" class="h-16 w-16 mb-2 object-contain" />
+          <% } else { %>
+            <div class="text-4xl mb-2 text-[<%= themeColor %>]">🍽️</div>
+            <% } %>
 
-        <span class="text-3xl font-bold text-gray-800">Techdine</span>
+              <span class="text-3xl font-bold text-gray-800">
+                <%= appName %>
+              </span>
       </div>
 
-      <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">
-        Welcome Back!
-      </h2>
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">Welcome Back!</h2>
 
       <p class="text-gray-500 text-center mb-8">
         Log in to manage your restaurant operations.
       </p>
 
+      <!-- FORM -->
       <form action="/login" method="POST" class="space-y-6">
-        <div>
-          <label for="email" class="sr-only">Email Address</label>
 
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition duration-150"
-            placeholder="Email Address"
-          />
+        <!-- EMAIL -->
+        <div>
+          <input type="email" name="email" required placeholder="Email Address" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm
+                 placeholder-gray-500 transition
+                 focus:ring-2 focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>]" />
         </div>
 
+        <!-- PASSWORD -->
         <div>
-          <label for="password" class="sr-only">Password</label>
-
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition duration-150"
-            placeholder="Password"
-          />
+          <input type="password" name="password" required placeholder="Password" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm
+                 placeholder-gray-500 transition
+                 focus:ring-2 focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>]" />
         </div>
 
+        <!-- REMEMBER + FORGOT -->
         <div class="flex items-center justify-between text-sm">
-          <div class="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              class="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-            />
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" name="remember-me" class="h-4 w-4 border-gray-300 rounded
+                        focus:ring-[<%= themeColor %>] text-[<%= themeColor %>]" />
+            <span>Remember me</span>
+          </label>
 
-            <label for="remember-me" class="ml-2 block text-gray-900">
-              Remember me
-            </label>
-          </div>
-
-          <a
-            href="#"
-            class="font-medium text-orange-600 hover:text-orange-500 transition duration-150"
-          >
+          <a href="#" class="font-medium hover:opacity-80 transition text-[<%= themeColor %>]">
             Forgot Password?
           </a>
         </div>
 
-        <div>
-          <button
-            type="submit"
-            class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-orange-300"
-          >
-            Log In to Dashboard
-          </button>
-        </div>
+        <!-- LOGIN BUTTON -->
+        <button type="submit" class="w-full py-3 px-4 rounded-lg text-white font-semibold shadow-lg
+               transform transition hover:scale-[1.01] 
+               focus:ring-4 bg-[<%= themeColor %>] focus:ring-[<%= themeColor %>]">
+          Log In to Dashboard
+        </button>
+
       </form>
 
-      <div class="text-center text-sm mt-4">
+      <!-- SIGNUP & HOME -->
+      <div class="text-center text-sm mt-6">
         <span class="text-gray-600">Don't have an account?</span>
 
-        <form action="/signup" method="GET">
-          <button
-            class="font-semibold text-orange-600 hover:text-orange-700 transition duration-150"
-          >
+        <form action="/signup" method="GET" class="inline">
+          <button class="font-semibold hover:opacity-80 transition text-[<%= themeColor %>]">
             Sign up
           </button>
         </form>
 
-        <div class="text-center text-sm mt-4">
-          <a
-            href="/techdine"
-            class="mt-4 font-medium text-orange-600 hover:text-orange-500 transition duration-150"
-          >
+        <div class="mt-4">
+          <a href="/techdine" class="font-medium hover:opacity-80 transition text-[<%= themeColor %>]">
             Go to Home
           </a>
         </div>
       </div>
+
     </div>
-  </body>
+
+</body>
+
 </html>

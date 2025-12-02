@@ -1,384 +1,361 @@
-<%- include("../includes/flash.ejs") %>
-  <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <button onclick="openAddModal()"
-        class="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors shadow-sm">
-        <i class="fas fa-plus mr-2"></i>
-        Add Restaurant
-      </button>
-    </div>
+<div style="--tc:<%= themeColor %>;">
+  <%- include("../includes/flash.ejs") %>
 
-    <!-- Search Bar -->
-    <div class="bg-white rounded-lg shadow-sm p-4">
-      <input type="text" placeholder="Search restaurants here"
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-    </div>
+    <div class="space-y-6">
 
-    <!-- Restaurants Table -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Restaurant Name
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Owner Name
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Email
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Phone
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Package
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Date & Time
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Status
-              </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <% if (restaurants && restaurants.length> 0) { %>
-              <% restaurants.forEach(restaurant=> { %>
-                <tr class="hover:bg-gray-50 transition-colors">
-                  <!-- Restaurant Name -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm font-medium text-gray-900">
-                      <%= restaurant.restaurantName || '-' %>
-                    </div>
-                  </td>
+      <!-- Add Restaurant Button -->
+      <div class="flex items-center justify-between">
+        <button onclick="openAddModal()" class="px-4 py-2 text-white font-medium rounded-lg transition-colors shadow-sm"
+          style="background: var(--tc);">
+          <i class="fas fa-plus mr-2"></i>
+          Add Restaurant
+        </button>
+      </div>
 
-                  <!-- Owner Name -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900">
-                      <%= restaurant.username || '-' %>
-                    </div>
-                  </td>
+      <!-- Search Bar -->
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <input type="text" placeholder="Search restaurants here"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+          style="--tw-ring-color: var(--tc);">
+      </div>
 
-                  <!-- Email -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-600">
-                      <%= restaurant.email || '-' %>
-                    </div>
-                  </td>
+      <!-- Restaurants Table -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Restaurant
+                  Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Owner Name
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Package
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date & Time
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
 
-                  <!-- Phone -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-600">
-                      <%= restaurant.phone || '-' %>
-                    </div>
-                  </td>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <% if (restaurants && restaurants.length> 0) { %>
+                <% restaurants.forEach(restaurant=> { %>
+                  <tr class="hover:bg-gray-50 transition-colors">
 
-                  <!-- Package -->
-                  <td class="px-6 py-4">
-                    <span 
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                      N/A
-                    </span>
-                  </td>
+                    <!-- R Name -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= restaurant.restaurantName || '-' %>
+                      </div>
+                    </td>
 
-                  <!-- Date & Time -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900">
-                      <%= new Date(restaurant.createdAt).toLocaleDateString() %>
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      <%= new Date(restaurant.createdAt).toLocaleTimeString() %>
-                    </div>
-                  </td>
+                    <!-- Owner -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-gray-900">
+                        <%= restaurant.username || '-' %>
+                      </div>
+                    </td>
 
-                  <!-- Status -->
-                  <td class="px-6 py-4">
-                    <% if (restaurant.isActive) { %>
-                      <span
-                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                        Active
+                    <!-- Email -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-gray-600">
+                        <%= restaurant.email || '-' %>
+                      </div>
+                    </td>
+
+                    <!-- Phone -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-gray-600">
+                        <%= restaurant.phone || '-' %>
+                      </div>
+                    </td>
+
+                    <!-- Package -->
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style="background: color-mix(in srgb, var(--tc) 20%, white); color: var(--tc);">
+                        N/A
                       </span>
-                      <% } else { %>
+                    </td>
+
+                    <!-- Date -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-gray-900">
+                        <%= new Date(restaurant.createdAt).toLocaleDateString() %>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        <%= new Date(restaurant.createdAt).toLocaleTimeString() %>
+                      </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="px-6 py-4">
+                      <% if (restaurant.isActive) { %>
                         <span
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                          Inactive
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                          Active
                         </span>
-                        <% } %>
-                  </td>
+                        <% } else { %>
+                          <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                            Inactive
+                          </span>
+                          <% } %>
+                    </td>
 
-                  <!-- Action -->
-                  <td class="px-6 py-4">
-                    <button
-                      onclick="openEditModal('<%= restaurant._id %>', '<%= restaurant.restaurantName %>', '<%= restaurant.username %>', '<%= restaurant.email %>', `<%= restaurant.phone ? restaurant.phone : '' %>`, '<%= restaurant.isActive %>')"
-                      class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors">
-                      <i class="fas fa-edit mr-1.5"></i>
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-                <% }) %>
-                  <% } else { %>
-                    <tr>
-                      <td colspan="8" class="px-6 py-8 text-center text-gray-500">
-                        <i class="fas fa-inbox text-4xl mb-2"></i>
-                        <p class="text-sm">No restaurants found. Add your first restaurant to get started.</p>
-                      </td>
-                    </tr>
-                    <% } %>
-          </tbody>
-        </table>
+                    <!-- Action -->
+                    <td class="px-6 py-4">
+                      <button
+                        onclick="openEditModal('<%= restaurant._id %>', '<%= restaurant.restaurantName %>', '<%= restaurant.username %>', '<%= restaurant.email %>', `<%= restaurant.phone ? restaurant.phone : '' %>`, '<%= restaurant.isActive %>')"
+                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                        style="color: var(--tc); background: color-mix(in srgb, var(--tc) 10%, white);">
+                        <i class="fas fa-edit mr-1.5"></i>
+                        Edit
+                      </button>
+                    </td>
+
+                  </tr>
+                  <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                          <i class="fas fa-inbox text-4xl mb-2"></i>
+                          <p class="text-sm">No restaurants found.</p>
+                        </td>
+                      </tr>
+                      <% } %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Edit Restaurant Modal -->
-  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900">Update Restaurant</h2>
-          <p class="text-sm text-gray-500 mt-1">Edit the details below</p>
-        </div>
-        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="--tc:<%= themeColor %>;">
+      <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 
-      <!-- Modal Body -->
-      <form id="editRestaurantForm" action="" method="POST" class="p-6 space-y-6">
-        <input type="hidden" name="_method" value="PUT">
-        <input type="hidden" id="userId" name="userId" />
-
-        <!-- Basic Information Section -->
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-              <i class="fas fa-info-circle text-orange-500"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900">Basic Information</h3>
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Update Restaurant</h2>
+            <p class="text-sm text-gray-500 mt-1">Edit details</p>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Restaurant Name -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Restaurant Name <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="restaurantName" name="restaurantName" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter restaurant name" />
-            </div>
-
-            <!-- Owner/Manager Name -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Owner/Manager Name <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="restaurantUsername" name="username" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter full name" />
-            </div>
-
-            <!-- Phone Number -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <input type="tel" id="restaurantPhone" name="phone"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter phone number" pattern="[0-9]{10}" maxlength="10" />
-              <p class="text-xs text-gray-500 mt-1">10-digit mobile number</p>
-            </div>
-
-            <!-- Restaurant Email -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Email Address <span class="text-red-500">*</span>
-              </label>
-              <input type="email" id="restaurantEmail" name="email" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="restaurant@example.com" />
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Status <span class="text-red-500">*</span>
-            </label>
-            <div class="flex gap-3">
-              <button type="button" id="activeBtn" onclick="setStatus(true)"
-                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="font-medium">Active</span>
-              </button>
-              <button type="button" id="inactiveBtn" onclick="setStatus(false)"
-                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all">
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                <span class="font-medium">Inactive</span>
-              </button>
-            </div>
-            <input type="hidden" id="isActive" name="isActive" />
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="flex gap-3 pt-4 border-t border-gray-200">
-          <button type="button" onclick="closeEditModal()"
-            class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-            <i class="fas fa-times mr-2"></i>
-            Cancel
-          </button>
-          <button type="submit"
-            class="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors shadow-sm">
-            <i class="fas fa-check mr-2"></i>
-            Update Restaurant
+          <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fas fa-times text-xl"></i>
           </button>
         </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Add Restaurant Modal -->
-  <div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900">Add New Restaurant</h2>
-          <p class="text-sm text-gray-500 mt-1">Fill in the details below to add a new restaurant</p>
-        </div>
-        <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
+        <!-- Body -->
+        <form id="editRestaurantForm" method="POST" class="p-6 space-y-6">
+          <input type="hidden" name="_method" value="PUT">
+          <input type="hidden" id="userId" name="userId">
 
-      <!-- Modal Body -->
-      <form id="addRestaurantForm" action="/admin-dashboard/restaurants/add" method="POST" class="p-6 space-y-6">
-        <!-- Basic Information Section -->
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-              <i class="fas fa-utensils text-orange-500"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900">Restaurant Information</h3>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Restaurant Name -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Restaurant Name <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="addRestaurantName" name="restaurantName" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter restaurant name" />
-            </div>
-
-            <!-- Full Name -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Full Name (Owner/Manager) <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="addUsername" name="username" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter full name" />
-            </div>
-
-            <!-- Phone Number -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <input type="tel" id="addPhone" name="phone"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Enter phone number" pattern="[0-9]{10}" maxlength="10" />
-              <p class="text-xs text-gray-500 mt-1">10-digit mobile number</p>
-            </div>
-
-            <!-- Email -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Email Address <span class="text-red-500">*</span>
-              </label>
-              <input type="email" id="addEmail" name="email" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="restaurant@example.com" />
-            </div>
-
-            <!-- Password -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Password <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <input type="password" id="addPassword" name="password" required
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-12"
-                  placeholder="Enter password" />
-                <button type="button" onclick="togglePassword()"
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                  <i class="fas fa-eye" id="togglePasswordIcon"></i>
-                </button>
+          <!-- Basic Info -->
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                style="background: color-mix(in srgb, var(--tc) 20%, white);">
+                <i class="fas fa-info-circle" style="color: var(--tc);"></i>
               </div>
-              <p class="text-xs text-gray-500 mt-1">Minimum 8 characters recommended</p>
+              <h3 class="text-lg font-semibold text-gray-900">Basic Information</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <!-- Restaurant Name -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Restaurant Name *</label>
+                <input type="text" id="restaurantName" name="restaurantName" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Owner Name -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Owner/Manager Name *</label>
+                <input type="text" id="restaurantUsername" name="username" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Phone -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input type="tel" id="restaurantPhone" name="phone"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Email -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" id="restaurantEmail" name="email" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+            </div>
+
+            <!-- Status -->
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+              <div class="flex gap-3">
+
+                <!-- Active -->
+                <button type="button" id="activeBtn" onclick="setStatus(true)"
+                  class="flex-1 px-4 py-3 rounded-lg border-2 flex items-center justify-center gap-2 transition"
+                  style="border-color: var(--tc); background: color-mix(in srgb, var(--tc) 15%, white);">
+                  <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span class="font-medium text-gray-900">Active</span>
+                </button>
+
+                <!-- Inactive -->
+                <button type="button" id="inactiveBtn" onclick="setStatus(false)"
+                  class="flex-1 px-4 py-3 border-2 rounded-lg flex items-center justify-center gap-2 transition"
+                  style="border-color: #ccc;">
+                  <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span class="font-medium text-gray-600">Inactive</span>
+                </button>
+
+              </div>
+              <input type="hidden" id="isActive" name="isActive">
+            </div>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="flex gap-3 pt-4 border-t border-gray-200">
+            <button type="button" onclick="closeEditModal()"
+              class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+              <i class="fas fa-times mr-2"></i> Cancel
+            </button>
+            <button type="submit" class="flex-1 px-6 py-3 text-white font-medium rounded-lg shadow-sm transition"
+              style="background: var(--tc);">
+              <i class="fas fa-check mr-2"></i> Update Restaurant
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="--tc:<%= themeColor %>;">
+      <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Add New Restaurant</h2>
+            <p class="text-sm text-gray-500 mt-1">Fill in the details</p>
+          </div>
+          <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 transition">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <form id="addRestaurantForm" method="POST" action="/admin-dashboard/restaurants/add" class="p-6 space-y-6">
+
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                style="background: color-mix(in srgb, var(--tc) 20%, white);">
+                <i class="fas fa-utensils" style="color: var(--tc);"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Restaurant Information</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <!-- Name -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Restaurant Name *</label>
+                <input type="text" id="addRestaurantName" name="restaurantName" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Username -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                <input type="text" id="addUsername" name="username" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Phone -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input type="tel" id="addPhone" name="phone"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Email -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" id="addEmail" name="email" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
+              <!-- Password -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                <input type="password" id="addPassword" name="password" required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                  style="--tw-ring-color: var(--tc);">
+              </div>
+
             </div>
           </div>
 
           <!-- Status -->
           <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Status <span class="text-red-500">*</span>
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
             <div class="flex gap-3">
+
+              <!-- Active -->
               <button type="button" id="addActiveBtn" onclick="setAddStatus(true)"
-                class="flex-1 px-4 py-3 border-2 border-orange-500 bg-orange-50 rounded-lg flex items-center justify-center gap-2 transition-all">
+                class="flex-1 px-4 py-3 border-2 rounded-lg flex items-center justify-center gap-2 transition"
+                style="border-color: var(--tc); background: color-mix(in srgb, var(--tc) 15%, white);">
                 <span class="w-3 h-3 rounded-full bg-green-500"></span>
                 <span class="font-medium text-gray-900">Active</span>
               </button>
+
+              <!-- Inactive -->
               <button type="button" id="addInactiveBtn" onclick="setAddStatus(false)"
-                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all">
+                class="flex-1 px-4 py-3 border-2 rounded-lg flex items-center justify-center gap-2 transition"
+                style="border-color: #ccc;">
                 <span class="w-3 h-3 rounded-full bg-red-500"></span>
                 <span class="font-medium text-gray-600">Inactive</span>
               </button>
+
             </div>
-            <input type="hidden" id="addIsActive" name="isActive" value="true" />
+            <input type="hidden" id="addIsActive" name="isActive" value="true">
           </div>
-        </div>
 
-        <!-- Error Message -->
-        <div id="addErrorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          <i class="fas fa-exclamation-circle mr-2"></i>
-          <span id="addErrorText"></span>
-        </div>
+          <!-- Footer -->
+          <div class="flex gap-3 pt-4 border-t border-gray-200">
+            <button type="button" onclick="closeAddModal()"
+              class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+              <i class="fas fa-times mr-2"></i> Cancel
+            </button>
+            <button type="submit" class="flex-1 px-6 py-3 text-white font-medium rounded-lg shadow-sm transition"
+              style="background: var(--tc);">
+              <i class="fas fa-plus mr-2"></i> Add Restaurant
+            </button>
+          </div>
 
-        <!-- Success Message -->
-        <div id="addSuccessMessage"
-          class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-          <i class="fas fa-check-circle mr-2"></i>
-          <span id="addSuccessText"></span>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="flex gap-3 pt-4 border-t border-gray-200">
-          <button type="button" onclick="closeAddModal()"
-            class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-            <i class="fas fa-times mr-2"></i>
-            Cancel
-          </button>
-          <button type="submit"
-            class="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors shadow-sm">
-            <i class="fas fa-plus mr-2"></i>
-            Add Restaurant
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <script src="/js/superAdminScript/restaurants.js"></script>
+    <script src="/js/superAdminScript/restaurants.js"></script>
+</div>

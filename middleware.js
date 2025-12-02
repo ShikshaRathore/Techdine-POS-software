@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Order = require("./models/order.js");
 const Reservation = require("./models/reservation.js");
+const WaiterRequest = require("./models/waiterRequest.js");
+const AppSettings = require("./models/appSettings.js");
 
 // 🔹 Middleware 1: Auth check
 const isLoggedIn = (req, res, next) => {
@@ -95,7 +97,7 @@ const attachStatistics = async (req, res, next) => {
 
     // Count pending waiter requests
     const waiterRequestsCount = await WaiterRequest.countDocuments({
-      branch: branchId,
+      branch: branchObjectId,
       status: "Pending",
     });
 
@@ -219,7 +221,6 @@ const attachStatistics = async (req, res, next) => {
       todayOrdersCount: todayOrders.length,
       paymentMethods,
       todayReservationsCount: todayReservations, // ✅ ADD THIS
-      paymentMethods,
       waiterRequestsCount,
 
       currentMonth: today.toLocaleString("en-US", { month: "long" }),
@@ -241,9 +242,29 @@ const attachStatistics = async (req, res, next) => {
   }
 };
 
+// Middleware to load app settings and make available to all views
+const superAdminAppsettings = async (req, res, next) => {
+  try {
+    const settings = await AppSettings.getSettings();
+
+    // Make only themeColor and logo available to all views
+    res.locals.themeColor = settings.themeColor;
+    res.locals.appLogo = settings.appLogo.url;
+
+    next();
+  } catch (error) {
+    console.error("Error loading app settings:", error);
+    // Fallback to defaults if settings can't be loaded
+    res.locals.themeColor = "#F97316";
+    res.locals.appLogo = "/images/default-logo.png";
+    next();
+  }
+};
+
 // ✅ Export both functions
 module.exports = {
   isLoggedIn,
   attachStatistics,
   isSuperAdmin,
+  superAdminAppsettings,
 };

@@ -8,12 +8,17 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const ExpressError = require("./utils/ExpressError.js");
 
 const cookieParser = require("cookie-parser");
 const { startSessionCleanup } = require("./jobs/sessionCleanup");
 const { afterStatusUpdate } = require("./services/orderStatusService");
 
-const { isLoggedIn, attachStatistics } = require("./middleware.js");
+const {
+  isLoggedIn,
+  attachStatistics,
+  superAdminAppsettings,
+} = require("./middleware.js");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
@@ -54,6 +59,7 @@ const menuItem = require("./models/menuItem.js");
 const Purchase = require("./models/purchase.js");
 const Package = require("./models/package.js");
 const Currency = require("./models/currency.js");
+const appSettings = require("./models/appSettings.js");
 
 // This MUST come right after creating the Express app
 app.set("trust proxy", 1);
@@ -167,6 +173,8 @@ mongoose.connection.once("open", () => {
   startSessionCleanup();
 });
 
+// ------------- Middlewares --------------
+
 app.use("/reservations", reservationRoutes);
 app.use("/restaurant", customerSiteRoutes);
 app.use("/admin-dashboard", superAdminRoutes);
@@ -179,18 +187,40 @@ app.use("/reports", reportRoutes);
 app.use("/waiterRequest/:branchId", waiterRequestRoutes);
 app.use("/frontend-setting", heroSectionRoutes);
 app.use("/appSettings", appSettingRoutes);
+
+app.use(superAdminAppsettings);
+
 //--------------API---------------------
 
-app.get("/", (req, res) => {
-  res.render("layouts/index.ejs");
+app.get("/", async (req, res) => {
+  const settings = await appSettings.getSettings();
+  res.render("layouts/index.ejs", { settings, currUser: req.user });
 });
 
-app.get("/Techdine", (req, res) => {
-  res.render("layouts/index.ejs");
+app.get("/Techdine", async (req, res) => {
+  const settings = await appSettings.getSettings();
+  res.render("layouts/index.ejs", { settings, currUser: req.user });
 });
 
-app.get("/signup", (req, res) => {
-  res.render("users/signup.ejs");
+app.get("/signup", async (req, res) => {
+  try {
+    const settings = await appSettings.getSettings();
+
+    res.render("users/signup", {
+      appName: settings.appName || "Techdine",
+      appLogo: settings.appLogo?.url || "/images/default-logo.png",
+      themeColor: settings.themeColor || "#F97316",
+    });
+  } catch (error) {
+    console.error("Signup settings error:", error);
+
+    // fallback
+    res.render("users/signup", {
+      appName: "Techdine",
+      appLogo: "/images/default-logo.png",
+      themeColor: "#F97316",
+    });
+  }
 });
 
 // ========== SIGNUP ROUTE ==========
@@ -213,8 +243,26 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.get("/login", (req, res) => {
-  res.render("users/login");
+app.get("/login", async (req, res) => {
+  try {
+    // Get app settings
+    const settings = await appSettings.getSettings();
+
+    // Pass only required settings to the view
+    res.render("users/login", {
+      appName: settings.appName,
+      appLogo: settings.appLogo.url,
+      themeColor: settings.themeColor,
+    });
+  } catch (error) {
+    console.error("Error loading app settings:", error);
+    // Fallback to default values if settings fail to load
+    res.render("users/login", {
+      appName: "Techdine",
+      appLogo: "/images/default-logo.png",
+      themeColor: "#F97316",
+    });
+  }
 });
 
 app.post("/login", async (req, res, next) => {
@@ -285,6 +333,12 @@ app.post("/login", async (req, res, next) => {
 // ========== DASHBOARD ROUTE ==========
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   try {
+    // Check if user is active
+    if (req.user.isActive === false) {
+      req.flash("error", "Your account is inactive. Please contact support.");
+      req.logout(() => {});
+      return res.redirect("/login");
+    }
     if (req.user.role === "superadmin") return res.redirect("/admin-dashboard");
 
     // Check if user is Staff (by checking if they have a branch field assigned)
@@ -314,6 +368,13 @@ app.get(
   attachStatistics,
   async (req, res) => {
     try {
+      // Universal account active check
+      if (req.user.isActive === false) {
+        req.flash("error", "Your account is inactive. Please contact support.");
+        req.logout(() => {});
+        return res.redirect("/login");
+      }
+
       if (req.user.role === "superadmin")
         return res.redirect("/admin-dashboard");
 
@@ -429,8 +490,14 @@ app.get(
   }
 );
 
-app.get("/add-branch", isLoggedIn, (req, res) => {
-  res.render("branch/addBranch.ejs");
+app.get("/add-branch", isLoggedIn, async (req, res) => {
+  const settings = await appSettings.getSettings();
+
+  res.render("branch/addBranch.ejs", {
+    appName: settings.appName,
+    appLogo: settings.appLogo?.url,
+    themeColor: settings.themeColor,
+  });
 });
 
 // ========== ADD BRANCH ROUTE ==========
@@ -2491,6 +2558,20 @@ app.get("/logout", (req, res) => {
     res.redirect("/Techdine");
   });
 });
+
+app.use((req, res, next) => {
+  next(new ExpressError(404, "Page not found!"));
+});
+
+app.use((err, req, res, next) => {
+  let { statusCode = 500, message = "Something Went Wrong!!" } = err;
+  res.status(statusCode).render("./includes/error.ejs", {
+    message,
+    themeColor: res.locals.themeColor,
+    appLogo: res.locals.appLogo,
+  });
+});
+
 const PORT = process.env.PORT;
 app.listen(PORT, "0.0.0.0", () =>
   console.log(`Server running on port ${PORT}`)

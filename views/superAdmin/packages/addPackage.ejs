@@ -1,15 +1,9 @@
 <!-- MODAL -->
-<div
-  id="addPackageModal"
-  class="fixed inset-0 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm z-50"
->
-  <div
-    class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200"
-  >
+<div id="addPackageModal"
+  class="fixed inset-0 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm z-50">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
     <!-- Header -->
-    <div
-      class="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 rounded-t-2xl z-10"
-    >
+    <div class="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 rounded-t-2xl z-10">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-2xl font-bold text-gray-900">Add New Package</h3>
@@ -17,46 +11,26 @@
             Configure your restaurant package details
           </p>
         </div>
-        <button
-          type="button"
-          onclick="document.getElementById('addPackageModal').classList.add('hidden')"
-          class="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+        <button type="button" onclick="document.getElementById('addPackageModal').classList.add('hidden')"
+          class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
     </div>
 
     <!-- Form Content -->
-    <form
-      action="/admin-dashboard/packages/add"
-      method="POST"
-      class="px-8 py-6 space-y-6"
-    >
+    <form action="/admin-dashboard/packages/add" method="POST" class="px-8 py-6 space-y-6">
+
       <!-- Package Name -->
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-2">
           Package Name <span class="text-red-500">*</span>
         </label>
-        <input
-          type="text"
-          name="name"
-          placeholder="e.g., Premium Plan, Basic Plan"
-          class="border border-gray-300 w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
-          required
-        />
+        <input type="text" name="name" placeholder="e.g., Premium Plan, Basic Plan"
+          class="border border-gray-300 w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent transition-all outline-none"
+          required />
       </div>
 
       <!-- Pricing Section -->
@@ -65,52 +39,33 @@
       </div>
 
       <div class="grid grid-cols-3 gap-4">
+        <!-- Monthly -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Monthly</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-2">Monthly</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              >₹</span
-            >
-            <input
-              type="number"
-              name="monthlyPrice"
-              placeholder="999"
-              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
-            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+            <input type="number" name="monthlyPrice" placeholder="999"
+              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none" />
           </div>
         </div>
+
+        <!-- Annual -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Annual</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-2">Annual</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              >₹</span
-            >
-            <input
-              type="number"
-              name="annualPrice"
-              placeholder="9999"
-              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
-            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+            <input type="number" name="annualPrice" placeholder="9999"
+              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none" />
           </div>
         </div>
+
+        <!-- Lifetime -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Lifetime</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-2">Lifetime</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              >₹</span
-            >
-            <input
-              type="number"
-              name="lifetimePrice"
-              placeholder="49999"
-              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
-            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+            <input type="number" name="lifetimePrice" placeholder="49999"
+              class="border border-gray-300 w-full pl-8 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none" />
           </div>
         </div>
       </div>
@@ -121,65 +76,48 @@
       </div>
 
       <div class="bg-gray-50 rounded-lg p-5 space-y-3">
+
+        <!-- Recommended -->
         <label class="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            name="isRecommended"
-            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer"
-          />
+          <input type="checkbox" name="isRecommended"
+            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer" />
           <div>
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Recommended Package</span
-            >
-            <p class="text-xs text-gray-500">
-              Highlight this package as recommended choice
-            </p>
+            <span class="text-sm font-medium text-gray-700 group-hover:text-[var(--theme-color)] transition-colors">
+              Recommended Package
+            </span>
+            <p class="text-xs text-gray-500">Highlight this package as recommended choice</p>
           </div>
         </label>
 
+        <!-- Trial -->
         <label class="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            name="isTrial"
-            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer"
-          />
+          <input type="checkbox" name="isTrial"
+            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer" />
           <div>
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Trial Available</span
-            >
-            <p class="text-xs text-gray-500">
-              Offer a trial period for this package
-            </p>
+            <span class="text-sm font-medium text-gray-700 group-hover:text-[var(--theme-color)] transition-colors">
+              Trial Available
+            </span>
+            <p class="text-xs text-gray-500">Offer a trial period for this package</p>
           </div>
         </label>
 
         <div class="ml-8">
-          <input
-            type="number"
-            name="trialDays"
-            placeholder="Number of trial days (e.g., 14)"
-            class="border border-gray-300 w-full px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none text-sm"
-          />
+          <input type="number" name="trialDays" placeholder="Number of trial days (e.g., 14)"
+            class="border border-gray-300 w-full px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-[var(--theme-color)] focus:border-transparent outline-none text-sm" />
         </div>
 
+        <!-- Private -->
         <label class="flex items-center gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            name="isPrivate"
-            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer"
-          />
+          <input type="checkbox" name="isPrivate"
+            class="w-5 h-5 rounded checkbox-custom border-gray-300 cursor-pointer" />
           <div>
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Private Package</span
-            >
-            <p class="text-xs text-gray-500">
-              Only available through direct invitation
-            </p>
+            <span class="text-sm font-medium text-gray-700 group-hover:text-[var(--theme-color)] transition-colors">
+              Private Package
+            </span>
+            <p class="text-xs text-gray-500">Only available through direct invitation</p>
           </div>
         </label>
+
       </div>
 
       <!-- Modules Section -->
@@ -187,265 +125,39 @@
         <span class="section-title">Included Modules</span>
       </div>
 
-      <div
-        class="bg-gradient-to-br from-orange-50 to-white rounded-lg p-6 border border-orange-100"
-      >
+      <div class="rounded-lg p-6 border" style="border-color: var(--theme-color);">
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="menu"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Menu</span
-            >
-          </label>
 
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="staff"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Item Category</span
-            >
-          </label>
+          <% [ "Menu" , "Item Category" , "Orders" , "Table" , "KOT" , "Customer" , "Payment" , "Settings"
+            , "Waiter Request" , "Menu Items" , "Area" , "Reservation" , "Order" , "Staff" , "Report"
+            , "Delivery Executive" ].forEach((moduleName)=> { %>
 
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="orders"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Orders</span
-            >
-          </label>
+            <label class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors">
+              <input type="checkbox" name="modules" value="<%= moduleName.toLowerCase().replace(' ', '-') %>"
+                class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer" />
+              <span class="text-sm font-medium text-gray-700 group-hover:text-[var(--theme-color)] transition-colors">
+                <%= moduleName %>
+              </span>
+            </label>
 
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="table"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Table</span
-            >
-          </label>
+            <% }) %>
 
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="kot"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >KOT</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="customer"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Customer</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="payment"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Payment</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="settings"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Settings</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="waiter"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Waiter Request</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="menu-items"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Menu Items</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="area"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Area</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="reservation"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Reservation</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="order"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Order</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="staff-mgmt"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Staff</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="report"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Report</span
-            >
-          </label>
-
-          <label
-            class="flex items-center gap-2.5 cursor-pointer group p-2 rounded hover:bg-white transition-colors"
-          >
-            <input
-              type="checkbox"
-              name="modules"
-              value="delivery"
-              class="w-4 h-4 rounded checkbox-custom border-gray-300 cursor-pointer"
-            />
-            <span
-              class="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors"
-              >Delivery Executive</span
-            >
-          </label>
         </div>
       </div>
 
-      <!-- Footer Actions -->
+      <!-- Footer -->
       <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
-        <button
-          type="button"
-          onclick="document.getElementById('addPackageModal').classList.add('hidden')"
-          class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
-        >
+        <button type="button" onclick="document.getElementById('addPackageModal').classList.add('hidden')"
+          class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
           Cancel
         </button>
-        <button
-          type="submit"
-          class="px-8 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 font-semibold transition-all transform hover:scale-[1.02]"
-        >
+
+        <button type="submit"
+          class="px-8 py-2.5 text-white rounded-lg shadow-lg font-semibold transition-all transform hover:scale-[1.02]"
+          style="
+            background: linear-gradient(to right, var(--theme-color), var(--theme-color));
+            box-shadow: 0 4px 12px var(--theme-color)50%;
+          ">
           Save Package
         </button>
       </div>
@@ -453,8 +165,8 @@
 
     <style>
       .checkbox-custom:checked {
-        background-color: #f97316;
-        border-color: #f97316;
+        background-color: var(--theme-color) !important;
+        border-color: var(--theme-color) !important;
       }
 
       .section-divider {
@@ -469,12 +181,10 @@
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(
-          to right,
-          transparent,
-          #e5e7eb,
-          transparent
-        );
+        background: linear-gradient(to right,
+            transparent,
+            var(--theme-color),
+            transparent);
       }
 
       .section-title {
@@ -484,7 +194,7 @@
         padding: 0 1rem;
         font-weight: 600;
         font-size: 0.875rem;
-        color: #6b7280;
+        color: var(--theme-color);
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }

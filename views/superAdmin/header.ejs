@@ -1,39 +1,159 @@
 <header class="bg-white shadow-sm">
   <div class="flex items-center justify-between px-6 py-4">
+    <!-- Left Section: Menu & Title -->
     <div class="flex items-center gap-4">
       <button class="text-gray-500 hover:text-gray-700 lg:hidden">
         <i class="fas fa-bars text-xl"></i>
       </button>
-      <h1 class="text-2xl font-semibold text-gray-800"><%= title %></h1>
+      <h1 class="text-2xl font-semibold text-gray-800">
+        <%= title %>
+      </h1>
     </div>
 
+    <!-- Right Section: Search, Notifications & Profile -->
     <div class="flex items-center gap-4">
+      <!-- Search Bar -->
       <div class="relative">
-        <input
-          type="text"
-          placeholder="Search..."
-          class="hidden md:block w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
+        <input type="text" placeholder="Search..."
+          class="hidden md:block w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none theme-focus-ring" />
       </div>
 
-      <button class="relative p-2 text-gray-500 hover:text-gray-700">
+      <!-- Notification Bell -->
+      <button class="relative p-2 text-gray-500 hover:text-gray-700 transition-colors">
         <i class="fas fa-bell text-xl"></i>
-        <span
-          class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
-        ></span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
       </button>
 
-      <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold"
-        >
-          A
-        </div>
-        <div class="hidden md:block">
-          <p class="text-sm font-semibold text-gray-800">Admin</p>
-          <p class="text-xs text-gray-500">Administrator</p>
+      <!-- User Avatar & Dropdown -->
+      <div class="relative flex-shrink-0">
+        <!-- Profile Icon Button -->
+        <button id="profileBtn"
+          class="w-10 h-10 theme-bg rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow focus:outline-none theme-focus-ring overflow-hidden"
+          style=`background: linear-gradient(135deg, <%=appSettings.themeColor %> 0%, <%= appSettings.themeColor %>dd
+            100%);`>
+            <% if (superAdmin && superAdmin.name) { %>
+              <span class="text-sm font-semibold">
+                <%= superAdmin.name.charAt(0).toUpperCase() %>
+              </span>
+              <% } else { %>
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="white" />
+                  <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <% } %>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu"
+          class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 animate-fadeIn">
+          <!-- User Info -->
+          <div class="px-4 py-3 border-b border-gray-100">
+            <p class="text-sm text-gray-500">Signed in as</p>
+            <% if (superAdmin && superAdmin.name) { %>
+              <p class="text-sm font-medium text-gray-900">
+                <%= superAdmin.name %>
+              </p>
+              <% } %>
+                <% if (superAdmin && superAdmin.email) { %>
+                  <p class="text-xs text-gray-600 truncate">
+                    <%= superAdmin.email %>
+                  </p>
+                  <% } %>
+          </div>
+
+
+
+          <!-- Settings Option -->
+          <a href="/admin-dashboard/settings"
+            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+              </path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Settings
+          </a>
+
+          <!-- Logout Option -->
+          <form action="/logout" method="GET" class="border-t border-gray-100">
+            <button type="submit"
+              class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+              <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                </path>
+              </svg>
+              Logout
+            </button>
+          </form>
         </div>
       </div>
     </div>
   </div>
 </header>
+
+<!-- Dropdown Toggle Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const profileBtn = document.getElementById('profileBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    // Toggle dropdown
+    profileBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.add('hidden');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        dropdownMenu.classList.add('hidden');
+      }
+    });
+  });
+</script>
+
+<!-- Add fadeIn animation to your CSS -->
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  /* Ensure dropdown appears above other content */
+  #dropdownMenu {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Smooth hover effect for dropdown items */
+  #dropdownMenu a,
+  #dropdownMenu button {
+    transition: all 0.15s ease;
+  }
+
+  /* Add subtle shadow on hover */
+  #dropdownMenu a:hover,
+  #dropdownMenu button:hover {
+    transform: translateX(2px);
+  }
+</style>

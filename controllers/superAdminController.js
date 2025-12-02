@@ -7,12 +7,29 @@ const AppSettings = require("../models/appSettings");
 
 exports.getDashboard = async (req, res) => {
   try {
+    // Ensure admin is logged in
+    if (!req.user) {
+      return res.redirect("/login");
+    }
+
+    // Get the logged-in super admin details
+    const superAdmin = req.user;
+
+    // Get app settings
     const appSettings = await AppSettings.getSettings();
 
     res.render("layouts/super-admin-dashboard", {
       page: "dashboard",
       title: "Dashboard",
+
+      // Pass super admin info
+      superAdmin,
+
+      // Pass app settings
       appSettings,
+      themeColor: appSettings.themeColor || "#F97316",
+
+      // Dashboard stats
       stats: {
         todayCount: 0,
         totalCount: 4,
@@ -28,6 +45,7 @@ exports.getDashboard = async (req, res) => {
 
 exports.getRestaurants = async (req, res) => {
   try {
+    const appSettings = await AppSettings.getSettings();
     // Find all users with role "Hotel-Admin" (restaurants)
     const restaurants = await User.find({ role: "Hotel-Admin" })
       .sort({ createdAt: -1 })
@@ -36,6 +54,9 @@ exports.getRestaurants = async (req, res) => {
     res.render("layouts/super-admin-dashboard", {
       page: "restaurants",
       title: "Restaurants",
+      superAdmin: req.user,
+      appSettings,
+      themeColor: appSettings.themeColor || "#F97316", // Pass theme color
       restaurants: restaurants, // sending users to view
     });
   } catch (err) {
@@ -90,10 +111,14 @@ exports.addRestaurant = async (req, res) => {
   }
 };
 
-exports.getPayments = (req, res) => {
+exports.getPayments = async (req, res) => {
+  const appSettings = await AppSettings.getSettings();
   res.render("layouts/super-admin-dashboard", {
     page: "payments",
     title: "Payments",
+    superAdmin: req.user,
+    appSettings,
+    themeColor: appSettings.themeColor || "#F97316",
     payments: [
       /* same data you wrote */
     ],
@@ -102,15 +127,21 @@ exports.getPayments = (req, res) => {
 
 exports.getPackages = async (req, res) => {
   const packages = await Package.find().lean();
+  const appSettings = await AppSettings.getSettings();
+
   res.render("layouts/super-admin-dashboard", {
     page: "packages",
     title: "Packages",
+    superAdmin: req.user,
+    appSettings,
+    themeColor: appSettings.themeColor || "#F97316", // Pass theme color
     packages,
   });
 };
 
 exports.addPackage = async (req, res) => {
   try {
+    const appSettings = await AppSettings.getSettings();
     const {
       name,
       monthlyPrice,
@@ -134,7 +165,11 @@ exports.addPackage = async (req, res) => {
       modules: req.body.modules || [],
     });
 
-    res.redirect("/admin-dashboard/packages");
+    res.redirect("/admin-dashboard/packages", {
+      superAdmin: req.user,
+      appSettings,
+      themeColor: appSettings.themeColor || "#F97316",
+    });
   } catch (err) {
     console.log(err);
     res.send("Error adding package");
@@ -144,6 +179,7 @@ exports.addPackage = async (req, res) => {
 exports.updatePackage = async (req, res) => {
   try {
     const id = req.body.packageId;
+    const appSettings = await AppSettings.getSettings();
 
     await Package.findByIdAndUpdate(id, {
       name: req.body.name,
@@ -157,7 +193,11 @@ exports.updatePackage = async (req, res) => {
       modules: Array.isArray(req.body.modules) ? req.body.modules : [],
     });
 
-    res.redirect("/admin-dashboard/packages");
+    res.redirect("/admin-dashboard/packages", {
+      superAdmin: req.user,
+      appSettings,
+      themeColor: appSettings.themeColor || "#F97316",
+    });
   } catch (err) {
     console.log(err);
     res.send("update error");
@@ -181,6 +221,8 @@ exports.getBilling = async (req, res) => {
     const users = await User.find({ role: "Hotel-Admin" }).sort({
       createdAt: -1,
     });
+
+    const appSettings = await AppSettings.getSettings();
 
     // Fetch all purchases and populate package details
     const allPurchases = await Purchase.find()
@@ -238,6 +280,9 @@ exports.getBilling = async (req, res) => {
     res.render("layouts/super-admin-dashboard", {
       page: "billing",
       title: "Billing",
+      superAdmin: req.user,
+      appSettings,
+      themeColor: appSettings.themeColor || "#F97316", // Pass theme color
       payments: payments,
       showRestaurantDetails: false,
       restaurant: null,
@@ -270,6 +315,8 @@ exports.getBilling = async (req, res) => {
 exports.getRestaurantDetails = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    const appSettings = await AppSettings.getSettings();
 
     console.log("=== Restaurant Details Route ===");
     console.log("userId:", userId);
@@ -356,6 +403,11 @@ exports.getRestaurantDetails = async (req, res) => {
     res.render("layouts/super-admin-dashboard", {
       page: "billing",
       title: `Billing - ${restaurant.restaurantName}`,
+      superAdmin: req.user,
+      appSettings,
+      themeColor: appSettings.themeColor || "#F97316",
+      appName: appSettings.appName,
+      appLogo: appSettings.appLogo?.url,
       payments: [],
       showRestaurantDetails: true,
       restaurant: restaurant,
@@ -402,7 +454,9 @@ exports.extendTrial = async (req, res) => {
     await currentPurchase.save();
 
     req.flash("success", `Trial extended by ${days} days`);
-    res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
+    res.redirect(`/admin-dashboard/restaurant/${userId}`, {
+      superAdmin: req.user,
+    }); // Changed redirect
   } catch (error) {
     console.error("Error extending trial:", error);
     req.flash("error", "Error extending trial");
@@ -430,7 +484,9 @@ exports.toggleRestaurantStatus = async (req, res) => {
         restaurant.isActive ? "activated" : "deactivated"
       } successfully`
     );
-    res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
+    res.redirect(`/admin-dashboard/restaurant/${userId}`, {
+      superAdmin: req.user,
+    }); // Changed redirect
   } catch (error) {
     console.error("Error toggling restaurant status:", error);
     req.flash("error", "Error updating restaurant status");
@@ -438,17 +494,25 @@ exports.toggleRestaurantStatus = async (req, res) => {
   }
 };
 
-exports.getOfflineRequest = (req, res) => {
+exports.getOfflineRequest = async (req, res) => {
+  const appSettings = await AppSettings.getSettings();
   res.render("layouts/super-admin-dashboard", {
     page: "offline-request",
     title: "Offline Request",
+    superAdmin: req.user,
+    appSettings,
+    themeColor: appSettings.themeColor || "#F97316",
   });
 };
 
-exports.getLandingSite = (req, res) => {
+exports.getLandingSite = async (req, res) => {
+  const appSettings = await AppSettings.getSettings();
   res.render("layouts/super-admin-dashboard", {
     page: "landing-site",
     title: "Landing Site",
+    superAdmin: req.user,
+    appSettings,
+    themeColor: appSettings.themeColor || "#F97316", // Pass theme color
   });
 };
 
@@ -473,6 +537,7 @@ exports.getSettings = async (req, res) => {
       // NEW: Passing super admin info to EJS
       superAdmin,
 
+      themeColor: settings.themeColor,
       // OLD: AppSettings data
       appSettings: settings,
       emailSettings: settings.emailSettings,
@@ -548,7 +613,7 @@ exports.updateRestaurant = async (req, res) => {
     });
 
     req.flash("success", "Restaurant updated successfully!");
-    res.redirect("/admin-dashboard/restaurants");
+    res.redirect("/admin-dashboard/restaurants", { superAdmin: req.user });
   } catch (error) {
     console.error("Error updating restaurant:", error);
 

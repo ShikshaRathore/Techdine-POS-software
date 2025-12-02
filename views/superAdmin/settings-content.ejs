@@ -3,31 +3,45 @@
   <div class="bg-white rounded-lg shadow-sm overflow-hidden">
     <div class="border-b border-gray-200">
       <nav class="flex -mb-px overflow-x-auto">
+
         <a href="/admin-dashboard/settings?tab=app"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'app' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'app' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           App Settings
         </a>
+
         <a href="/admin-dashboard/settings?tab=email"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'email' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'email' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           Email Settings
         </a>
+
         <a href="/admin-dashboard/settings?tab=language"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'language' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'language' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           Language Settings
         </a>
+
         <a href="/admin-dashboard/settings?tab=payment"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'payment' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'payment' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           Payment Gateways
         </a>
+
         <a href="/admin-dashboard/settings?tab=push"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'push' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'push' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           Push Notification Settings
         </a>
+
         <a href="/admin-dashboard/settings?tab=currencies"
-          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap <%= currentTab === 'currencies' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %>">
+          class="px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap
+          <%= currentTab === 'currencies' ? 'theme-text theme-border' : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300' %>">
           Currencies
         </a>
+
       </nav>
+
     </div>
 
     <div class="p-6">
@@ -43,8 +57,7 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">App Name</label>
                 <input type="text" name="appName" value="<%= appSettings.appName %>"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required />
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
               </div>
 
               <!-- Logo -->
@@ -77,7 +90,7 @@
                 <div class="flex items-center gap-3">
                   <input type="color" name="themeColor" value="<%= appSettings.themeColor %>"
                     class="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer" id="theme-color-input" />
-                  <span id="color-display" class="text-sm text-gray-600">
+                  <span id="color-display" class="text-sm theme-text">
                     <%= appSettings.themeColor %>
                   </span>
                 </div>
@@ -85,9 +98,10 @@
 
               <!-- Submit -->
               <button type="submit"
-                class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                class="px-6 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                 Save Settings
               </button>
+
             </div>
           </form>
         </div>
@@ -103,7 +117,7 @@
               <div class="flex-1">
                 <h3 class="text-lg font-semibold text-gray-900">Remove Logo</h3>
                 <p class="mt-2 text-sm text-gray-600">
-                  Are you sure you want to remove the logo? This will set the logo back to default.
+                  Are you sure you want to remove the logo? This will reset to default.
                 </p>
               </div>
             </div>
@@ -134,84 +148,91 @@
 
                 <form action="/appSettings/email" method="POST">
                   <div class="space-y-6">
+
+                    <!-- From Name -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Mail From Name</label>
                       <input type="text" name="fromName" value="<%= emailSettings.fromName %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- From Email -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Mail From Email</label>
                       <input type="email" name="fromEmail" value="<%= emailSettings.fromEmail %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- Email Queue -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Enable Email Queue</label>
                       <select name="enableQueue"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring">
                         <option value="false" <%=!emailSettings.enableQueue ? 'selected' : '' %>>No</option>
                         <option value="true" <%=emailSettings.enableQueue ? 'selected' : '' %>>Yes</option>
                       </select>
                     </div>
 
+                    <!-- Mail Driver -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Mail Driver</label>
                       <select name="mailDriver"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring">
                         <option value="SMTP" <%=emailSettings.mailDriver==='SMTP' ? 'selected' : '' %>>SMTP</option>
                       </select>
                     </div>
 
+                    <!-- SMTP Host -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">SMTP Host</label>
                       <input type="text" name="smtpHost" value="<%= emailSettings.smtpHost %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- SMTP Port -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">SMTP Port</label>
                       <input type="number" name="smtpPort" value="<%= emailSettings.smtpPort %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- SMTP Username -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Mail Username</label>
                       <input type="text" name="smtpUsername" value="<%= emailSettings.smtpUsername %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- SMTP Password -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Mail Password</label>
                       <input type="password" name="smtpPassword" value="<%= emailSettings.smtpPassword %>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        required />
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" required />
                     </div>
 
+                    <!-- Mail Encryption -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">SMTP Mail Encryption</label>
                       <select name="smtpEncryption"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring">
                         <option value="tls" <%=emailSettings.smtpEncryption==='tls' ? 'selected' : '' %>>TLS</option>
                         <option value="ssl" <%=emailSettings.smtpEncryption==='ssl' ? 'selected' : '' %>>SSL</option>
                       </select>
                     </div>
 
+                    <!-- Buttons -->
                     <div class="flex gap-3">
                       <button type="submit"
-                        class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                        class="px-6 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                         Save Settings
                       </button>
+
                       <button type="button" id="test-smtp-btn"
                         class="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors">
                         Test SMTP
                       </button>
                     </div>
+
                   </div>
                 </form>
           </div>
@@ -220,11 +241,10 @@
             <!-- Language Settings -->
             <div class="space-y-6">
               <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Manage Translations
-                </h3>
+                <h3 class="text-lg font-semibold text-gray-800">Manage Translations</h3>
+
                 <button type="button" id="add-language-btn"
-                  class="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                  class="px-4 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                   Add Language
                 </button>
               </div>
@@ -251,41 +271,53 @@
                         </th>
                       </tr>
                     </thead>
+
                     <tbody class="divide-y divide-gray-200" id="languages-tbody">
                       <% languages.forEach((lang, index)=> { %>
                         <tr class="hover:bg-gray-50">
+
+                          <!-- Language Code -->
                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <%= lang.code %>
                               <input type="hidden" name="languages[<%= index %>][code]" value="<%= lang.code %>" />
                           </td>
+
+                          <!-- Language Name -->
                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <%= lang.name %>
                               <input type="hidden" name="languages[<%= index %>][name]" value="<%= lang.name %>" />
                           </td>
+
+                          <!-- Active Checkbox -->
                           <td class="px-6 py-4 whitespace-nowrap">
                             <input type="checkbox" name="languages[<%= index %>][active]" value="true" <%=lang.active
                               ? 'checked' : '' %>
-                            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                            class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]" />
                           </td>
+
+                          <!-- RTL Checkbox -->
                           <td class="px-6 py-4 whitespace-nowrap">
                             <input type="checkbox" name="languages[<%= index %>][rtl]" value="true" <%=lang.rtl
                               ? 'checked' : '' %>
-                            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                            class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]" />
                           </td>
+
+                          <!-- Delete Button -->
                           <td class="px-6 py-4 whitespace-nowrap">
                             <button type="button" onclick="deleteLanguage('<%= lang.code %>', this)"
                               class="text-red-600 hover:text-red-800">
                               <i class="fas fa-trash"></i>
                             </button>
                           </td>
+
                         </tr>
-                        <% }); %>
+                        <% }) %>
                     </tbody>
                   </table>
                 </div>
 
                 <button type="submit"
-                  class="mt-6 px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                  class="mt-6 px-6 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                   Save Changes
                 </button>
               </form>
@@ -295,6 +327,7 @@
             <div id="add-language-modal"
               class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
               <div class="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
+
                 <div class="flex items-center justify-between">
                   <h3 class="text-lg font-semibold text-gray-900">Add New Language</h3>
                   <button type="button" id="close-language-modal" class="text-gray-400 hover:text-gray-600">
@@ -303,28 +336,29 @@
                 </div>
 
                 <form id="add-language-form" class="space-y-4">
+
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Language Code</label>
                     <input type="text" name="code" placeholder="en, es, fr" required
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                   </div>
 
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Language Name</label>
                     <input type="text" name="name" placeholder="English, Spanish" required
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                   </div>
 
                   <div class="flex items-center gap-4">
                     <label class="flex items-center gap-2">
                       <input type="checkbox" name="active"
-                        class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                        class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]">
                       <span class="text-sm text-gray-700">Active</span>
                     </label>
 
                     <label class="flex items-center gap-2">
                       <input type="checkbox" name="rtl"
-                        class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                        class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]">
                       <span class="text-sm text-gray-700">RTL</span>
                     </label>
                   </div>
@@ -334,10 +368,12 @@
                       class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                       Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+
+                    <button type="submit" class="px-4 py-2 text-white rounded-lg theme-bg theme-hover-bg">
                       Add Language
                     </button>
                   </div>
+
                 </form>
               </div>
             </div>
@@ -346,6 +382,7 @@
             <div id="delete-language-modal"
               class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
               <div class="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
+
                 <div class="flex items-start gap-3">
                   <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
                     <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -354,7 +391,7 @@
                     <h3 class="text-lg font-semibold text-gray-900">Delete Language</h3>
                     <p class="mt-2 text-sm text-gray-600">
                       Are you sure you want to delete <strong id="delete-language-name" class="text-gray-900"></strong>?
-                      This action cannot be undone and will remove all translations for this language.
+                      This action cannot be undone.
                     </p>
                   </div>
                 </div>
@@ -362,7 +399,7 @@
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
                   <i class="fas fa-info-circle text-yellow-600 mt-0.5"></i>
                   <p class="text-xs text-yellow-800">
-                    Users currently using this language will be switched to the default language.
+                    Users using this language will be switched to default language.
                   </p>
                 </div>
 
@@ -371,185 +408,211 @@
                     class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     Cancel
                   </button>
+
                   <button type="button" id="confirm-delete-language"
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
-                    <i class="fas fa-trash"></i>
-                    Delete Language
+                    class="px-4 py-2 text-white rounded-lg bg-red-600 hover:bg-red-700 transition-colors flex items-center gap-2">
+                    <i class="fas fa-trash"></i> Delete Language
                   </button>
                 </div>
+
               </div>
             </div>
 
-            <!-- Success Toast -->
+            <!-- Toasts -->
             <div id="success-toast"
-              class="hidden fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in">
+              class="hidden fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
               <i class="fas fa-check-circle"></i>
               <span id="success-message">Operation successful</span>
             </div>
 
-            <!-- Error Toast -->
             <div id="error-toast"
-              class="hidden fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in">
+              class="hidden fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
               <i class="fas fa-times-circle"></i>
               <span id="error-message">Operation failed</span>
             </div>
+
 
             <% } else if (currentTab==='payment' ) { %>
               <!-- Payment Gateways -->
               <div class="space-y-6 max-w-2xl">
                 <h3 class="text-lg font-semibold text-gray-800">Payment Gateways</h3>
+
                 <p class="text-sm text-gray-600">
                   Enter payment gateway credentials to receive subscription payments.
                 </p>
 
+                <!-- Tabs -->
                 <div class="flex gap-4 border-b border-gray-200 pb-4">
                   <button
-                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-600 border-b-2 border-orange-500">
+                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium theme-text theme-border border-b-2"
+                    style="border-color: var(--theme-color);">
                     <i class="fas fa-credit-card"></i>
                     Razorpay
                   </button>
+
                   <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500">
                     <i class="fab fa-stripe"></i>
                     Stripe
                   </button>
+
                   <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500">
                     <i class="fas fa-money-check"></i>
                     Offline Payment Method
                   </button>
                 </div>
 
+                <!-- Enable Razorpay -->
                 <div class="flex items-center gap-3">
-                  <input type="checkbox" id="enableRazorpay" <%=paymentGateways.razorpay.enabled ? 'checked' : '' %>
-                  class="w-4
-                  h-4
-                  text-orange-500 border-gray-300 rounded focus:ring-orange-500">
-                  <label for="enableRazorpay" class="text-sm font-medium text-gray-700">Enable Razorpay</label>
+                  <input type="checkbox" id="enableRazorpay" <%=paymentGateways.razorpay.enabled ? "checked" : "" %>
+                  class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]" />
+
+                  <label for="enableRazorpay" class="text-sm font-medium text-gray-700">
+                    Enable Razorpay
+                  </label>
                 </div>
 
+                <!-- Select Environment -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Select Environment</label>
-                  <select
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="TEST" <%=paymentGateways.razorpay.environment==='TEST' ? 'selected' : '' %>>TEST
-                    <option value="LIVE" <%=paymentGateways.razorpay.environment==='LIVE' ? 'selected' : '' %>>LIVE
+                  <select name="razorpayEnv"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring">
+                    <option value="TEST" <%=paymentGateways.razorpay.environment==="TEST" ? "selected" : "" %>>
+                      TEST
+                    </option>
+                    <option value="LIVE" <%=paymentGateways.razorpay.environment==="LIVE" ? "selected" : "" %>>
+                      LIVE
                     </option>
                   </select>
                 </div>
 
+                <!-- Test Key -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Test Razorpay KEY</label>
-                  <input type="text" value="<%= paymentGateways.razorpay.testKey %>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <input type="text" name="razorpayTestKey" value="<%= paymentGateways.razorpay.testKey %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                 </div>
 
+                <!-- Test Secret -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Test Razorpay SECRET</label>
-                  <input type="password" value="<%= paymentGateways.razorpay.testSecret %>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <input type="password" name="razorpayTestSecret" value="<%= paymentGateways.razorpay.testSecret %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                 </div>
 
-                <button
-                  class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                <button class="px-6 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                   Save
                 </button>
               </div>
 
+
               <% } else if (currentTab==='push' ) { %>
                 <!-- Push Notifications -->
                 <div class="space-y-6 max-w-2xl">
+
                   <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-800">
                       Push Notification Settings
                     </h3>
+
                     <div class="flex items-center gap-2">
                       <span class="text-sm font-medium text-gray-700">BEAMS</span>
-                      <a href="#" class="text-sm text-blue-600 hover:underline">Generate Credentials</a>
+                      <a href="#" class="text-sm theme-text hover:underline">Generate Credentials</a>
                     </div>
                   </div>
 
+                  <!-- Enable Push Notifications -->
                   <div class="flex items-center gap-3">
-                    <input type="checkbox" id="enablePush" <%=pushNotifications.enabled ? 'checked' : '' %> class="w-4
-                    h-4 text-orange-500 border-gray-300
-                    rounded focus:ring-orange-500">
-                    <label for="enablePush" class="text-sm font-medium text-gray-700">Enable Push Notifications</label>
+                    <input type="checkbox" id="enablePush" <%=pushNotifications.enabled ? "checked" : "" %>
+                    class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]"
+                    />
+
+                    <label for="enablePush" class="text-sm font-medium text-gray-700">
+                      Enable Push Notifications
+                    </label>
                   </div>
 
+                  <!-- Pusher Instance ID -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pusher Instance ID</label>
-                    <input type="text" value="<%= pushNotifications.pusher.instanceId %>"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    <input type="text" name="instanceId" value="<%= pushNotifications.pusher.instanceId %>"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                   </div>
 
+                  <!-- Pusher Beams Secret -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pusher Beams Secret</label>
-                    <input type="text" value="<%= pushNotifications.pusher.beamsSecret %>"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    <input type="text" name="beamsSecret" value="<%= pushNotifications.pusher.beamsSecret %>"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                   </div>
 
-                  <button
-                    class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                  <button class="px-6 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                     Save
                   </button>
-                </div>
 
+                </div>
                 <% } else if (currentTab==='currencies' ) { %>
                   <!-- Currencies -->
                   <div class="space-y-6">
+
                     <div class="flex items-center justify-between">
                       <h3 class="text-lg font-semibold text-gray-800">Currencies</h3>
+
                       <button onclick="openAddCurrencyModal()"
-                        class="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                        class="px-4 py-2 text-white font-medium rounded-lg transition-colors theme-bg theme-hover-bg">
                         <i class="fas fa-plus mr-2"></i>Add Currency
                       </button>
                     </div>
 
+                    <!-- Currency Table -->
                     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
                       <table class="w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                           <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Currency
-                            </th>
+                              Currency</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Code
-                            </th>
+                              Code</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Symbol
-                            </th>
+                              Symbol</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Exchange Rate
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
+                              Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Default
-                            </th>
+                              Default</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Actions
-                            </th>
+                              Actions</th>
                           </tr>
                         </thead>
+
                         <tbody class="divide-y divide-gray-200">
                           <% if (currencies && currencies.length> 0) { %>
+
                             <% currencies.forEach(currency=> { %>
                               <tr class="hover:bg-gray-50">
+
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                   <%= currency.name %>
                                 </td>
+
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                   <%= currency.code %>
                                 </td>
+
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                   <%= currency.symbol %>
                                 </td>
+
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                   <%= currency.exchangeRate %>
                                 </td>
+
+                                <!-- Active / Inactive Badge -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                   <% if (currency.active) { %>
-                                    <span
-                                      class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                                      style="background-color: var(--theme-color); color:white;">
                                       Active
                                     </span>
                                     <% } else { %>
@@ -559,44 +622,57 @@
                                       </span>
                                       <% } %>
                                 </td>
+
+                                <!-- Default Badge -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                   <% if (currency.isDefault) { %>
-                                    <span
-                                      class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                                      style="background-color: var(--theme-color); color:white;">
                                       <i class="fas fa-check mr-1"></i>Default
                                     </span>
                                     <% } else { %>
                                       <span class="text-gray-400">-</span>
                                       <% } %>
                                 </td>
+
+                                <!-- Action Buttons -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                   <div class="flex gap-2">
+
+                                    <!-- Edit Btn -->
                                     <button data-currency='<%- JSON.stringify(currency) %>'
                                       onclick="openEditCurrencyModal(this.getAttribute('data-currency'))"
-                                      class="px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                                      class="px-3 py-1.5 text-[var(--theme-color)] border rounded-lg theme-border hover:bg-gray-50 transition-colors">
                                       <i class="fas fa-edit mr-1"></i>Edit
                                     </button>
+
+                                    <!-- Delete Btn -->
                                     <% if (!currency.isDefault) { %>
                                       <button onclick="deleteCurrency('<%= currency._id %>')"
                                         class="px-3 py-1.5 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors">
                                         <i class="fas fa-trash mr-1"></i>Delete
                                       </button>
                                       <% } else { %>
-                                        <button disabled title="Cannot delete default currency"
+                                        <button disabled
                                           class="px-3 py-1.5 text-gray-400 border border-gray-300 rounded-lg cursor-not-allowed">
                                           <i class="fas fa-trash mr-1"></i>Delete
                                         </button>
                                         <% } %>
+
                                   </div>
                                 </td>
+
                               </tr>
-                              <% }); %>
+                              <% }) %>
+
                                 <% } else { %>
+
                                   <tr>
                                     <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                                       No currencies found. Add your first currency to get started.
                                     </td>
                                   </tr>
+
                                   <% } %>
                         </tbody>
                       </table>
@@ -607,6 +683,7 @@
                   <div id="addCurrencyModal"
                     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
                     <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+
                       <div class="flex items-center justify-between p-6 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Add Currency</h3>
                         <button onclick="closeAddCurrencyModal()" class="text-gray-400 hover:text-gray-600">
@@ -615,50 +692,50 @@
                       </div>
 
                       <form action="/appSettings/currencies/add" method="POST" class="p-6 space-y-4">
+
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Currency Name*</label>
                           <input type="text" name="name" required placeholder="e.g., US Dollar"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Currency Code*</label>
                           <input type="text" name="code" required maxlength="3" placeholder="e.g., USD"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent uppercase">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring uppercase" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Symbol*</label>
                           <input type="text" name="symbol" required placeholder="e.g., $"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Exchange Rate*</label>
                           <input type="number" name="exchangeRate" step="0.000001" min="0" required value="1"
-                            placeholder="e.g., 1"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                           <p class="text-xs text-gray-500 mt-1">Exchange rate relative to base currency</p>
                         </div>
 
                         <div class="flex items-center">
                           <input type="checkbox" name="isDefault" id="addIsDefault" value="true"
-                            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
-                          <label for="addIsDefault" class="ml-2 text-sm text-gray-700">
-                            Set as default currency
-                          </label>
+                            class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]" />
+                          <label for="addIsDefault" class="ml-2 text-sm text-gray-700">Set as default currency</label>
                         </div>
 
                         <div class="flex gap-3 pt-4">
                           <button type="button" onclick="closeAddCurrencyModal()"
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                             Cancel
                           </button>
+
                           <button type="submit"
-                            class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                            class="flex-1 px-4 py-2 text-white rounded-lg transition-colors theme-bg theme-hover-bg">
                             Add Currency
                           </button>
                         </div>
+
                       </form>
                     </div>
                   </div>
@@ -667,6 +744,7 @@
                   <div id="editCurrencyModal"
                     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
                     <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+
                       <div class="flex items-center justify-between p-6 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Edit Currency</h3>
                         <button onclick="closeEditCurrencyModal()" class="text-gray-400 hover:text-gray-600">
@@ -675,35 +753,35 @@
                       </div>
 
                       <form id="editCurrencyForm" method="POST" class="p-6 space-y-4">
+
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Currency Name*</label>
                           <input type="text" name="name" id="editName" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Currency Code*</label>
                           <input type="text" name="code" id="editCode" required maxlength="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent uppercase">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring uppercase" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Symbol*</label>
                           <input type="text" name="symbol" id="editSymbol" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                         </div>
 
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-2">Exchange Rate*</label>
                           <input type="number" name="exchangeRate" id="editExchangeRate" step="0.000001" min="0"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            required class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-focus-ring" />
                           <p class="text-xs text-gray-500 mt-1">Exchange rate relative to base currency</p>
                         </div>
 
                         <div class="flex items-center">
                           <input type="checkbox" name="isDefault" id="editIsDefault" value="true"
-                            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                            class="w-4 h-4 border-gray-300 rounded theme-focus-ring text-[var(--theme-color)]" />
                           <label for="editIsDefault" class="ml-2 text-sm text-gray-700">
                             Set as default currency
                           </label>
@@ -711,14 +789,16 @@
 
                         <div class="flex gap-3 pt-4">
                           <button type="button" onclick="closeEditCurrencyModal()"
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                             Cancel
                           </button>
+
                           <button type="submit"
-                            class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                            class="flex-1 px-4 py-2 text-white rounded-lg transition-colors theme-bg theme-hover-bg">
                             Update Currency
                           </button>
                         </div>
+
                       </form>
                     </div>
                   </div>
@@ -727,45 +807,52 @@
                   <div id="deleteCurrencyModal"
                     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                     <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 animate-fadeIn">
-                      <!-- Warning Icon Header -->
+
+                      <!-- Warning Icon -->
                       <div class="p-6 text-center">
-                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full"
+                          style="background-color: rgba(255, 0, 0, 0.12);">
                           <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
                         </div>
+
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">Delete Currency</h3>
+
                         <p class="text-sm text-gray-600 mb-4">
                           Are you sure you want to delete this currency? This action cannot be undone.
                         </p>
 
-                        <!-- Warning Box -->
-                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <div class="border border-red-200 rounded-lg p-4 mb-6"
+                          style="background-color: rgba(255, 0, 0, 0.08);">
                           <div class="flex items-start">
                             <i class="fas fa-info-circle text-red-600 mt-0.5 mr-3"></i>
                             <div class="text-left">
                               <p class="text-sm font-medium text-red-800 mb-1">Warning</p>
                               <p class="text-xs text-red-700">
-                                Deleting this currency may affect existing transactions and orders that use this
-                                currency.
+                                Deleting this currency may affect transactions using it.
                               </p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <!-- Action Buttons -->
+                      <!-- Button Row -->
                       <div class="bg-gray-50 px-6 py-4 flex gap-3 rounded-b-lg">
                         <button type="button" onclick="closeDeleteModal()"
-                          class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                          class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100">
                           <i class="fas fa-times mr-2"></i>Cancel
                         </button>
+
                         <button type="button" id="confirmDeleteBtn"
-                          class="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors">
+                          class="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700">
                           <i class="fas fa-trash mr-2"></i>Delete Currency
                         </button>
                       </div>
+
                     </div>
                   </div>
+
                   <% } %>
+
     </div>
   </div>
   <script src="/js/superAdminScript/settings-content.js"></script>

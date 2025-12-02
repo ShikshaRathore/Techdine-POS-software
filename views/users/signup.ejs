@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Techdine Sign Up - Image Background UI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 min-h-screen antialiased">
-    <%- include("../includes/flash.ejs") %>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= appName %> - Sign Up
+  </title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen antialiased">
+  <%- include("../includes/flash.ejs") %>
+
     <div class="flex min-h-screen">
-      <!-- Left Side - Hero Section with Background Image -->
-      <div
-        class="hidden lg:flex lg:w-3/5 xl:w-7/12 bg-cover bg-center"
-        style="
-          background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-        "
-      >
-        <div
-          class="w-full h-full p-16 flex flex-col justify-center bg-black/50 text-white"
-        >
+
+      <!-- LEFT SIDE HERO IMAGE -->
+      <div class="hidden lg:flex lg:w-3/5 xl:w-7/12 bg-cover bg-center"
+        style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80');">
+        <div class="w-full h-full p-16 flex flex-col justify-center bg-black/50 text-white">
+
+          <!-- Logo -->
           <div class="flex items-center space-x-3 mb-16">
-            <div class="text-4xl">🍽️</div>
-            <span class="text-3xl font-bold">Techdine</span>
+            <% if (appLogo && appLogo !=='/images/default-logo.png' ) { %>
+              <img src="<%= appLogo %>" class="h-12 w-12 object-contain" />
+              <% } else { %>
+                <div class="text-4xl text-[<%= themeColor %>]">🍽️</div>
+                <% } %>
+
+                  <span class="text-3xl font-bold">
+                    <%= appName %>
+                  </span>
           </div>
 
           <h1 class="text-5xl font-extrabold leading-tight mb-8">
@@ -30,193 +40,98 @@
 
           <ul class="space-y-4 text-xl font-light">
             <li class="flex items-start">
-              <svg
-                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
+              <svg class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span
-                >Streamline <strong>Order Management</strong> and reduce
-                errors.</span
-              >
+              Streamline <strong>Order Management</strong> and reduce errors.
             </li>
+
             <li class="flex items-start">
-              <svg
-                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
+              <svg class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span
-                ><strong>Optimize Table Reservations</strong> for maximum
-                seating capacity.</span
-              >
+              <strong>Optimize Table Reservations</strong> for maximum seating.
             </li>
+
             <li class="flex items-start">
-              <svg
-                class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
+              <svg class="w-6 h-6 text-yellow-300 mt-1 mr-4 flex-shrink-0" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span
-                >Enable <strong>Effortless Menu Management</strong> updates in
-                real-time.</span
-              >
+              Enable <strong>Effortless Menu Management</strong> updates.
             </li>
           </ul>
+
         </div>
       </div>
 
-      <!-- Right Side - Signup Form -->
-      <div
-        class="w-full lg:w-2/5 xl:w-5/12 p-8 md:p-12 flex items-center justify-center bg-gray-100"
-      >
-        <div
-          class="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-200"
-        >
-          <!-- Logo for Mobile -->
+      <!-- RIGHT SIDE SIGNUP FORM -->
+      <div class="w-full lg:w-2/5 xl:w-5/12 p-8 md:p-12 flex items-center justify-center bg-gray-100">
+        <div class="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-200">
+
+          <!-- Mobile Logo -->
           <div class="flex lg:hidden items-center space-x-2 mb-8">
-            <div class="text-3xl text-orange-600">🍽️</div>
-            <span class="text-2xl font-bold text-gray-800">Techdine</span>
+            <% if (appLogo && appLogo !=='/images/default-logo.png' ) { %>
+              <img src="<%= appLogo %>" class="h-10 w-10 object-contain" />
+              <% } else { %>
+                <div class="text-3xl text-[<%= themeColor %>]">🍽️</div>
+                <% } %>
+
+                  <span class="text-2xl font-bold text-gray-800">
+                    <%= appName %>
+                  </span>
           </div>
 
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">
-            Start Your Free Trial
-          </h2>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Start Your Free Trial</h2>
           <p class="text-gray-500 mb-8">
             Create your account to begin optimizing your operations.
           </p>
 
-          <form
-            id="signupForm"
-            method="POST"
-            action="/signup"
-            class="space-y-5"
-          >
-            <div>
-              <input
-                type="text"
-                id="restaurantName"
-                name="restaurantName"
-                required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
-                placeholder="Restaurant Name"
-              />
-              <p
-                class="error-message text-red-500 text-sm mt-1 hidden"
-                id="restaurantNameError"
-              ></p>
-            </div>
-            <div>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
-                placeholder="Your Full Name"
-              />
-              <p
-                class="error-message text-red-500 text-sm mt-1 hidden"
-                id="fullNameError"
-              ></p>
-            </div>
-            <div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
-                placeholder="Enter your email"
-              />
-              <p
-                class="error-message text-red-500 text-sm mt-1 hidden"
-                id="emailError"
-              ></p>
-            </div>
-            <div>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 shadow-sm transition"
-                placeholder="Password"
-              />
-              <p
-                class="error-message text-red-500 text-sm mt-1 hidden"
-                id="passwordError"
-              ></p>
-            </div>
+          <form id="signupForm" method="POST" action="/signup" class="space-y-5">
 
-            <button
-              type="submit"
-              id="submitBtn"
-              class="w-full py-3 px-4 mt-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-orange-300"
-            >
-              <span id="btnText">Next: Branch Details</span>
-              <span id="btnLoader" class="hidden">
-                <svg
-                  class="animate-spin h-5 w-5 mx-auto"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              </span>
+            <input type="text" name="restaurantName" class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                   focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>] shadow-sm"
+              placeholder="Restaurant Name" required />
+
+            <input type="text" name="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                   focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>] shadow-sm"
+              placeholder="Your Full Name" required />
+
+            <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                   focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>] shadow-sm"
+              placeholder="Email Address" required />
+
+            <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                   focus:ring-[<%= themeColor %>] focus:border-[<%= themeColor %>] shadow-sm" placeholder="Password"
+              required />
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" class="w-full py-3 px-4 mt-2 rounded-lg text-white font-semibold shadow-lg
+                   transform hover:scale-[1.01]
+                   bg-[<%= themeColor %>] hover:opacity-90
+                   focus:ring-4 focus:ring-[<%= themeColor %>]">
+              Next: Branch Details
             </button>
+
           </form>
 
           <div class="text-center text-sm mt-6">
             <span class="text-gray-600">Already have an account?</span>
-            <a
-              href="login.html"
-              class="font-semibold text-orange-600 hover:text-orange-700 transition duration-150 ml-1"
-            >
+
+            <a href="/login" class="font-semibold ml-1 text-[<%= themeColor %>] hover:opacity-80">
               Login here
             </a>
           </div>
+
         </div>
       </div>
+
     </div>
-  </body>
+</body>
+
 </html>

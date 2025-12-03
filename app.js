@@ -160,8 +160,11 @@ passport.deserializeUser(async (obj, done) => {
 
 //Flash + locals middleware
 app.use((req, res, next) => {
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
+  const successMsg = req.flash("success");
+  const errorMsg = req.flash("error");
+
+  res.locals.success = successMsg.length > 0 ? successMsg[0] : "";
+  res.locals.error = errorMsg.length > 0 ? errorMsg[0] : "";
   res.locals.currUser = req.user;
   next();
 });

@@ -484,9 +484,7 @@ exports.toggleRestaurantStatus = async (req, res) => {
         restaurant.isActive ? "activated" : "deactivated"
       } successfully`
     );
-    res.redirect(`/admin-dashboard/restaurant/${userId}`, {
-      superAdmin: req.user,
-    }); // Changed redirect
+    res.redirect(`/admin-dashboard/restaurant/${userId}`); // Changed redirect
   } catch (error) {
     console.error("Error toggling restaurant status:", error);
     req.flash("error", "Error updating restaurant status");
@@ -613,7 +611,7 @@ exports.updateRestaurant = async (req, res) => {
     });
 
     req.flash("success", "Restaurant updated successfully!");
-    res.redirect("/admin-dashboard/restaurants", { superAdmin: req.user });
+    res.redirect("/admin-dashboard/restaurants");
   } catch (error) {
     console.error("Error updating restaurant:", error);
 

@@ -1,140 +1,133 @@
-<% if ((locals.success && success.length) || (locals.error && error.length)) { %>
-  <!DOCTYPE html>
-  <html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flash Message</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      @keyframes slideDown {
-        from {
-          transform: translateY(-100%);
-          opacity: 0;
-        }
-
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
+<% if (success || error) { %>
+  <style>
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
       }
 
-      @keyframes fadeOut {
-        from {
-          opacity: 1;
-        }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-        to {
-          opacity: 0;
-        }
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
       }
 
-      .slide-down {
-        animation: slideDown 0.5s ease-out;
+      to {
+        opacity: 0;
       }
+    }
 
-      .fade-out {
-        animation: fadeOut 0.5s ease-out forwards;
-      }
-    </style>
-  </head>
+    .slide-down {
+      animation: slideDown 0.5s ease-out;
+    }
 
-  <body class="bg-gray-100 min-h-screen flex items-start justify-center pt-6">
-    <!-- Success Flash Message -->
-    <% if (locals.success && success.length) { %>
-      <div id="flashMessage"
-        class="slide-down fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
-        <div class="bg-white rounded-lg shadow-2xl border-l-4 border-green-500 p-4 flex items-start space-x-3">
-          <!-- Success Icon -->
-          <div class="flex-shrink-0">
-            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
+    .fade-out {
+      animation: fadeOut 0.5s ease-out forwards;
+    }
+  </style>
 
-          <!-- Message Content -->
-          <div class="flex-1">
-            <h3 class="font-semibold text-gray-900">
-              <%= success %>
-            </h3>
-          </div>
-
-          <!-- Close Button -->
-          <button onclick="closeMessage()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+  <!-- Success Flash Message -->
+  <% if (success) { %>
+    <div id="successMessage"
+      class="slide-down fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+      <div class="bg-white rounded-lg shadow-2xl border-l-4 border-green-500 p-4 flex items-start space-x-3">
+        <!-- Success Icon -->
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
-          <div id="progressBar" class="h-full bg-green-500 transition-all duration-[5000ms] ease-linear w-full"></div>
+        <!-- Message Content -->
+        <div class="flex-1">
+          <h3 class="font-semibold text-gray-900">
+            <%= success %>
+          </h3>
+        </div>
+
+        <!-- Close Button -->
+        <button onclick="closeMessage('successMessage')"
+          class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
+        <div id="successProgressBar" class="h-full bg-green-500 transition-all duration-[5000ms] ease-linear w-full">
         </div>
       </div>
-      <% } %>
+    </div>
+    <% } %>
 
-        <!-- Error Flash Message -->
-        <% if (locals.error && error.length) { %>
-          <div id="flashMessage"
-            class="slide-down fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
-            <div class="bg-white rounded-lg shadow-2xl border-l-4 border-red-500 p-4 flex items-start space-x-3">
-              <!-- Error Icon -->
-              <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-
-              <!-- Message Content -->
-              <div class="flex-1">
-                <h3 class="font-semibold text-gray-900">
-                  <%= error %>
-                </h3>
-              </div>
-
-              <!-- Close Button -->
-              <button onclick="closeMessage()"
-                class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
+      <!-- Error Flash Message -->
+      <% if (error) { %>
+        <div id="errorMessage"
+          class="slide-down fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+          <div class="bg-white rounded-lg shadow-2xl border-l-4 border-red-500 p-4 flex items-start space-x-3">
+            <!-- Error Icon -->
+            <div class="flex-shrink-0">
+              <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
 
-            <!-- Progress Bar -->
-            <div class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
-              <div id="progressBar" class="h-full bg-red-500 transition-all duration-[5000ms] ease-linear w-full"></div>
+            <!-- Message Content -->
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900">
+                <%= error %>
+              </h3>
+            </div>
+
+            <!-- Close Button -->
+            <button onclick="closeMessage('errorMessage')"
+              class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div id="errorProgressBar" class="h-full bg-red-500 transition-all duration-[5000ms] ease-linear w-full">
             </div>
           </div>
-          <% } %>
+        </div>
+        <% } %>
 
-            <script>
-              // Auto-hide after 5 seconds
-              setTimeout(() => {
-                closeMessage();
-              }, 5000);
+          <script>
+            // Animate progress bars
+            setTimeout(() => {
+              const successBar = document.getElementById('successProgressBar');
+              const errorBar = document.getElementById('errorProgressBar');
+              if (successBar) successBar.style.width = '0%';
+              if (errorBar) errorBar.style.width = '0%';
+            }, 100);
 
-              // Animate progress bar
-              setTimeout(() => {
-                document.getElementById("progressBar").style.width = "0%";
-              }, 100);
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+              closeMessage('successMessage');
+              closeMessage('errorMessage');
+            }, 5000);
 
-              function closeMessage() {
-                const msg = document.getElementById("flashMessage");
-                if (msg) {
-                  msg.classList.add("fade-out");
-                  setTimeout(() => {
-                    msg.style.display = "none";
-                  }, 500);
-                }
+            function closeMessage(id) {
+              const msg = document.getElementById(id);
+              if (msg) {
+                msg.classList.add('fade-out');
+                setTimeout(() => {
+                  msg.style.display = 'none';
+                }, 500);
               }
-            </script>
-  </body>
-
-  </html>
-
-  <% } %>
+            }
+          </script>
+          <% } %>

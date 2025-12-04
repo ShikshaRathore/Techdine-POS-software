@@ -1,6 +1,6 @@
 const Branch = require("../models/branch");
 const User = require("../models/user");
-const Permission = require("../models/permission"); // ✅ Import permission model
+const Permission = require("../models/permission");
 const Package = require("../models/package");
 const UserSubscription = require("../models/userSubscription");
 const Purchase = require("../models/purchase");
@@ -76,7 +76,7 @@ module.exports.showSettings = async (req, res) => {
       };
     }
 
-    // ✅ BILLING DATA - Branch-based
+    // BILLING DATA - Branch-based
     const userId = req.user._id;
 
     // Get current package from branch

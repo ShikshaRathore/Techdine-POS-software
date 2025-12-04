@@ -160,18 +160,6 @@ export function initPage() {
     });
   }
 
-  function addTestButton() {
-    const testBtn = document.createElement("button");
-    testBtn.textContent = "🔊 Test Sound";
-    testBtn.className =
-      "fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50";
-    testBtn.onclick = () => {
-      playNotificationSound();
-      showVisualNotification("TF-01", "Top Floor");
-    };
-    document.body.appendChild(testBtn);
-  }
-
   // --- Initialize features ---
   attachRequestClickHandlers();
   addTestButton();
@@ -181,9 +169,5 @@ export function initPage() {
   // Re-check every 5 sec
   setInterval(checkForNewRequests, 5000);
 }
-
-// ❗ DO NOT auto-run initPage()
-// Dashboard script will call it:
-// module.initPage(branchId);
 
 window.showWaiterRequestInit = initPage;

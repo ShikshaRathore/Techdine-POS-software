@@ -227,74 +227,80 @@
             </a>
           </div>
           <!-- Hero-Section -->
-          <%- include("../includes/frontend-setting.ejs", { branch, branches, branchId }) %>
-            <!-- Menu - Check permission -->
-            <% if (hasPermission('menu', 'read' ) || hasPermission('menuItem', 'read' ) ||
-              hasPermission('category', 'read' )) { %>
-              <%- include("../includes/menu.ejs", { branch, branches, branchId }) %>
-                <% } %>
+          <% if (userRole==='Hotel-Admin' ) { %>
+            <%- include("../includes/frontend-setting.ejs", { branch, branches, branchId }) %>
+              <% } %>
+                <!-- Menu - Check permission -->
+                <% if (hasPermission('menu', 'read' ) || hasPermission('menuItem', 'read' ) ||
+                  hasPermission('category', 'read' )) { %>
+                  <%- include("../includes/menu.ejs", { branch, branches, branchId }) %>
+                    <% } %>
 
-                  <!-- Tables - Check permission -->
-                  <% if (hasPermission('table', 'read' ) || hasPermission('area', 'read' )) { %>
-                    <%- include("../includes/tables.ejs", { branch, branches, branchId }) %>
-                      <% } %>
-                        <!-- POS - Check permission -->
-                        <% if (hasPermission('order', 'create' )) { %>
-                          <%- include("../includes/pos.ejs", { branch, branches, branchId }) %>
-                            <% } %>
+                      <!-- Tables - Check permission -->
+                      <% if (hasPermission('table', 'read' ) || hasPermission('area', 'read' )) { %>
+                        <%- include("../includes/tables.ejs", { branch, branches, branchId }) %>
+                          <% } %>
+                            <!-- POS - Check permission -->
+                            <% if (hasPermission('order', 'create' )) { %>
+                              <%- include("../includes/pos.ejs", { branch, branches, branchId }) %>
+                                <% } %>
 
-                              <!-- Orders - Check permission -->
-                              <% if (hasPermission('order', 'read' )) { %>
-                                <%- include("../includes/orders.ejs", { branch, branches, branchId }) %>
-                                  <% } %>
+                                  <!-- Orders - Check permission -->
+                                  <% if (hasPermission('order', 'read' )) { %>
+                                    <%- include("../includes/orders.ejs", { branch, branches, branchId }) %>
+                                      <% } %>
 
-                                    <!-- Waiter Request - Check permission -->
-                                    <% if (hasPermission('waiterRequest', 'read' )) { %>
-                                      <%- include("../includes/waiter-request.ejs", { branch, branches, branchId }) %>
-                                        <% } %>
+                                        <!-- Waiter Request - Check permission -->
+                                        <% if (hasPermission('waiterRequest', 'read' )) { %>
+                                          <%- include("../includes/waiter-request.ejs", { branch, branches, branchId })
+                                            %>
+                                            <% } %>
 
-                                          <!-- Reservations - Check permission -->
-                                          <% if (hasPermission('reservation', 'read' )) { %>
-                                            <%- include("../includes/reservations.ejs", { branch, branches, branchId })
-                                              %>
-                                              <% } %>
+                                              <!-- Reservations - Check permission -->
+                                              <% if (hasPermission('reservation', 'read' )) { %>
+                                                <%- include("../includes/reservations.ejs", { branch, branches, branchId
+                                                  }) %>
+                                                  <% } %>
 
-                                                <!-- Customers - Check permission -->
-                                                <% if (hasPermission('customer', 'read' )) { %>
-                                                  <%- include("../includes/customers.ejs", { branch, branches, branchId
-                                                    }) %>
-                                                    <% } %>
+                                                    <!-- Customers - Check permission -->
+                                                    <% if (hasPermission('customer', 'read' )) { %>
+                                                      <%- include("../includes/customers.ejs", { branch, branches,
+                                                        branchId }) %>
+                                                        <% } %>
 
-                                                      <!-- Staff - Check permission -->
-                                                      <% if (hasPermission('staff', 'read' )) { %>
-                                                        <%- include("../includes/staff.ejs", { branch, branches,
-                                                          branchId }) %>
-                                                          <% } %>
+                                                          <!-- Staff - Check permission -->
+                                                          <% if (hasPermission('staff', 'read' )) { %>
+                                                            <%- include("../includes/staff.ejs", { branch, branches,
+                                                              branchId }) %>
+                                                              <% } %>
 
-                                                            <!-- Delivery Executive - Check permission -->
-                                                            <% if (hasPermission('deliveryExecutive', 'read' )) { %>
-                                                              <%- include("../includes/delivery-executive.ejs") %>
-                                                                <% } %>
+                                                                <!-- Delivery Executive - Check permission -->
+                                                                <% if (hasPermission('deliveryExecutive', 'read' )) { %>
+                                                                  <%- include("../includes/delivery-executive.ejs") %>
+                                                                    <% } %>
 
-                                                                  <!-- Payments - Check permission -->
-                                                                  <% if (hasPermission('payment', 'read' )) { %>
-                                                                    <%- include("../includes/payments.ejs", { branch,
-                                                                      branches, branchId }) %>
-                                                                      <% } %>
+                                                                      <!-- Payments - Check permission -->
+                                                                      <% if (hasPermission('payment', 'read' )) { %>
+                                                                        <%- include("../includes/payments.ejs", {
+                                                                          branch, branches, branchId }) %>
+                                                                          <% } %>
 
-                                                                        <!-- Reports - Check permission -->
-                                                                        <% if (hasPermission('report', 'read' )) { %>
-                                                                          <%- include("../includes/reports.ejs", {
-                                                                            branch, branches, branchId }) %>
-                                                                            <% } %>
+                                                                            <!-- Reports - Check permission -->
+                                                                            <% if (hasPermission('report', 'read' )) {
+                                                                              %>
+                                                                              <%- include("../includes/reports.ejs", {
+                                                                                branch, branches, branchId }) %>
+                                                                                <% } %>
 
-                                                                              <!-- Settings - Check permission -->
-                                                                              <% if (hasPermission('settings', 'read' ))
-                                                                                { %>
-                                                                                <%- include("../includes/settings.ejs",
-                                                                                  { branch, branches, branchId,
-                                                                                  hotelAdmin}) %>
-                                                                                  <% } %>
+                                                                                  <!-- Settings - Check permission -->
+                                                                                  <% if
+                                                                                    (hasPermission('settings', 'read' ))
+                                                                                    { %>
+                                                                                    <%-
+                                                                                      include("../includes/settings.ejs",
+                                                                                      { branch, branches, branchId,
+                                                                                      hotelAdmin}) %>
+                                                                                      <% } %>
         </nav>
         <!-- customer-site -->
         <%- include("../includes/customer-site.ejs", { branch: branch, branches: branches, branchId: branchId , }) %>

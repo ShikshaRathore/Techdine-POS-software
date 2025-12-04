@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders - <%= branch.branchName %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .order-card {
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Mobile Navbar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <button onclick="goBack()" class="text-gray-600 hover:text-gray-900">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-gray-900">My Orders</h1>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>
+                        <%= branch.branchName %>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Session Summary -->
+    <% if (session) { %>
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <div class="max-w-4xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm">Active Session</p>
+                        <h2 class="text-2xl font-bold">Table <%= tableCode %>
+                        </h2>
+                        <p class="text-orange-100 text-sm mt-1">
+                            <%= session.orderCount %> order<%= session.orderCount !==1 ? 's' : '' %> placed
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-orange-100 text-sm">Total Amount</p>
+                        <p class="text-3xl font-bold">$<%= session.totalAmount.toFixed(2) %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+            <!-- Orders List -->
+            <div class="max-w-4xl mx-auto px-4 py-6 pb-24">
+                <% if (orders && orders.length> 0) { %>
+                    <div class="space-y-4">
+                        <% orders.forEach((order, index)=> { %>
+                            <div class="order-card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden fade-in"
+                                style=`animation-delay: <%=index * 0.1 %>s`>
+                                <!-- Order Header -->
+                                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-gray-900">
+                                                <%= order.orderNumber %>
+                                            </h3>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                <%= new Date(order.createdAt).toLocaleString('en-US', { month: 'short' ,
+                                                    day: 'numeric' , year: 'numeric' , hour: '2-digit' ,
+                                                    minute: '2-digit' }) %>
+                                            </p>
+                                        </div>
+                                        <div class="text-right">
+                                            <% let statusClass='bg-gray-100 text-gray-700' ; if (order.status==='KOT' )
+                                                statusClass='bg-yellow-100 text-yellow-800' ; else if
+                                                (order.status==='Billed' ) statusClass='bg-blue-100 text-blue-800' ;
+                                                else if (order.status==='Paid' )
+                                                statusClass='bg-green-100 text-green-800' ; else if
+                                                (order.status==='Cancelled' ) statusClass='bg-red-100 text-red-800' ; %>
+                                                <span class="status-badge <%= statusClass %>">
+                                                    <%= order.status %>
+                                                </span>
+                                                <p class="text-sm text-gray-600 mt-1">
+                                                    <%= order.orderType %>
+                                                </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Order Items -->
+                                <div class="p-4">
+                                    <div class="space-y-3">
+                                        <% order.items.forEach(item=> { %>
+                                            <div class="flex items-center space-x-3">
+                                                <!-- Item Image -->
+                                                <div
+                                                    class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                                                    <% if (item.menuItem?.menuItemImage?.url) { %>
+                                                        <img src="<%= item.menuItem.menuItemImage.url %>"
+                                                            alt="<%= item.menuItem.itemName %>"
+                                                            class="w-full h-full object-cover" />
+                                                        <% } else { %>
+                                                            <div class="w-full h-full flex items-center justify-center">
+                                                                <svg class="w-8 h-8 text-gray-300" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                            </div>
+                                                            <% } %>
+                                                </div>
+
+                                                <!-- Item Details -->
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-start justify-between">
+                                                        <div>
+                                                            <div class="flex items-center space-x-2">
+                                                                <!-- Veg/Non-Veg Indicator -->
+                                                                <% if (item.menuItem?.type==='Veg' ) { %>
+                                                                    <div
+                                                                        class="w-4 h-4 border-2 border-green-600 rounded flex items-center justify-center">
+                                                                        <div
+                                                                            class="w-1.5 h-1.5 rounded-full bg-green-600">
+                                                                        </div>
+                                                                    </div>
+                                                                    <% } else if (item.menuItem?.type==='Non Veg' ) { %>
+                                                                        <div
+                                                                            class="w-4 h-4 border-2 border-red-600 rounded flex items-center justify-center">
+                                                                            <div class="w-1.5 h-1.5 bg-red-600"></div>
+                                                                        </div>
+                                                                        <% } %>
+                                                                            <h4
+                                                                                class="font-semibold text-gray-900 text-sm">
+                                                                                <%= item.menuItem?.itemName
+                                                                                    || 'Unknown Item' %>
+                                                                            </h4>
+                                                            </div>
+                                                            <p class="text-xs text-gray-500 mt-1">Qty: <%= item.quantity
+                                                                    %>
+                                                            </p>
+                                                            <% if (item.notes) { %>
+                                                                <p class="text-xs text-gray-600 mt-1 italic">"<%=
+                                                                        item.notes %>"</p>
+                                                                <% } %>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <p class="font-bold text-gray-900">$<%= (item.price *
+                                                                    item.quantity).toFixed(2) %>
+                                                            </p>
+                                                            <p class="text-xs text-gray-500">$<%= item.price.toFixed(2)
+                                                                    %> each</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+
+                                    <!-- Special Instructions -->
+                                    <% if (order.specialInstructions) { %>
+                                        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <p class="text-xs font-semibold text-yellow-800 mb-1">Special Instructions:
+                                            </p>
+                                            <p class="text-sm text-yellow-900">
+                                                <%= order.specialInstructions %>
+                                            </p>
+                                        </div>
+                                        <% } %>
+
+                                            <!-- Order Total -->
+                                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                                <div class="space-y-2">
+                                                    <% if (order.subtotal) { %>
+                                                        <div class="flex justify-between text-sm text-gray-600">
+                                                            <span>Subtotal</span>
+                                                            <span>$<%= order.subtotal.toFixed(2) %></span>
+                                                        </div>
+                                                        <% } %>
+
+                                                            <% if (order.taxes && order.taxes.length> 0) { %>
+                                                                <% order.taxes.forEach(tax=> { %>
+                                                                    <div
+                                                                        class="flex justify-between text-sm text-gray-600">
+                                                                        <span>
+                                                                            <%= tax.name %> (<%= tax.percentage %>%)
+                                                                        </span>
+                                                                        <span>$<%= tax.amount.toFixed(2) %></span>
+                                                                    </div>
+                                                                    <% }) %>
+                                                                        <% } %>
+
+                                                                            <div
+                                                                                class="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t">
+                                                                                <span>Total</span>
+                                                                                <span>$<%= order.totalAmount.toFixed(2)
+                                                                                        %></span>
+                                                                            </div>
+                                                </div>
+                                            </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                    <% } else { %>
+                        <!-- Empty State -->
+                        <div class="text-center py-16">
+                            <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">No Orders Yet</h3>
+                            <p class="text-gray-500 mb-6">You haven't placed any orders in this session.</p>
+                            <button onclick="goToMenu()"
+                                class="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                                Browse Menu
+                            </button>
+                        </div>
+                        <% } %>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-4">
+                <div class="max-w-4xl mx-auto flex justify-between items-center space-x-4">
+                    <button onclick="goBack()"
+                        class="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                        Back to Menu
+                    </button>
+                    <% if (session && orders.length> 0) { %>
+                        <button onclick="requestBill()"
+                            class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                            Request Bill
+                        </button>
+                        <% } %>
+                </div>
+            </div>
+
+            <script>
+                const branchId = '<%= branch._id %>';
+                const tableId = '<%= tableId || "" %>';
+                const tableCode = '<%= tableCode || "" %>';
+
+                function goBack() {
+                    window.location.href = `/restaurant/${branchId}?table=${tableId}&tableCode=${tableCode}`;
+                }
+
+                function goToMenu() {
+                    window.location.href = `/restaurant/${branchId}?table=${tableId}&tableCode=${tableCode}`;
+                }
+
+                function requestBill() {
+                    if (confirm('Request bill for all orders in this session?')) {
+                        // You can implement bill request functionality here
+                        alert('Bill request sent to staff!');
+                    }
+                }
+
+                // Auto-refresh orders every 30 seconds
+                setInterval(() => {
+                    // Silently reload to get latest order statuses
+                    location.reload();
+                }, 30000);
+            </script>
+</body>
+
+</html>

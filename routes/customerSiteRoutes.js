@@ -1,50 +1,3 @@
-// // routes/customerRoutes.js
-
-// const express = require("express");
-// const router = express.Router();
-// const customerSiteController = require("../controllers/customerSiteController");
-
-// /**
-//  * @route   GET /restaurant/:branchId/info
-//  * @desc    Get branch info for QR code generation
-//  * @access  Public
-//  */
-// router.get("/:branchId/info", customerSiteController.getBranchInfo);
-
-// /**
-//  * @route   GET /restaurant/:branchId/order/:orderId/status
-//  * @desc    Get order status
-//  * @access  Public
-//  */
-// router.get(
-//   "/:branchId/order/:orderId/status",
-//   customerSiteController.getOrderStatus
-// );
-
-// router.get(
-//   "/:branchId/reservations",
-//   customerSiteController.getReservationPage
-// );
-// /**
-//  * @route   POST /restaurant/:branchId/place-order
-//  * @desc    Place a new order
-//  * @access  Public
-//  */
-
-// router.post("/:branchId/place-order", customerSiteController.placeOrder);
-// router.post(
-//   "/:branchId/reservations",
-//   customerSiteController.createReservation
-// );
-// /**
-//  * @route   GET /restaurant/:branchId
-//  * @desc    Display customer dashboard with menu
-//  * @access  Public
-//  */
-// router.get("/:branchId", customerSiteController.getCustomerDashboard);
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/order");
@@ -86,10 +39,16 @@ router.get("/:branchId", async (req, res) => {
       });
     }
 
+    const menuItems = await MenuItem.find({
+      branch: branchId,
+    })
+      .populate("category")
+      .sort({ itemName: 1 });
+
     // Render customer site with session info
     res.render("layouts/customer-dashboard", {
       branch: await Branch.findById(branchId),
-      menuItems: await MenuItem.find({ branch: branchId }),
+      menuItems: menuItems,
       allBranches: await Branch.find(),
       session: sessionData?.session || sessionData || null,
       tableId,
@@ -208,7 +167,7 @@ router.post("/:branchId/place-order", async (req, res) => {
         : null,
     });
 
-    sendNotification(`🛎️ New Order from Table ${tableCode}`);
+    // sendNotification(`🛎️ New Order from Table ${tableCode}`);
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ success: false, message: "Failed to place order" });
@@ -351,6 +310,91 @@ router.get("/:branchId/tables", async (req, res) => {
       message: "Failed to fetch tables",
       error: error.message,
     });
+  }
+});
+
+/**
+ * Get all orders for current session
+ */
+router.get("/:branchId/my-orders", async (req, res) => {
+  try {
+    const { branchId } = req.params;
+    const sessionToken = req.cookies.tableSession;
+    const { tableId } = req.query;
+
+    // Get session details
+    let sessionOrders = [];
+    let session = null;
+
+    if (sessionToken && tableId) {
+      session = await TableSessionService.validateSession(
+        sessionToken,
+        tableId
+      );
+
+      if (session) {
+        const sessionDetails = await TableSessionService.getSessionDetails(
+          session._id
+        );
+
+        // Fetch all orders with populated data
+        sessionOrders = await Order.find({
+          _id: { $in: sessionDetails.orders },
+        })
+          .populate({
+            path: "items.menuItem",
+            select: "itemName price menuItemImage type",
+          })
+          .populate("table", "tableCode")
+          .sort({ createdAt: -1 });
+      }
+    }
+
+    // Render the my-orders page
+    res.render("customer/my-orders", {
+      branch: await Branch.findById(branchId),
+      orders: sessionOrders,
+      session: session
+        ? {
+            id: session._id,
+            totalAmount: session.totalAmount,
+            orderCount: sessionOrders.length,
+            startedAt: session.startedAt,
+          }
+        : null,
+      tableId,
+      tableCode: req.query.tableCode,
+    });
+  } catch (error) {
+    console.error("Error fetching my orders:", error);
+    res.status(500).send("Error loading orders");
+  }
+});
+
+/**
+ * Get order details (for AJAX requests)
+ */
+router.get("/:branchId/order-details/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "items.menuItem",
+        select: "itemName price menuItemImage type preparationTime",
+      })
+      .populate("table", "tableCode");
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+    res.status(500).json({ success: false, message: "Error fetching order" });
   }
 });
 

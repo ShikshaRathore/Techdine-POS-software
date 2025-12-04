@@ -4,6 +4,9 @@ const Reservation = require("./models/reservation.js");
 const WaiterRequest = require("./models/waiterRequest.js");
 const AppSettings = require("./models/appSettings.js");
 
+const TableSession = require("./models/tableSession");
+const Table = require("./models/table");
+
 // 🔹 Middleware 1: Auth check
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -261,10 +264,176 @@ const superAdminAppsettings = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware to validate table access and prevent multiple sessions
+ */
+const validateTableAccess = async (req, res, next) => {
+  try {
+    const { branchId } = req.params;
+    const { table: tableId, tableCode } = req.query;
+
+    // If no table info, continue (will show table selection)
+    if (!tableId || !tableCode) {
+      return next();
+    }
+
+    // Check if table exists and is active
+    const table = await Table.findById(tableId);
+    if (!table || table.status !== "Active") {
+      return res.render("customer/table-unavailable", {
+        message: "This table is not available",
+        tableCode,
+        branchId,
+      });
+    }
+
+    // Check for active session
+    const activeSession = await TableSession.findActiveSession(tableId);
+
+    if (activeSession) {
+      // Get device/session identifier from request
+      const deviceId = req.cookies.deviceId || req.sessionID;
+      const userSession = req.session;
+
+      // Check if this is the SAME user/device trying to access
+      const isSessionOwner =
+        (activeSession.customer &&
+          userSession.customerId &&
+          activeSession.customer.toString() === userSession.customerId) ||
+        activeSession.guestInfo?.deviceId === deviceId;
+
+      if (isSessionOwner) {
+        // Same user - allow access, attach session info
+        req.tableSession = activeSession;
+        req.isSessionOwner = true;
+        return next();
+      } else {
+        // Different user - table is occupied
+        return res.render("customer/table-occupied", {
+          message: "This table is currently in use",
+          tableCode,
+          tableId,
+          branchId,
+          sessionStartedAt: activeSession.startedAt,
+          canRequestNotification: true, // Allow them to request notification when available
+        });
+      }
+    }
+
+    // No active session - allow access
+    next();
+  } catch (error) {
+    console.error("Error validating table access:", error);
+    res.status(500).render("error", {
+      message: "Error validating table access",
+    });
+  }
+};
+
+/**
+ * Middleware to create or retrieve session
+ */
+const ensureTableSession = async (req, res, next) => {
+  try {
+    const { branchId } = req.params;
+    const { table: tableId, tableCode } = req.query;
+
+    if (!tableId) {
+      return next();
+    }
+
+    // Check if session already exists in request (from validateTableAccess)
+    if (req.tableSession) {
+      return next();
+    }
+
+    // Get or create device identifier
+    let deviceId = req.cookies.deviceId;
+    if (!deviceId) {
+      deviceId = `device_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+      res.cookie("deviceId", deviceId, {
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        httpOnly: true,
+      });
+    }
+
+    // Create new session
+    const sessionToken = `session_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+
+    const newSession = new TableSession({
+      table: tableId,
+      branch: branchId,
+      sessionToken,
+      guestInfo: {
+        deviceId,
+        ipAddress: req.ip || req.connection.remoteAddress,
+      },
+      customer: req.session.customerId || null,
+    });
+
+    await newSession.save();
+
+    // Update table availability status
+    await Table.findByIdAndUpdate(tableId, {
+      availabilityStatus: "Occupied",
+    });
+
+    req.tableSession = newSession;
+    req.session.currentTableSession = sessionToken;
+
+    next();
+  } catch (error) {
+    console.error("Error ensuring table session:", error);
+    next(error);
+  }
+};
+
+/**
+ * Check if table is in use before allowing QR scan access
+ */
+const checkTableAvailability = async (req, res, next) => {
+  try {
+    const { table: tableId } = req.query;
+
+    if (!tableId) {
+      return next();
+    }
+
+    const activeSession = await TableSession.findActiveSession(tableId);
+
+    if (activeSession) {
+      const deviceId = req.cookies.deviceId || req.sessionID;
+      const isSessionOwner =
+        (activeSession.customer &&
+          req.session.customerId &&
+          activeSession.customer.toString() === req.session.customerId) ||
+        activeSession.guestInfo?.deviceId === deviceId;
+
+      if (!isSessionOwner) {
+        // Table is occupied by someone else
+        req.isTableOccupied = true;
+        req.occupiedSession = activeSession;
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error checking table availability:", error);
+    next(error);
+  }
+};
+
 // ✅ Export both functions
 module.exports = {
   isLoggedIn,
   attachStatistics,
   isSuperAdmin,
   superAdminAppsettings,
+  validateTableAccess,
+  ensureTableSession,
+  checkTableAvailability,
 };

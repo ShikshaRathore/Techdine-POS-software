@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Error - <%= appName %>
+    <title>Error - <%= appName || 'TechDine' %>
     </title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
-            --theme-color: <%=themeColor %>;
-            --theme-light: color-mix(in srgb, <%=themeColor %> 80%, white);
-            --theme-dark: color-mix(in srgb, <%=themeColor %> 80%, black);
+            --theme-color: <%=themeColor || '#f97316' %>;
+            --theme-light: color-mix(in srgb, <%=themeColor || '#f97316' %> 80%, white);
+            --theme-dark: color-mix(in srgb, <%=themeColor || '#f97316' %> 80%, black);
         }
 
         .theme-text {
@@ -70,14 +70,18 @@
 
             <!-- Error Heading -->
             <h1 class="text-2xl font-bold text-gray-900 mb-3">
-                Oops! Something went wrong
+                <% if (status===404) { %>
+                    Page Not Found
+                    <% } else { %>
+                        Oops! Something went wrong
+                        <% } %>
             </h1>
 
             <!-- Error Message -->
             <div class="mb-6">
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                     <p class="text-sm text-red-800 font-medium">
-                        <%= message %>
+                        <%= message || 'An unexpected error occurred' %>
                     </p>
                 </div>
             </div>
@@ -100,6 +104,21 @@
                 If this problem persists, please contact support
             </p>
 
+            <!-- Dev Mode Error Details -->
+            <% if (error && error.stack) { %>
+                <details class="mt-6 text-left">
+                    <summary class="cursor-pointer text-sm text-gray-600 hover:text-gray-800 font-medium">
+                        🔧 Developer Details
+                    </summary>
+                    <div class="mt-3 bg-gray-900 text-gray-100 p-4 rounded-lg text-left overflow-auto max-h-64">
+                        <p class="text-xs font-mono mb-2 text-orange-400">
+                            Status: <%= status || '500' %>
+                        </p>
+                        <pre class="text-xs font-mono whitespace-pre-wrap"><%= error.stack %></pre>
+                    </div>
+                </details>
+                <% } %>
+
         </div>
 
         <!-- Branding Footer -->
@@ -107,11 +126,11 @@
             <div class="flex items-center justify-center space-x-2">
                 <div class="w-6 h-6 theme-gradient rounded flex items-center justify-center">
                     <span class="text-white font-bold text-xs">
-                        <%= appName ? appName.charAt(0).toUpperCase() : 'T' %>
+                        <%= (appName || 'TechDine' ).charAt(0).toUpperCase() %>
                     </span>
                 </div>
                 <span class="text-sm font-semibold text-gray-700">
-                    <%= appName %>
+                    <%= appName || 'TechDine' %>
                 </span>
             </div>
         </div>

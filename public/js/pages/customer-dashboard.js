@@ -319,11 +319,13 @@ function newOrder() {
   window.location.reload();
 }
 
-// Filter by category
+// Replace the filterByCategory function in customer-dashboard.js with this:
+
 function filterByCategory(category) {
   currentCategory = category;
   applyFilters();
 
+  // Remove active classes from all buttons
   document.querySelectorAll(".category-filter-btn").forEach((btn) => {
     btn.classList.remove(
       "text-orange-500",
@@ -334,17 +336,21 @@ function filterByCategory(category) {
     btn.classList.add("text-gray-500");
   });
 
+  // Find and activate the correct button
   let activeBtn;
   if (category === "all") {
-    activeBtn = document.querySelector(
-      ".category-filter-btn[onclick=\"filterByCategory('all')\"]"
-    );
-  } else {
+    // Find the "Show All" button by its onclick attribute or text content
     activeBtn = Array.from(
       document.querySelectorAll(".category-filter-btn")
-    ).find((btn) => btn.dataset.category === category);
+    ).find((btn) => btn.textContent.trim().startsWith("Show All"));
+  } else {
+    // Find button by data-category attribute
+    activeBtn = document.querySelector(
+      `.category-filter-btn[data-category="${category}"]`
+    );
   }
 
+  // Apply active styles to the selected button
   if (activeBtn) {
     activeBtn.classList.remove("text-gray-500");
     activeBtn.classList.add(
@@ -355,6 +361,11 @@ function filterByCategory(category) {
     );
   }
 }
+
+// Also add this debug function to check if categories are loading:
+document.addEventListener("DOMContentLoaded", function () {
+  updateCart();
+});
 
 // Search items
 function searchItems() {

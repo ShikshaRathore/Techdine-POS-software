@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Table Occupied</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 fade-in">
+        <!-- Icon -->
+        <div class="flex justify-center mb-6">
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-gray-900 text-center mb-3">
+            Table In Use
+        </h1>
+
+        <!-- Message -->
+        <p class="text-gray-600 text-center mb-6">
+            Table <strong class="text-gray-900">
+                <%= tableCode %>
+            </strong> is currently occupied by another customer.
+        </p>
+
+        <!-- Info Box -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Only one session is allowed per table at a time. Please choose another table or wait until this
+                        table becomes available.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Info (Optional) -->
+        <% if (sessionStartedAt) { %>
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Session started:</span>
+                    <span class="text-gray-900 font-medium">
+                        <%= new Date(sessionStartedAt).toLocaleTimeString('en-US', { hour: '2-digit' , minute: '2-digit'
+                            }) %>
+                    </span>
+                </div>
+            </div>
+            <% } %>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <!-- Choose Another Table Button -->
+                    <button onclick="chooseAnotherTable()"
+                        class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Choose Another Table
+                    </button>
+
+                    <!-- Refresh Status Button -->
+                    <button onclick="refreshStatus()"
+                        class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Check Again
+                    </button>
+
+                    <% if (canRequestNotification) { %>
+                        <!-- Notify Me Button -->
+                        <button onclick="requestNotification()"
+                            class="w-full border-2 border-orange-500 text-orange-500 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            Notify Me When Available
+                        </button>
+                        <% } %>
+                </div>
+
+                <!-- Help Text -->
+                <div class="mt-6 pt-6 border-t border-gray-200 text-center">
+                    <p class="text-sm text-gray-500">
+                        Need help?
+                        <a href="/contact" class="text-orange-500 hover:text-orange-600 font-medium">
+                            Contact Support
+                        </a>
+                    </p>
+                </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-4 text-gray-700 font-medium">Checking availability...</p>
+        </div>
+    </div>
+
+    <script>
+        const branchId = '<%= branchId %>';
+        const tableId = '<%= tableId %>';
+        const tableCode = '<%= tableCode %>';
+
+        function chooseAnotherTable() {
+            // Redirect to branch page without table parameters
+            window.location.href = `/restaurant/${branchId}`;
+        }
+
+        async function refreshStatus() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('hidden');
+
+            try {
+                // Check current table status
+                const response = await fetch(
+                    `/restaurant/${branchId}/table-status?tableId=${tableId}`
+                );
+                const data = await response.json();
+
+                if (data.isAvailable) {
+                    // Table is now available - reload with table parameters
+                    window.location.href = `/restaurant/${branchId}?table=${tableId}&tableCode=${tableCode}`;
+                } else {
+                    // Still occupied
+                    loadingOverlay.classList.add('hidden');
+                    showNotification('Table is still in use. Please try again later.');
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+                loadingOverlay.classList.add('hidden');
+                showNotification('Error checking table status. Please try again.');
+            }
+        }
+
+        async function requestNotification() {
+            try {
+                const response = await fetch(
+                    `/restaurant/${branchId}/notify-when-available`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tableId, tableCode }),
+                    }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('You will be notified when this table becomes available!');
+                } else {
+                    showNotification('Unable to set notification. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error requesting notification:', error);
+                showNotification('Error setting up notification.');
+            }
+        }
+
+        function showNotification(message) {
+            // Simple notification - you can enhance this
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 fade-in';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Auto-refresh every 30 seconds
+        let autoRefreshInterval;
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                refreshStatus();
+            }, 30000); // 30 seconds
+        }
+
+        // Start auto-refresh when page loads
+        startAutoRefresh();
+
+        // Stop auto-refresh when page is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(autoRefreshInterval);
+            } else {
+                startAutoRefresh();
+            }
+        });
+    </script>
+</body>
+
+</html>

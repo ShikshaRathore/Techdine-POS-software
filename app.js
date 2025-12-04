@@ -173,7 +173,7 @@ mongoose.connection.once("open", () => {
   console.log("✅ Database connected");
 
   // Start session cleanup
-  startSessionCleanup();
+  startSessionCleanup(30, 120);
 });
 
 // ------------- Middlewares --------------
@@ -200,7 +200,7 @@ app.get("/", async (req, res) => {
   res.render("layouts/index.ejs", { settings, currUser: req.user });
 });
 
-app.get("/Techdine", async (req, res) => {
+app.get("/techdine", async (req, res) => {
   const settings = await appSettings.getSettings();
   res.render("layouts/index.ejs", { settings, currUser: req.user });
 });
@@ -502,31 +502,6 @@ app.get("/add-branch", isLoggedIn, async (req, res) => {
     themeColor: settings.themeColor,
   });
 });
-
-// ========== ADD BRANCH ROUTE ==========
-// app.post("/add-branch", isLoggedIn, async (req, res) => {
-//   try {
-//     const { branchName, country, address, branchHead } = req.body;
-//     const ownerId = req.user._id;
-
-//     const newBranch = new Branch({
-//       branchName,
-//       country,
-//       address: address,
-//       owner: ownerId,
-//       branchHead: branchHead || null,
-//     });
-
-//     await newBranch.save();
-//     req.flash("success", "New Branch Created Successfully!");
-//     // ✅ Redirect to the new branch dashboard
-//     res.redirect(`/dashboard/${newBranch._id}`);
-//   } catch (err) {
-//     console.error(err);
-//     req.flash("error", "Failed to create branch!");
-//     res.redirect("/add-branch");
-//   }
-// });
 
 app.post("/add-branch", isLoggedIn, async (req, res) => {
   try {
@@ -2129,147 +2104,6 @@ function generateReceiptTemplate(order) {
   `;
 }
 
-// -------------------------- Customer Dashboard----------------------------------//
-
-// app.get("/customer-dashboard/:id", async (req, res) => {
-//   try {
-//     const branchId = req.params.id;
-
-//     // Find branch by ID
-//     const branch = await Branch.findById(branchId);
-//     if (!branch) {
-//       req.flash("error", "Branch not found!");
-//       return res.redirect("/dashboard");
-//     }
-
-//     // Find menu for this branch
-//     const menu = await Menu.findOne({ branch: branchId });
-
-//     // Find all menu items for this branch, populate category
-//     const menuItems = await MenuItem.find({ branch: branchId })
-//       .populate("category")
-//       .populate("menu")
-//       .sort({ category: 1, itemName: 1 }); // Sort by category, then name
-
-//     res.render("./layouts/customer-dashboard.ejs", {
-//       branch,
-//       menu,
-//       menuItems,
-//     });
-//   } catch (err) {
-//     console.error("Error loading customer dashboard:", err);
-//     req.flash("error", "Failed to load customer dashboard!");
-//     res.redirect("/dashboard");
-//   }
-// });
-
-// // Add this route BEFORE your app.listen() line in app.js
-
-// app.post("/api/customer/place-order", async (req, res) => {
-//   try {
-//     const { branchId, orderType, items, totalAmount, specialInstructions } =
-//       req.body;
-
-//     // Validate required fields
-//     if (
-//       !branchId ||
-//       !orderType ||
-//       !items ||
-//       items.length === 0 ||
-//       !totalAmount
-//     ) {
-//       return res.status(400).json({
-//         success: false,
-//         error: "Missing required fields",
-//       });
-//     }
-
-//     // Validate branch exists
-//     const branch = await Branch.findById(branchId);
-//     if (!branch) {
-//       return res.status(404).json({
-//         success: false,
-//         error: "Branch not found",
-//       });
-//     }
-
-//     // Generate unique order number
-//     const orderCount = await Order.countDocuments({ branch: branchId });
-//     const orderNumber = `${orderCount + 1}`;
-
-//     // Create the order
-//     const newOrder = new Order({
-//       orderNumber: orderNumber,
-//       branch: branchId,
-//       orderType: orderType,
-//       items: items,
-//       totalAmount: totalAmount,
-//       specialInstructions: specialInstructions || "",
-//       status: "KOT",
-//       paymentStatus: "Unpaid",
-//       kotGenerated: true,
-//       customer: req.user?._id || null, // If user is logged in
-//     });
-
-//     await newOrder.save();
-
-//     // Generate KOT number
-//     const kotCount = await KOT.countDocuments({ branch: branchId });
-//     const kotNumber = `KOT-${kotCount + 1}`;
-
-//     // Create KOT
-//     const newKOT = new KOT({
-//       kotNumber: kotNumber,
-//       order: newOrder._id,
-//       branch: branchId,
-//       items: items.map((item) => ({
-//         menuItem: item.menuItem,
-//         quantity: item.quantity,
-//         notes: specialInstructions || "",
-//       })),
-//       status: "In Kitchen",
-//       createdBy: req.user?._id || newOrder._id, // Use order ID if customer not logged in
-//       createdByModel: "Customer",
-//       startedAt: new Date(),
-//     });
-
-//     await newKOT.save();
-
-//     // Populate order details for response
-//     await newOrder.populate("items.menuItem");
-
-//     console.log("✅ Order Created:", newOrder.orderNumber);
-//     console.log("✅ KOT Created:", newKOT.kotNumber);
-
-//     res.json({
-//       success: true,
-//       message: "Order placed successfully!",
-//       order: {
-//         _id: newOrder._id,
-//         orderNumber: newOrder.orderNumber,
-//         orderType: newOrder.orderType,
-//         totalAmount: newOrder.totalAmount,
-//         status: newOrder.status,
-//         items: newOrder.items,
-//         createdAt: newOrder.createdAt,
-//       },
-//       kot: {
-//         _id: newKOT._id,
-//         kotNumber: newKOT.kotNumber,
-//         status: newKOT.status,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("❌ Error placing order:", error);
-//     res.status(500).json({
-//       success: false,
-//       error: "Failed to place order. Please try again.",
-//     });
-//   }
-// });
-
-// -------------------------- Customer Dashboard----------------------------------//
-
 // -----------------Staff----------------
 
 // GET - Display staff list page for specific branch
@@ -2558,7 +2392,7 @@ app.get("/logout", (req, res) => {
       return next(err);
     }
     req.flash("success", "User logged Out!");
-    res.redirect("/Techdine");
+    res.redirect("/techdine");
   });
 });
 
@@ -2569,9 +2403,12 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   let { statusCode = 500, message = "Something Went Wrong!!" } = err;
   res.status(statusCode).render("./includes/error.ejs", {
+    status: statusCode,
+    statusCode: statusCode,
     message,
     themeColor: res.locals.themeColor,
     appLogo: res.locals.appLogo,
+    appName: res.locals.appName,
   });
 });
 

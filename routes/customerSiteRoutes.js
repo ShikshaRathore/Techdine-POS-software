@@ -167,7 +167,7 @@ router.post("/:branchId/place-order", async (req, res) => {
         : null,
     });
 
-    // sendNotification(`🛎️ New Order from Table ${tableCode}`);
+    sendNotification(`🛎️ New Order from Table ${tableCode}`);
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ success: false, message: "Failed to place order" });
